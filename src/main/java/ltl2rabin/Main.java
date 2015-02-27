@@ -5,6 +5,7 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("Main method stub");
+        System.out.println("1+1=2");
     }
 
     /* Not working trivial attempt to create a parser. Does not recognize operator priorities.
