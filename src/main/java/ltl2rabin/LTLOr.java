@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import java.util.Collection;
+
 /**
  * This class represents a logical disjunction (|) in an LTL formula.
  */
@@ -25,5 +27,10 @@ public class LTLOr extends LTLFormula {
     @Override
     public String toString() {
         return "(" + left.toString() + " | " + right.toString() + ")";
+    }
+
+    @Override
+    public LTLFormula after(Collection<String> tokens) {
+        return new LTLOr(left.after(tokens), right.after(tokens));
     }
 }

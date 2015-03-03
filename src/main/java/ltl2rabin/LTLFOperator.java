@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import java.util.Collection;
+
 /**
  * This class represents the F (finally) operator in LTL.
  */
@@ -25,5 +27,10 @@ public class LTLFOperator extends LTLFormula {
     @Override
     public String toString() {
         return "F " + operand.toString();
+    }
+
+    @Override
+    public LTLFormula after(Collection<String> tokens) {
+        return new LTLOr(this, this.operand.after(tokens));
     }
 }

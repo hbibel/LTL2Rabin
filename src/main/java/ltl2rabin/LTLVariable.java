@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import java.util.Collection;
+
 /**
  * Represents a variable (string) with an optional negation ('!') in an LTL Formula.
  */
@@ -45,5 +47,10 @@ public class LTLVariable extends LTLFormula {
     public String toString() {
         if (negated) return "!" + value;
         else return value;
+    }
+
+    @Override
+    public LTLFormula after(Collection<String> tokens) {
+        return new LTLBoolean(negated != (tokens.contains(value)));
     }
 }

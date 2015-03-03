@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import java.util.Collection;
+
 /**
  * This class represents the G (globally) operator in LTL.
  */
@@ -25,5 +27,10 @@ public class LTLGOperator extends LTLFormula {
     @Override
     public String toString() {
         return "G " + operand.toString();
+    }
+
+    @Override
+    public LTLFormula after(Collection<String> tokens) {
+        return new LTLAnd(this, operand.after(tokens));
     }
 }

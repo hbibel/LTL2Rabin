@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import java.util.Collection;
+
 /**
  * Represents a boolean value in an LTL formula (true or false)
  */
@@ -21,5 +23,10 @@ public class LTLBoolean extends LTLFormula {
     @Override
     public String toString() {
         if (value) return "tt"; else return "ff";
+    }
+
+    @Override
+    public LTLFormula after(Collection<String> tokens) {
+        return this;
     }
 }

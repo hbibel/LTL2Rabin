@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import java.util.Collection;
+
 /**
  * This class represents the U (until) operator in an LTL formula.
  */
@@ -25,5 +27,10 @@ public class LTLUOperator extends LTLFormula {
     @Override
     public String toString() {
         return "(" + left.toString() + " U " + right.toString() + ")";
+    }
+
+    @Override
+    public LTLFormula after(Collection<String> tokens) {
+        return new LTLOr(right.after(tokens), new LTLAnd(left.after(tokens), this));
     }
 }
