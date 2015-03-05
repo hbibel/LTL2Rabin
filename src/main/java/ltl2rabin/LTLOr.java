@@ -1,22 +1,27 @@
 package ltl2rabin;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
  * This class represents a logical disjunction (|) in an LTL formula.
  */
 public class LTLOr extends LTLFormula {
-    private LTLFormula left;
-    private LTLFormula right;
+    private ArrayList<LTLFormula> disjuncts;
 
     /**
      * The only valid constructor for LTLOr
-     * @param left The LTLFormula left of the disjunction
-     * @param right The LTLFormula right of the disjunction
+     * @param disjuncts The LTL formulae that are connected by the disjunction
      */
-    public LTLOr(LTLFormula left, LTLFormula right) {
-        this.left = left;
-        this.right = right;
+    public LTLOr(ArrayList<LTLFormula> disjuncts) {
+        this.disjuncts = disjuncts;
+    }
+
+    public LTLOr(LTLFormula l, LTLFormula r) {
+        ArrayList<LTLFormula> params = new ArrayList<>();
+        params.add(l);
+        params.add(r);
+        disjuncts = params;
     }
 
     public LTLOr() {
@@ -26,11 +31,19 @@ public class LTLOr extends LTLFormula {
 
     @Override
     public String toString() {
-        return "(" + left.toString() + " | " + right.toString() + ")";
+        String result = "(";
+        for (LTLFormula f : disjuncts) {
+            result = result + f.toString() + ", ";
+        }
+        return result.substring(0, result.length()-1) + ")";
     }
 
     @Override
     public LTLFormula after(Collection<String> tokens) {
-        return new LTLOr(left.after(tokens), right.after(tokens));
+        ArrayList<LTLFormula> result = new ArrayList<LTLFormula>();
+        for (LTLFormula f : disjuncts) {
+            result.add(f.after(tokens));
+        }
+        return new LTLOr(result);
     }
 }

@@ -1,5 +1,6 @@
 package ltl2rabin;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -31,6 +32,9 @@ public class LTLFOperator extends LTLFormula {
 
     @Override
     public LTLFormula after(Collection<String> tokens) {
-        return new LTLOr(this, this.operand.after(tokens));
+        ArrayList<LTLFormula> orParameter = new ArrayList<>();
+        orParameter.add(this);
+        orParameter.add(this.operand.after(tokens));
+        return new LTLOr(orParameter);
     }
 }

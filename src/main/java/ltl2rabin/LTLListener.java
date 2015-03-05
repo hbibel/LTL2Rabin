@@ -3,158 +3,138 @@ package ltl2rabin;
 import ltl2rabin.parser.LTLBaseListener;
 import ltl2rabin.parser.LTLParser;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.TerminalNode;
+import org.antlr.v4.runtime.tree.ParseTree;
+
+import java.util.ArrayList;
 
 public class LTLListener extends LTLBaseListener {
-    LTLFormula LTLTree;
+    LTLFormula ltlTree;
     LTLParser parser;
+
+    /* This is not a very pretty solution. Initially I had this:
+    @Override
+    public void exitEveryRule(ParserRuleContext ctx) {
+        if (null == ctx.getParent()) {
+            // null == ctx.getParent() means that this node is the root node of the parse tree that antlr generated
+            // for us. Now we can create the LTL Tree.
+            ltlTree = createLTLFormula(ctx);
+
+        }
+        super.exitEveryRule(ctx);
+    }
+     * but then I realized that the parent node doesn't get visited in all cases (for example, it is not visited when
+     * I parse "a U c"). So for now, the exitEveryRule method searches for the parent node the first time it is called,
+     * then sets the "done" flag and calls the createLTLFormula method.
+     */
+    private boolean done = false;
 
     public LTLListener(LTLParser parser) {
         this.parser = parser;
     }
 
     @Override
-    public void enterFormulaf(LTLParser.FormulafContext ctx) {
-        super.enterFormulaf(ctx);
-    }
-
-    @Override
-    public void exitFormulaf(LTLParser.FormulafContext ctx) {
-        if (null == ctx.getParent()) {
-            System.out.println("This F right here is the parent node.");
-            System.out.println(ctx.getText());
-
-        }
-        super.exitFormulaf(ctx);
-    }
-
-    @Override
-    public void enterFormulag(LTLParser.FormulagContext ctx) {
-        if (null == ctx.getParent()) {
-            System.out.println("This G right here is the parent node.");
-        }
-        super.enterFormulag(ctx);
-    }
-
-    @Override
-    public void exitFormulag(LTLParser.FormulagContext ctx) {
-        super.exitFormulag(ctx);
-    }
-
-    @Override
-    public void enterFormulax(LTLParser.FormulaxContext ctx) {
-        if (null == ctx.getParent()) {
-            System.out.println("This X right here is the parent node.");
-        }
-        super.enterFormulax(ctx);
-    }
-
-    @Override
-    public void exitFormulax(LTLParser.FormulaxContext ctx) {
-        super.exitFormulax(ctx);
-    }
-
-    @Override
-    public void enterFormulaorformula(LTLParser.FormulaorformulaContext ctx) {
-        super.enterFormulaorformula(ctx);
-    }
-
-    @Override
-    public void exitFormulaorformula(LTLParser.FormulaorformulaContext ctx) {
-        super.exitFormulaorformula(ctx);
-    }
-
-    @Override
-    public void enterFormulaatom(LTLParser.FormulaatomContext ctx) {
-        super.enterFormulaatom(ctx);
-    }
-
-    @Override
-    public void exitFormulaatom(LTLParser.FormulaatomContext ctx) {
-        super.exitFormulaatom(ctx);
-    }
-
-    @Override
-    public void enterFormulainparentheses(LTLParser.FormulainparenthesesContext ctx) {
-        super.enterFormulainparentheses(ctx);
-    }
-
-    @Override
-    public void exitFormulainparentheses(LTLParser.FormulainparenthesesContext ctx) {
-        super.exitFormulainparentheses(ctx);
-    }
-
-    @Override
-    public void enterOrformula(LTLParser.OrformulaContext ctx) {
-        super.enterOrformula(ctx);
-    }
-
-    @Override
-    public void exitOrformula(LTLParser.OrformulaContext ctx) {
-        super.exitOrformula(ctx);
-    }
-
-    @Override
-    public void enterAndformula(LTLParser.AndformulaContext ctx) {
-        super.enterAndformula(ctx);
-    }
-
-    @Override
-    public void exitAndformula(LTLParser.AndformulaContext ctx) {
-        super.exitAndformula(ctx);
-    }
-
-    @Override
-    public void enterUformula(LTLParser.UformulaContext ctx) {
-        super.enterUformula(ctx);
-    }
-
-    @Override
-    public void exitUformula(LTLParser.UformulaContext ctx) {
-        super.exitUformula(ctx);
-    }
-
-    @Override
-    public void enterAtom(LTLParser.AtomContext ctx) {
-        super.enterAtom(ctx);
-    }
-
-    @Override
-    public void exitAtom(LTLParser.AtomContext ctx) {
-        if(null != ctx.Identifier()) {
-            boolean negated = false;
-            String name = ctx.Identifier().getText();
-            if (name.startsWith("!")) {
-                negated = true;
-                name = name.substring(1);
-            }
-            LTLVariable var = new LTLVariable(name, negated);
-            System.out.println("Created variable var=" + var.toString());
-        }
-        if (null != ctx.Boolean()) {
-            // Create boolean here
-        }
-        super.exitAtom(ctx);
-    }
-
-    @Override
-    public void enterEveryRule(ParserRuleContext ctx) {
-        super.enterEveryRule(ctx);
-    }
-
-    @Override
     public void exitEveryRule(ParserRuleContext ctx) {
+        if (!done) {
+            done = true;
+            ltlTree = createLTLFormula(findRoot(ctx));
+        }
         super.exitEveryRule(ctx);
     }
 
-    @Override
-    public void visitTerminal(TerminalNode node) {
-        super.visitTerminal(node);
+    private ParseTree findRoot(ParseTree ctx) {
+        // null == ctx.getParent() means that this node is the root node of the parse tree that antlr generated
+        // for us.
+        if (null == ctx.getParent()) return ctx;
+        else return findRoot(ctx.getParent());
     }
 
-    @Override
-    public void visitErrorNode(ErrorNode node) {
-        super.visitErrorNode(node);
+    /**
+     * This function takes a node from the parse tree generated by antlr, creates a node of type LTLFormula and
+     * calls itself on the child nodes again, thus creating the sub-tree rooting from ctx
+     *
+     * @param ctx The object representing the node in the parse tree generated by antlr. Its type either is ParseTree
+     *            or one of its implementing classes (e.g. ParserRuleContext)
+     * @return The node of the LTL tree; its type is not LTLFormula but one of its subtypes
+     */
+    private LTLFormula createLTLFormula(ParseTree ctx) {
+        if (ctx instanceof LTLParser.FormulafContext) {
+            return new LTLFOperator(createLTLFormula(ctx.getChild(1)));
+        }
+        else if (ctx instanceof  LTLParser.FormulagContext) {
+            return new LTLGOperator(createLTLFormula(ctx.getChild(1)));
+        }
+        else if (ctx instanceof LTLParser.FormulaxContext) {
+            return new LTLXOperator(createLTLFormula(ctx.getChild(1)));
+        }
+        else if (ctx instanceof LTLParser.FormulaorformulaContext) {
+            return createLTLFormula(ctx.getChild(0));
+        }
+        else if (ctx instanceof LTLParser.OrformulaContext) {
+            // If there's only one child, it's not really a disjunction.
+            if (((LTLParser.OrformulaContext) ctx).children.size() == 1) {
+                return createLTLFormula(ctx.getChild(0));
+            }
+            // The relevant children are at indices 0, 2, 4, ...
+            else {
+                ArrayList<LTLFormula> formulae = new ArrayList<>();
+                for (int i=0; i < ((LTLParser.OrformulaContext) ctx).children.size(); i=i+2) {
+                    formulae.add(createLTLFormula(ctx.getChild(i)));
+                }
+                return new LTLOr(formulae);
+            }
+        }
+        else if (ctx instanceof LTLParser.AndformulaContext) {
+            // If there's only one child, it's not really a disjunction.
+            if (((LTLParser.AndformulaContext) ctx).children.size() == 1) {
+                return createLTLFormula(ctx.getChild(0));
+            }
+            // The relevant children are at indices 0, 2, 4, ...
+            else {
+                ArrayList<LTLFormula> formulae = new ArrayList<>();
+                for (int i=0; i < ((LTLParser.AndformulaContext) ctx).children.size(); i=i+2) {
+                    formulae.add(createLTLFormula(ctx.getChild(i)));
+                }
+                return new LTLAnd(formulae);
+            }
+        }
+        else if (ctx instanceof LTLParser.UformulaContext) {
+            // If there's only one child, it's an atom.
+            if (((LTLParser.UformulaContext) ctx).children.size() == 1) {
+                return createLTLFormula(ctx.getChild(0));
+            }
+            // The relevant children are at indices 0 and 2. Unlike AND and OR, U is a strictly binary operator.
+            else {
+                return new LTLUOperator(createLTLFormula(ctx.getChild(0)), createLTLFormula(ctx.getChild(2)));
+            }
+        }
+        else if (ctx instanceof LTLParser.AtomContext) {
+            if (((LTLParser.AtomContext) ctx).children.size() == 3) {
+                // If the atom has 3 children, it is a formula within parentheses. Child 0 is '(' and child 2 is ')'.
+                return createLTLFormula(ctx.getChild(1));
+            }
+            else {
+                if (null != ((LTLParser.AtomContext) ctx).Boolean()) {
+                    if (((LTLParser.AtomContext) ctx).Boolean().getText().equals("tt")) {
+                        return new LTLBoolean(true);
+                    }
+                    else {
+                        return new LTLBoolean(false);
+                    }
+                }
+                else {
+                    // ctx is a terminal symbol, but no boolean
+                    String text = ((LTLParser.AtomContext) ctx).Identifier().getText();
+                    if (text.charAt(0) == '!') {
+                        return new LTLVariable(text.substring(1), true);
+                    }
+                    else return new LTLVariable(text);
+                }
+            }
+        }
+        return null;
+    }
+
+    public LTLFormula getLtlTree() {
+        return ltlTree;
     }
 }
