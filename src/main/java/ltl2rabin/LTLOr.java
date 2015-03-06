@@ -33,9 +33,10 @@ public class LTLOr extends LTLFormula {
     public String toString() {
         String result = "(";
         for (LTLFormula f : disjuncts) {
-            result = result + f.toString() + ", ";
+            result = result + f.toString() + " | ";
         }
-        return result.substring(0, result.length()-1) + ")";
+        // cut the last | and close the parentheses
+        return result.substring(0, result.length()-3) + ")";
     }
 
     @Override

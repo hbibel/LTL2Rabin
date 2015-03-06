@@ -32,9 +32,9 @@ public class LTLAnd extends LTLFormula {
     public String toString() {
         String result = "(";
         for (LTLFormula f : conjuncts) {
-            result = result + f.toString() + ", ";
+            result = result + f.toString() + " & ";
         }
-        return result.substring(0, result.length()-1) + ")";
+        return result.substring(0, result.length()-3) + ")";
     }
 
     @Override

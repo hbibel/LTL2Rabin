@@ -52,18 +52,16 @@ public class LTLListenerTest {
         LTLFormula testCase3 = testEnterFormulaHelp("(a | b)");
         assertEquals(expectedTestResult3.toString(), testCase3.toString());
 
-        LTLVariable ol4 = new LTLVariable("b");
-        LTLVariable or4 = new LTLVariable("c");
         ArrayList<LTLFormula> op4 = new ArrayList<>();
-        op4.add(ol4);
-        op4.add(or4);
-        LTLOr boc4 = new LTLOr(op4);
-        LTLOr expectedTestResult4 = new LTLOr(new LTLVariable("a"), boc4);
+        op4.add(new LTLVariable("a"));
+        op4.add(new LTLVariable("b"));
+        op4.add(new LTLVariable("c"));
+        LTLOr expectedTestResult4 = new LTLOr(op4);
         LTLFormula testCase4 = testEnterFormulaHelp("a | b | c");
         assertEquals(expectedTestResult4.toString(), testCase4.toString());
 
-        LTLUOperator buc5 = new LTLUOperator(new LTLVariable("b"), new LTLVariable("c"));
-        LTLOr expectedTestResult5 = new LTLOr(new LTLVariable("a"), buc5);
+        LTLUOperator aub5 = new LTLUOperator(new LTLVariable("a"), new LTLVariable("b"));
+        LTLOr expectedTestResult5 = new LTLOr(aub5, new LTLVariable("c"));
         LTLFormula testCase5 = testEnterFormulaHelp("(a U b | c)");
         assertEquals(expectedTestResult5.toString(), testCase5.toString());
 
@@ -80,7 +78,7 @@ public class LTLListenerTest {
         LTLGOperator gaobucanaubuxc = new LTLGOperator(aobucanaubuxc);
         LTLFOperator fgaobucanaubuxc = new LTLFOperator(gaobucanaubuxc);
         LTLFOperator expectedTestResult999 = fgaobucanaubuxc;
-        LTLFormula testCase999 = testEnterFormulaHelp("F G (a | b U c) & !a U (b U X c)");
+        LTLFormula testCase999 = testEnterFormulaHelp("F G (a | b U c) & !a U (b U (X c))");
         assertEquals(expectedTestResult999.toString(), testCase999.toString());
     }
 }
