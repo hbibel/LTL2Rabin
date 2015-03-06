@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import java.util.Collection;
+
 /**
  * This class represents the X (next) operator in LTL.
  */
@@ -25,5 +27,10 @@ public class LTLXOperator extends LTLFormula {
     @Override
     public String toString() {
         return "X" + operand.toString();
+    }
+
+    @Override
+    public LTLFormula after(Collection<String> tokens) {
+        return operand;
     }
 }

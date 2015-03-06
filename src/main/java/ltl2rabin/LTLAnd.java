@@ -1,20 +1,27 @@
 package ltl2rabin;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 /**
  * This class represents a logical conjunction (&) in an LTL formula.
  */
 public class LTLAnd extends LTLFormula {
-    private LTLFormula left;
-    private LTLFormula right;
+    private ArrayList<LTLFormula> conjuncts;
 
     /**
      * The only valid constructor for LTLAnd
-     * @param left The LTLFormula left of the conjunction
-     * @param right The LTLFormula right of the conjunction
+     * @param conjuncts The LTL formulae that are connected by the conjunction
      */
-    public LTLAnd(LTLFormula left, LTLFormula right) {
-        this.left = left;
-        this.right = right;
+    public LTLAnd(ArrayList<LTLFormula> conjuncts) {
+        this.conjuncts = conjuncts;
+    }
+
+    public LTLAnd(LTLFormula l, LTLFormula r) {
+        ArrayList<LTLFormula> params = new ArrayList<>();
+        params.add(l);
+        params.add(r);
+        conjuncts = params;
     }
 
     public LTLAnd() {
@@ -23,6 +30,19 @@ public class LTLAnd extends LTLFormula {
 
     @Override
     public String toString() {
-        return "(" + left.toString() + " & " + right.toString() + ")";
+        String result = "(";
+        for (LTLFormula f : conjuncts) {
+            result = result + f.toString() + " & ";
+        }
+        return result.substring(0, result.length()-3) + ")";
+    }
+
+    @Override
+    public LTLFormula after(Collection<String> tokens) {
+        ArrayList<LTLFormula> result = new ArrayList<LTLFormula>();
+        for (LTLFormula f : conjuncts) {
+            result.add(f.after(tokens));
+        }
+        return new LTLAnd(result);
     }
 }
