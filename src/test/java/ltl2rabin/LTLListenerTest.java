@@ -10,11 +10,11 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class LTLListenerTest {
 
-    private LTLFormula testEnterFormulaHelp(String s) {
+    private LTLListener testEnterFormulaHelp(String s) {
         ANTLRInputStream input = new ANTLRInputStream(s);
         LTLLexer lexer = new LTLLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -25,14 +25,15 @@ public class LTLListenerTest {
         LTLListener extractor = new LTLListener(parser);
         walker.walk(extractor, tree);
 
-        return extractor.getLtlTree();
+        return extractor;
     }
 
     @Test
     public void getLtlTree() throws Exception {
         LTLVariable expectedTestResult1 = new LTLVariable("a");
-        LTLFormula testCase1 = testEnterFormulaHelp("a");
+        LTLFormula testCase1 = testEnterFormulaHelp("a").getLtlTree();
         assertEquals(expectedTestResult1.toString(), testCase1.toString());
+        // TODO: Test getTerminalSymbols
 
         LTLVariable ol = new LTLVariable("a");
         LTLVariable or = new LTLVariable("b");
@@ -40,7 +41,7 @@ public class LTLListenerTest {
         op2.add(ol);
         op2.add(or);
         LTLOr expectedTestResult2 = new LTLOr(op2);
-        LTLFormula testCase2 = testEnterFormulaHelp("a | b");
+        LTLFormula testCase2 = testEnterFormulaHelp("a | b").getLtlTree();
         assertEquals(expectedTestResult2.toString(), testCase2.toString());
 
         LTLVariable ol3 = new LTLVariable("a");
@@ -49,7 +50,7 @@ public class LTLListenerTest {
         op3.add(ol3);
         op3.add(or3);
         LTLOr expectedTestResult3 = new LTLOr(op3);
-        LTLFormula testCase3 = testEnterFormulaHelp("(a | b)");
+        LTLFormula testCase3 = testEnterFormulaHelp("(a | b)").getLtlTree();
         assertEquals(expectedTestResult3.toString(), testCase3.toString());
 
         ArrayList<LTLFormula> op4 = new ArrayList<>();
@@ -57,12 +58,12 @@ public class LTLListenerTest {
         op4.add(new LTLVariable("b"));
         op4.add(new LTLVariable("c"));
         LTLOr expectedTestResult4 = new LTLOr(op4);
-        LTLFormula testCase4 = testEnterFormulaHelp("a | b | c");
+        LTLFormula testCase4 = testEnterFormulaHelp("a | b | c").getLtlTree();
         assertEquals(expectedTestResult4.toString(), testCase4.toString());
 
         LTLUOperator aub5 = new LTLUOperator(new LTLVariable("a"), new LTLVariable("b"));
         LTLOr expectedTestResult5 = new LTLOr(aub5, new LTLVariable("c"));
-        LTLFormula testCase5 = testEnterFormulaHelp("(a U b | c)");
+        LTLFormula testCase5 = testEnterFormulaHelp("(a U b | c)").getLtlTree();
         assertEquals(expectedTestResult5.toString(), testCase5.toString());
 
         LTLVariable c = new LTLVariable("c");
@@ -78,7 +79,7 @@ public class LTLListenerTest {
         LTLGOperator gaobucanaubuxc = new LTLGOperator(aobucanaubuxc);
         LTLFOperator fgaobucanaubuxc = new LTLFOperator(gaobucanaubuxc);
         LTLFOperator expectedTestResult999 = fgaobucanaubuxc;
-        LTLFormula testCase999 = testEnterFormulaHelp("F G (a | b U c) & !a U (b U (X c))");
+        LTLFormula testCase999 = testEnterFormulaHelp("F G (a | b U c) & !a U (b U (X c))").getLtlTree();
         assertEquals(expectedTestResult999.toString(), testCase999.toString());
     }
 }
