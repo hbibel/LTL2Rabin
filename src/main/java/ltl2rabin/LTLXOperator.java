@@ -33,4 +33,10 @@ public class LTLXOperator extends LTLFormula {
     public LTLFormula after(Collection<String> tokens) {
         return operand;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj.getClass() != this.getClass()) return false;
+        return this.operand.equals(((LTLXOperator)obj).operand);
+    }
 }

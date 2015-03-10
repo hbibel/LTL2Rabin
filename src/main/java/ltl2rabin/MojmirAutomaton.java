@@ -27,7 +27,6 @@ public class MojmirAutomaton<T, U> {
     }
 
     public void reach() {
-        boolean newStateAdded = true;
         HashSet<State> statesToBeAdded = new HashSet<State> ();
         Set<Set<U>> words = Sets.powerSet(alphabet);
 

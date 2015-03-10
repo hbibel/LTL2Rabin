@@ -37,4 +37,10 @@ public class LTLFOperator extends LTLFormula {
         orParameter.add(this.operand.after(tokens));
         return new LTLOr(orParameter);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj.getClass() != this.getClass()) return false;
+        return this.operand.equals(((LTLFOperator)obj).operand);
+    }
 }

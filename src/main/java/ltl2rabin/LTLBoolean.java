@@ -29,4 +29,10 @@ public class LTLBoolean extends LTLFormula {
     public LTLFormula after(Collection<String> tokens) {
         return this;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj.getClass() != this.getClass()) return false;
+        return this.value == ((LTLBoolean)obj).value;
+    }
 }
