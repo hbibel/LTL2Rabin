@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -65,5 +67,14 @@ public class LTLAnd extends LTLFormula {
             equality = equality && this.conjuncts.get(i).equals(((LTLAnd)obj).conjuncts.get(i));
         }
         return equality;
+    }
+
+    @Override
+    public int hashCode() {
+        HashCodeBuilder hashCodeBuilder = new HashCodeBuilder(911, 19);
+        for (LTLFormula c : conjuncts) {
+            hashCodeBuilder.append(c);
+        }
+        return hashCodeBuilder.toHashCode();
     }
 }

@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -10,7 +12,7 @@ public class LTLOr extends LTLFormula {
     private ArrayList<LTLFormula> disjuncts;
 
     /**
-     * The only valid constructor for LTLOr
+     *
      * @param disjuncts The LTL formulae that are connected by the disjunction
      */
     public LTLOr(ArrayList<LTLFormula> disjuncts) {
@@ -18,10 +20,16 @@ public class LTLOr extends LTLFormula {
     }
 
     public LTLOr(LTLFormula l, LTLFormula r) {
+        // In case you wonder why I created the mergeTwoArguments method: A constructor call (this(...)) must be the
+        // first statement in a constructor.
+        this(mergeTwoArguments(l,r));
+    }
+
+    private static ArrayList<LTLFormula> mergeTwoArguments(LTLFormula l, LTLFormula r) {
         ArrayList<LTLFormula> params = new ArrayList<>();
         params.add(l);
         params.add(r);
-        disjuncts = params;
+        return params;
     }
 
     public LTLOr() {
@@ -68,5 +76,14 @@ public class LTLOr extends LTLFormula {
             equality = equality && this.disjuncts.get(i).equals(((LTLOr)obj).disjuncts.get(i));
         }
         return equality;
+    }
+
+    @Override
+    public int hashCode() {
+        HashCodeBuilder hashCodeBuilder = new HashCodeBuilder(911, 19);
+        for (LTLFormula d : disjuncts) {
+            hashCodeBuilder.append(d);
+        }
+        return hashCodeBuilder.toHashCode();
     }
 }

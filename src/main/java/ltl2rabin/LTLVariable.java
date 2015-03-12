@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.Collection;
 
 /**
@@ -58,5 +60,10 @@ public class LTLVariable extends LTLFormula {
     public boolean equals(Object obj) {
         if (obj.getClass() != this.getClass()) return false;
         return this.value == ((LTLVariable)obj).value && this.negated == ((LTLVariable)obj).negated;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(911, 19).append(value).append(negated).toHashCode();
     }
 }

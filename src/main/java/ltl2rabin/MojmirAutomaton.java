@@ -32,8 +32,9 @@ public class MojmirAutomaton<T, U> {
 
         for (State state : states) {
             for (Set<U> word : words) {
-                T newState = transitionFunction.apply(state.info, word);
-                statesToBeAdded.add(new State(newState));
+                T newStateInfo = transitionFunction.apply(state.info, word);
+                State newState = new State(newStateInfo);
+                boolean debugCheck = statesToBeAdded.add(newState);
             }
         }
         if (states.addAll(statesToBeAdded)) reach(); // if new states have been added, repeat
@@ -41,6 +42,10 @@ public class MojmirAutomaton<T, U> {
 
     public class State {
         T info;
+
+        public State(T info) {
+            this.info = info;
+        }
 
         @Override
         public boolean equals(Object obj) {
@@ -52,8 +57,9 @@ public class MojmirAutomaton<T, U> {
             return info.hashCode();
         }
 
-        public State(T info) {
-            this.info = info;
+        @Override
+        public String toString() {
+            return "state(" + info.toString() + ")";
         }
     }
 }

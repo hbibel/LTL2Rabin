@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -42,5 +44,10 @@ public class LTLGOperator extends LTLFormula {
     public boolean equals(Object obj) {
         if (obj.getClass() != this.getClass()) return false;
         return this.operand.equals(((LTLGOperator)obj).operand);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(911, 19).append(operand).toHashCode();
     }
 }
