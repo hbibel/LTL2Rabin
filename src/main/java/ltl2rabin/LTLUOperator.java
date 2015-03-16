@@ -21,10 +21,6 @@ public class LTLUOperator extends LTLFormula {
         this.right = right;
     }
 
-    public LTLUOperator() {
-        throw new IllegalArgumentException("Empty constructor LTLUOperator() has been called!");
-    }
-
 
     @Override
     public String toString() {
@@ -32,8 +28,40 @@ public class LTLUOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> tokens) {
-        return new LTLOr(right.after(tokens), new LTLAnd(left.after(tokens), this));
+    public LTLFormula after(Collection<String> letters) {
+        LTLFormula afLeftSide = left.after(letters);
+        LTLFormula afRightSide = right.after(letters);
+
+        /*
+        r   l   result
+        ----------------
+        ff  ff  ff
+        ff  tt  this
+        tt  ff  tt
+        tt  tt  tt
+        x   ff  afRightSide
+        x   tt  afRightSide OR this
+        tt  x   afLeftSide AND this
+        tt  x   tt
+        x   x   afRightSide OR (afLeftSide AND this)
+
+        x = "is not instance of LTLBoolean"
+         */
+        if (afRightSide instanceof LTLBoolean) {
+            if (((LTLBoolean) afRightSide).getValue() == true) return new LTLBoolean(true);
+            if (afLeftSide instanceof LTLBoolean) {
+                if(((LTLBoolean) afLeftSide).getValue() == true) return this;
+                else return new LTLBoolean(false);
+            }
+            else {
+                return new LTLAnd(afLeftSide, this);
+            }
+        }
+        if (afLeftSide instanceof LTLBoolean) {
+            if (((LTLBoolean) afLeftSide).getValue() == false) return afRightSide;
+            else return new LTLOr(afRightSide, this);
+        }
+        return new LTLOr(afRightSide, new LTLAnd(afLeftSide, this));
     }
 
     @Override

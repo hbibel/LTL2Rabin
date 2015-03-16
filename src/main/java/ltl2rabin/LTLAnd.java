@@ -26,10 +26,6 @@ public class LTLAnd extends LTLFormula {
         conjuncts = params;
     }
 
-    public LTLAnd() {
-        throw new IllegalArgumentException("Empty constructor LTLAnd() has been called!");
-    }
-
     @Override
     public String toString() {
         String result = "(";
@@ -40,22 +36,22 @@ public class LTLAnd extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> tokens) {
-        ArrayList<LTLFormula> result = new ArrayList<LTLFormula>();
+    public LTLFormula after(Collection<String> letters) {
+        ArrayList<LTLFormula> newConjuncts = new ArrayList<LTLFormula>();
         for (LTLFormula f : conjuncts) {
-            LTLFormula temp = f.after(tokens);
+            LTLFormula temp = f.after(letters);
             // false & something = false
             if (temp instanceof LTLBoolean) {
                 if (!((LTLBoolean) temp).getValue()) return new LTLBoolean(false);
                 else continue;
             }
-            result.add(temp);
+            newConjuncts.add(temp);
         }
-        // An empty disjunction list means that all conjuncts resolved to false
-        if (0 == result.size()) return new LTLBoolean(false);
+        // An empty disjunction list means that all conjuncts resolved to true
+        if (0 == newConjuncts.size()) return new LTLBoolean(true);
         // Only one conjunct? Then we don't need an "and".
-        if (1 == result.size()) return result.get(0);
-        return new LTLAnd(result);
+        if (1 == newConjuncts.size()) return newConjuncts.get(0);
+        return new LTLAnd(newConjuncts);
     }
 
     @Override

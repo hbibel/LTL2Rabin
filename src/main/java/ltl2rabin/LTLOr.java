@@ -22,7 +22,7 @@ public class LTLOr extends LTLFormula {
     public LTLOr(LTLFormula l, LTLFormula r) {
         // In case you wonder why I created the mergeTwoArguments method: A constructor call (this(...)) must be the
         // first statement in a constructor.
-        this(mergeTwoArguments(l,r));
+        this(mergeTwoArguments(l, r));
     }
 
     private static ArrayList<LTLFormula> mergeTwoArguments(LTLFormula l, LTLFormula r) {
@@ -30,10 +30,6 @@ public class LTLOr extends LTLFormula {
         params.add(l);
         params.add(r);
         return params;
-    }
-
-    public LTLOr() {
-        throw new IllegalArgumentException("Empty constructor LTLOr() has been called!");
     }
 
 
@@ -48,17 +44,17 @@ public class LTLOr extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> tokens) {
+    public LTLFormula after(Collection<String> letters) {
         ArrayList<LTLFormula> result = new ArrayList<LTLFormula>();
         for (LTLFormula f : disjuncts) {
-            LTLFormula temp = f.after(tokens);
+            LTLFormula temp = f.after(letters);
             if (temp instanceof LTLBoolean) {
                 // true | something = true
                 if (((LTLBoolean) temp).getValue()) return new LTLBoolean(true);
                 // false | something = something
                 if (!((LTLBoolean) temp).getValue()) continue;
             }
-            result.add(f.after(tokens));
+            result.add(f.after(letters));
         }
         // An empty disjunction list means that all disjuncts resolved to false
         if (0 == result.size()) return new LTLBoolean(false);

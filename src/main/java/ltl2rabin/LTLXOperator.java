@@ -18,10 +18,6 @@ public class LTLXOperator extends LTLFormula {
         this.operand = operand;
     }
 
-    public LTLXOperator() {
-        throw new IllegalArgumentException("Empty constructor LTLXOperator() called!");
-    }
-
     public LTLFormula getOperand() {
         return operand;
     }
@@ -32,7 +28,7 @@ public class LTLXOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> tokens) {
+    public LTLFormula after(Collection<String> letters) {
         return operand;
     }
 

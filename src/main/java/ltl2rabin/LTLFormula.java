@@ -8,5 +8,5 @@ import java.util.Collection;
 public abstract class LTLFormula {
     public abstract String toString();
 
-    public abstract LTLFormula after(Collection<String> tokens);
+    public abstract LTLFormula after(Collection<String> letters);
 }

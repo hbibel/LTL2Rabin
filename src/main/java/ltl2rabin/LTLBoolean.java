@@ -10,10 +10,6 @@ import java.util.Collection;
 public class LTLBoolean extends LTLFormula {
     private final boolean value;
 
-    public LTLBoolean() throws IllegalArgumentException {
-        throw new IllegalArgumentException("Empty constructor LTLBoolean() has been called!");
-    }
-
     public LTLBoolean(boolean value) {
         this.value = value;
     }
@@ -28,7 +24,7 @@ public class LTLBoolean extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> tokens) {
+    public LTLFormula after(Collection<String> letters) {
         return this;
     }
 

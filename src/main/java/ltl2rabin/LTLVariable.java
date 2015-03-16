@@ -33,10 +33,6 @@ public class LTLVariable extends LTLFormula {
         negated = false;
     }
 
-    public LTLVariable() {
-        throw new IllegalArgumentException("Empty constructor LTLVariable() has been called!");
-    }
-
     public String getValue() {
         return value;
     }
@@ -52,8 +48,8 @@ public class LTLVariable extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> tokens) {
-        return new LTLBoolean(negated != (tokens.contains(value)));
+    public LTLFormula after(Collection<String> letters) {
+        return new LTLBoolean(negated != (letters.contains(value)));
     }
 
     @Override

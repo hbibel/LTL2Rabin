@@ -19,10 +19,6 @@ public class LTLFOperator extends LTLFormula {
         this.operand = operand;
     }
 
-    public LTLFOperator() {
-        throw new IllegalArgumentException("Empty constructor LTLFOperator() called!");
-    }
-
     public LTLFormula getOperand() {
         return operand;
     }
@@ -33,10 +29,13 @@ public class LTLFOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> tokens) {
+    public LTLFormula after(Collection<String> letters) {
         ArrayList<LTLFormula> orParameter = new ArrayList<>();
         orParameter.add(this);
-        orParameter.add(this.operand.after(tokens));
+        LTLFormula newDisjunct = this.operand.after(letters);
+        if (newDisjunct.equals(new LTLBoolean(true))) return new LTLBoolean(true);
+        else if (newDisjunct.equals(new LTLBoolean(false))) return orParameter.get(0);
+        orParameter.add(newDisjunct);
         return new LTLOr(orParameter);
     }
 
