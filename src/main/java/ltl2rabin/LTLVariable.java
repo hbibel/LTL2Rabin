@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.Collection;
 
 /**
@@ -31,10 +33,6 @@ public class LTLVariable extends LTLFormula {
         negated = false;
     }
 
-    public LTLVariable() {
-        throw new IllegalArgumentException("Empty constructor LTLVariable() has been called!");
-    }
-
     public String getValue() {
         return value;
     }
@@ -50,7 +48,18 @@ public class LTLVariable extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> tokens) {
-        return new LTLBoolean(negated != (tokens.contains(value)));
+    public LTLFormula after(Collection<String> letters) {
+        return new LTLBoolean(negated != (letters.contains(value)));
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj.getClass() != this.getClass()) return false;
+        return this.value == ((LTLVariable)obj).value && this.negated == ((LTLVariable)obj).negated;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(911, 19).append(value).append(negated).toHashCode();
     }
 }

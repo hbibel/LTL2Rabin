@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.Collection;
 
 /**
@@ -7,10 +9,6 @@ import java.util.Collection;
  */
 public class LTLBoolean extends LTLFormula {
     private final boolean value;
-
-    public LTLBoolean() throws IllegalArgumentException {
-        throw new IllegalArgumentException("Empty constructor LTLBoolean() has been called!");
-    }
 
     public LTLBoolean(boolean value) {
         this.value = value;
@@ -26,7 +24,18 @@ public class LTLBoolean extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> tokens) {
+    public LTLFormula after(Collection<String> letters) {
         return this;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj.getClass() != this.getClass()) return false;
+        return this.value == ((LTLBoolean)obj).value;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(911, 19).append(value).toHashCode();
     }
 }

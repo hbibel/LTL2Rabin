@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -17,10 +19,6 @@ public class LTLGOperator extends LTLFormula {
         this.operand = operand;
     }
 
-    public LTLGOperator() {
-        throw new IllegalArgumentException("Empty constructor LTLGOperator() called!");
-    }
-
     public LTLFormula getOperand() {
         return operand;
     }
@@ -31,10 +29,24 @@ public class LTLGOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> tokens) {
+    public LTLFormula after(Collection<String> letters) {
         ArrayList<LTLFormula> andParameter = new ArrayList<>();
         andParameter.add(this);
-        andParameter.add(operand.after(tokens));
+        LTLFormula newConjunct = operand.after(letters);
+        if (newConjunct.equals(new LTLBoolean(true))) return andParameter.get(0);
+        else if (newConjunct.equals(new LTLBoolean(false))) return new LTLBoolean(false);
+        andParameter.add(newConjunct);
         return new LTLAnd(andParameter);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj.getClass() != this.getClass()) return false;
+        return this.operand.equals(((LTLGOperator)obj).operand);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(911, 19).append(operand).toHashCode();
     }
 }

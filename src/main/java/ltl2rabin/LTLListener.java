@@ -6,10 +6,13 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 public class LTLListener extends LTLBaseListener {
     LTLFormula ltlTree;
     LTLParser parser;
+    // There is some optimization potential here. Maybe use a hash set or so.
+    HashSet<String> terminalSymbols = new HashSet<>();
 
     /* This is not a very pretty solution. Initially I had this:
     @Override
@@ -125,9 +128,14 @@ public class LTLListener extends LTLBaseListener {
                     // ctx is a terminal symbol, but no boolean
                     String text = ((LTLParser.AtomContext) ctx).Identifier().getText();
                     if (text.charAt(0) == '!') {
-                        return new LTLVariable(text.substring(1), true);
+                        String symbol = text.substring(1);
+                        if (!terminalSymbols.contains(symbol)) terminalSymbols.add(symbol);
+                        return new LTLVariable(symbol, true);
                     }
-                    else return new LTLVariable(text);
+                    else {
+                        if (!terminalSymbols.contains(text)) terminalSymbols.add(text);
+                        return new LTLVariable(text);
+                    }
                 }
             }
         }
@@ -136,5 +144,9 @@ public class LTLListener extends LTLBaseListener {
 
     public LTLFormula getLtlTree() {
         return ltlTree;
+    }
+
+    public HashSet<String> getTerminalSymbols() {
+        return terminalSymbols;
     }
 }
