@@ -60,17 +60,6 @@ public class LTLAnd extends LTLFormula {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj.getClass() != this.getClass()) return false;
-        if (this.conjuncts.size() != ((LTLAnd)obj).conjuncts.size()) return false;
-        boolean equality = true;
-        for (int i = 0; i < this.conjuncts.size(); i++) {
-            equality = equality && this.conjuncts.get(i).equals(((LTLAnd)obj).conjuncts.get(i));
-        }
-        return equality;
-    }
-
-    @Override
     public int hashCode() {
         HashCodeBuilder hashCodeBuilder = new HashCodeBuilder(911, 19);
         for (LTLFormula c : conjuncts) {

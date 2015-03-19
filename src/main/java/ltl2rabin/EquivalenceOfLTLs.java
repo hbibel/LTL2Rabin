@@ -13,7 +13,7 @@ public class EquivalenceOfLTLs {
 
     public static boolean arePropositionallyEquivalent(LTLFormula formula1, LTLFormula formula2) {
         // question: Should (F a) = (F a) always hold?
-        if (formula1.equals(formula2)) return true;
+//         if (formula1.equals(formula2)) return true;
 
         BDD bdd1 = lookUpBDD(formula1);
         BDD bdd2 = lookUpBDD(formula2);

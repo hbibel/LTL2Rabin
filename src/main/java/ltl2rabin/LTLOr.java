@@ -68,17 +68,6 @@ public class LTLOr extends LTLFormula {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj.getClass() != this.getClass()) return false;
-        if (this.disjuncts.size() != ((LTLOr)obj).disjuncts.size()) return false;
-        boolean equality = true;
-        for (int i = 0; i < this.disjuncts.size(); i++) {
-            equality = equality && this.disjuncts.get(i).equals(((LTLOr)obj).disjuncts.get(i));
-        }
-        return equality;
-    }
-
-    @Override
     public int hashCode() {
         HashCodeBuilder hashCodeBuilder = new HashCodeBuilder(911, 19);
         for (LTLFormula d : disjuncts) {

@@ -2,6 +2,8 @@ package ltl2rabin;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -29,6 +31,14 @@ public class EquivalenceOfLTLsTest {
         LTLFormula b1 = new LTLBoolean(true);
         LTLFormula a3 = new LTLAnd(v1, b1);
         LTLFormula o3 = new LTLOr(v1, b1);
+        LTLFormula v2 = new LTLVariable("b");
+        LTLFormula v3 = new LTLVariable("c");
+        ArrayList<LTLFormula> aArgs1 = new ArrayList<>();
+        aArgs1.add(v1); aArgs1.add(v2); aArgs1.add(v3);
+        ArrayList<LTLFormula> aArgs2 = new ArrayList<>();
+        aArgs2.add(v3); aArgs2.add(v1); aArgs2.add(v2);
+        LTLFormula a4 = new LTLAnd(aArgs1);
+        LTLFormula a5 = new LTLAnd(aArgs2);
 
         // F a = F a (different objects)
         assertTrue(EquivalenceOfLTLs.arePropositionallyEquivalent(f1, f2));
@@ -44,5 +54,17 @@ public class EquivalenceOfLTLsTest {
         assertTrue(EquivalenceOfLTLs.arePropositionallyEquivalent(o3, b1));
         // "a" | tt != "a"
         assertFalse(EquivalenceOfLTLs.arePropositionallyEquivalent(v1, o3));
+        // "a" & "b" & "c" = "c" & "a" & "b"
+        assertTrue(EquivalenceOfLTLs.arePropositionallyEquivalent(a4, a5));
+    }
+
+    @Test
+    public void testCase3() {
+        LTLVariable v1 = new LTLVariable("a");
+        LTLVariable v2 = new LTLVariable("b");
+        LTLAnd a1 = new LTLAnd(v1, v2);
+        LTLAnd a2 = new LTLAnd(v2, v1);
+
+        assertTrue(a1.equals(a2));
     }
 }
