@@ -28,7 +28,7 @@ public class LTLXOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> letters) {
+    public LTLFormula af(Collection<String> letters) {
         return operand;
     }
 

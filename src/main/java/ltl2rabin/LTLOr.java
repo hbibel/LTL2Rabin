@@ -4,6 +4,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * This class represents a logical disjunction (|) in an LTL formula.
@@ -32,6 +33,9 @@ public class LTLOr extends LTLFormula {
         return params;
     }
 
+    public Iterator<LTLFormula> getIterator() {
+        return disjuncts.iterator();
+    }
 
     @Override
     public String toString() {
@@ -44,17 +48,17 @@ public class LTLOr extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> letters) {
-        ArrayList<LTLFormula> result = new ArrayList<LTLFormula>();
+    public LTLFormula af(Collection<String> letters) {
+        ArrayList<LTLFormula> result = new ArrayList<>();
         for (LTLFormula f : disjuncts) {
-            LTLFormula temp = f.after(letters);
+            LTLFormula temp = f.af(letters);
             if (temp instanceof LTLBoolean) {
                 // true | something = true
                 if (((LTLBoolean) temp).getValue()) return new LTLBoolean(true);
                 // false | something = something
                 if (!((LTLBoolean) temp).getValue()) continue;
             }
-            result.add(f.after(letters));
+            result.add(f.af(letters));
         }
         // An empty disjunction list means that all disjuncts resolved to false
         if (0 == result.size()) return new LTLBoolean(false);

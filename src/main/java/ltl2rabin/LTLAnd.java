@@ -4,6 +4,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * This class represents a logical conjunction (&) in an LTL formula.
@@ -26,6 +27,10 @@ public class LTLAnd extends LTLFormula {
         conjuncts = params;
     }
 
+    public Iterator<LTLFormula> getIterator() {
+        return conjuncts.iterator();
+    }
+
     @Override
     public String toString() {
         String result = "(";
@@ -36,10 +41,10 @@ public class LTLAnd extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> letters) {
-        ArrayList<LTLFormula> newConjuncts = new ArrayList<LTLFormula>();
+    public LTLFormula af(Collection<String> letters) {
+        ArrayList<LTLFormula> newConjuncts = new ArrayList<>();
         for (LTLFormula f : conjuncts) {
-            LTLFormula temp = f.after(letters);
+            LTLFormula temp = f.af(letters);
             // false & something = false
             if (temp instanceof LTLBoolean) {
                 if (!((LTLBoolean) temp).getValue()) return new LTLBoolean(false);

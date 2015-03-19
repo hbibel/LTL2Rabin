@@ -28,9 +28,9 @@ public class LTLUOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> letters) {
-        LTLFormula afLeftSide = left.after(letters);
-        LTLFormula afRightSide = right.after(letters);
+    public LTLFormula af(Collection<String> letters) {
+        LTLFormula afLeftSide = left.af(letters);
+        LTLFormula afRightSide = right.af(letters);
 
         /*
         r   l   result
@@ -48,9 +48,9 @@ public class LTLUOperator extends LTLFormula {
         x = "is not instance of LTLBoolean"
          */
         if (afRightSide instanceof LTLBoolean) {
-            if (((LTLBoolean) afRightSide).getValue() == true) return new LTLBoolean(true);
+            if (((LTLBoolean) afRightSide).getValue()) return new LTLBoolean(true);
             if (afLeftSide instanceof LTLBoolean) {
-                if(((LTLBoolean) afLeftSide).getValue() == true) return this;
+                if(((LTLBoolean) afLeftSide).getValue()) return this;
                 else return new LTLBoolean(false);
             }
             else {
@@ -58,7 +58,7 @@ public class LTLUOperator extends LTLFormula {
             }
         }
         if (afLeftSide instanceof LTLBoolean) {
-            if (((LTLBoolean) afLeftSide).getValue() == false) return afRightSide;
+            if (!((LTLBoolean) afLeftSide).getValue()) return afRightSide;
             else return new LTLOr(afRightSide, this);
         }
         return new LTLOr(afRightSide, new LTLAnd(afLeftSide, this));

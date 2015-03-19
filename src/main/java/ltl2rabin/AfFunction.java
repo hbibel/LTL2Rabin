@@ -7,6 +7,6 @@ public class AfFunction implements BiFunction<LTLFormula, Set<String>, LTLFormul
 
     @Override
     public LTLFormula apply(LTLFormula formula, Set<String> strings) {
-        return formula.after(strings);
+        return formula.af(strings);
     }
 }

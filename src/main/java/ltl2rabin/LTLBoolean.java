@@ -24,7 +24,7 @@ public class LTLBoolean extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> letters) {
+    public LTLFormula af(Collection<String> letters) {
         return this;
     }
 

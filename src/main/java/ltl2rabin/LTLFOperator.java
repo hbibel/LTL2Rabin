@@ -29,10 +29,10 @@ public class LTLFOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula after(Collection<String> letters) {
+    public LTLFormula af(Collection<String> letters) {
         ArrayList<LTLFormula> orParameter = new ArrayList<>();
         orParameter.add(this);
-        LTLFormula newDisjunct = this.operand.after(letters);
+        LTLFormula newDisjunct = this.operand.af(letters);
         if (newDisjunct.equals(new LTLBoolean(true))) return new LTLBoolean(true);
         else if (newDisjunct.equals(new LTLBoolean(false))) return orParameter.get(0);
         orParameter.add(newDisjunct);
