@@ -7,18 +7,11 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-import java.util.HashSet;
-
 public class Main {
-    public static HashSet<String> stringSet = new HashSet<String>();
-
     public static void main(String[] args) {
-        stringSet.add(new String("Giraffe"));
-        boolean shouldBeTrue = stringSet.add(new String("Elephant"));
-        boolean shouldBeFalse = stringSet.add(new String("Giraffe"));
-        System.out.println(shouldBeTrue + " == true");
-        System.out.println(shouldBeFalse + " == false");
+        System.out.println("This program runs, but does not do anything useful yet.");
     }
+
     public static LTLListener stringToLTLFormula (String s) {
         ANTLRInputStream input = new ANTLRInputStream(s);
         LTLLexer lexer = new LTLLexer(input);

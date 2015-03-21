@@ -17,15 +17,20 @@ public class MojmirAutomaton<T, U> {
     // public Set<State> acceptingStates; // yet to be identified
     public Set<State> sinks;
     public Set<State> states;
+
+    public State getInitialState() {
+        return initialState;
+    }
+
+    public State initialState;
     public Set<U> alphabet;
     public BiFunction<T, Set<U>, T> transitionFunction;
 
     public MojmirAutomaton(T info, BiFunction<T, Set<U>, T> transitionFunction, HashSet<U> alphabet) {
         this.alphabet = alphabet;
         states = new HashSet<> ();
-        State firstState = new State(info);
-        firstState.setOrigin(true);
-        states.add(firstState);
+        initialState = new State(info);
+        states.add(initialState);
         sinks = new HashSet<>();
         this.transitionFunction = transitionFunction;
         reach();
@@ -33,13 +38,13 @@ public class MojmirAutomaton<T, U> {
 
     public void reach() {
         Queue<State> statesToBeAdded = new ConcurrentLinkedQueue<>(states);
-        Set<Set<U>> words = Sets.powerSet(alphabet);
+        Set<Set<U>> letters = Sets.powerSet(alphabet);
 
         while (!statesToBeAdded.isEmpty()) {
             State temp = statesToBeAdded.poll();
             boolean isSink = true;
-            for (Set<U> word : words) {
-                T newStateInfo = transitionFunction.apply(temp.info, word);
+            for (Set<U> letter : letters) {
+                T newStateInfo = transitionFunction.apply(temp.info, letter);
                 if (newStateInfo.equals(temp.info)) continue;
                 // A sink is a state that only has self-loops as outgoing transitions. If temp is a sink, this
                 // line never will be reached.
@@ -48,7 +53,7 @@ public class MojmirAutomaton<T, U> {
                 if (!states.add(newState)) continue; // Remark: states is a set, so no duplicate states will be added, instead false is returned
                 statesToBeAdded.offer(newState);
             }
-            if (isSink && (!temp.isOrigin())) {
+            if (isSink && !(temp == initialState)) {
                 temp.setSink(true);
                 sinks.add(temp);
             }
@@ -57,12 +62,15 @@ public class MojmirAutomaton<T, U> {
 
     public class State {
         T info;
+
+        public boolean isSink() {
+            return isSink;
+        }
+
         boolean isSink;
-        boolean isOrigin;
 
         public State(T info) {
             isSink = false;
-            isOrigin = false;
             this.info = info;
         }
 
@@ -70,12 +78,10 @@ public class MojmirAutomaton<T, U> {
             this.isSink = isSink;
         }
 
-        public void setOrigin(boolean isOrigin) {
-            this.isOrigin = isOrigin;
-        }
-
-        public boolean isOrigin() {
-            return isOrigin;
+        // Alternative: Keep all state transitions in a mapping: letter --> State
+        public State readLetter(Set<U> letter) {
+            T newInfo = transitionFunction.apply(this.info, letter);
+            return new State(newInfo);
         }
 
         @SuppressWarnings("unchecked")
