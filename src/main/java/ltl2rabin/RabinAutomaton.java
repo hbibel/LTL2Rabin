@@ -14,11 +14,16 @@ public class RabinAutomaton<T, U> {
     private final State initialState;
     private final Set<U> alphabet;
 
-    public RabinAutomaton(MojmirAutomaton<T, U> mojmirAutomaton, Set<U> alphabet) {
+    public Set<State> getStates() {
+        return states;
+    }
+
+    public RabinAutomaton(final MojmirAutomaton<T, U> mojmirAutomaton, Set<U> alphabet) {
         this.alphabet = alphabet;
         List<MojmirAutomaton<T, U>.State> initialMojmirStates = new ArrayList<>();
         initialMojmirStates.add(mojmirAutomaton.getInitialState());
         initialState = new State(initialMojmirStates);
+        states.add(initialState);
 
         boolean reachedFixpoint = false;
         Set<Set<U>> letters = Sets.powerSet(alphabet);
@@ -33,7 +38,7 @@ public class RabinAutomaton<T, U> {
                         // According to the javadocs: For ordered streams, the selection of distinct elements is stable
                         // (for duplicated elements, the element appearing first in the encounter order is preserved.)
                         .distinct()
-                        .filter(MojmirAutomaton.State::isSink)
+                        .filter(MojmirAutomaton.State::isNoSink)
                         .collect(Collectors.toList());
                 tempStates = newStateList;
                 reachedFixpoint &= !states.add(new State(newStateList));

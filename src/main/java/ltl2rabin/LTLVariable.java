@@ -54,7 +54,7 @@ public class LTLVariable extends LTLFormula {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj.getClass() != this.getClass())
+        return (obj.getClass() == this.getClass())
                 && this.value.equals(((LTLVariable)obj).value)
                 && this.negated == ((LTLVariable)obj).negated;
     }
