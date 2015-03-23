@@ -9,12 +9,8 @@ import java.util.Collection;
  * This class represents the F (finally) operator in LTL.
  */
 public class LTLFOperator extends LTLFormula {
-    private LTLFormula operand;
+    private final LTLFormula operand;
 
-    /**
-     * The only valid constructor for LTLFOperator.
-     * @param operand The LTLFormula following the operator
-     */
     public LTLFOperator(LTLFormula operand) {
         this.operand = operand;
     }
@@ -29,7 +25,7 @@ public class LTLFOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula af(Collection<String> letters) {
+    public LTLFormula af(final Collection<String> letters) {
         ArrayList<LTLFormula> orParameter = new ArrayList<>();
         orParameter.add(this);
         LTLFormula newDisjunct = this.operand.af(letters);
@@ -41,8 +37,8 @@ public class LTLFOperator extends LTLFormula {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj.getClass() != this.getClass()) return false;
-        return this.operand.equals(((LTLFOperator)obj).operand);
+        return (obj.getClass() == this.getClass())
+                && this.operand.equals(((LTLFOperator)obj).operand);
     }
 
     @Override

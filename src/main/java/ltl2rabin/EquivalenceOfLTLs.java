@@ -7,14 +7,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 public class EquivalenceOfLTLs {
-    public static BDDFactory bddFactory = BDDFactory.init("java", 2, 2);
-    private static HashMap<LTLFormula, BDD> ltlToBDDMap = new HashMap<>();
+    private static final BDDFactory bddFactory = BDDFactory.init("java", 2, 2);
+    private static final HashMap<LTLFormula, BDD> ltlToBDDMap = new HashMap<>();
     private static int varCount = 0;
 
-    public static boolean arePropositionallyEquivalent(LTLFormula formula1, LTLFormula formula2) {
+    public static boolean arePropositionallyEquivalent(final LTLFormula formula1, final LTLFormula formula2) {
         // question: Should (F a) = (F a) always hold?
 //         if (formula1.equals(formula2)) return true;
 
+        // Should I cache the BDD? Memory overhead vs creation time
         BDD bdd1 = lookUpBDD(formula1);
         BDD bdd2 = lookUpBDD(formula2);
 

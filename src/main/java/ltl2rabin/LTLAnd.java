@@ -10,7 +10,7 @@ import java.util.Iterator;
  * This class represents a logical conjunction (&) in an LTL formula.
  */
 public class LTLAnd extends LTLFormula {
-    private ArrayList<LTLFormula> conjuncts;
+    private final ArrayList<LTLFormula> conjuncts;
 
     /**
      * The only valid constructor for LTLAnd
@@ -41,7 +41,7 @@ public class LTLAnd extends LTLFormula {
     }
 
     @Override
-    public LTLFormula af(Collection<String> letters) {
+    public LTLFormula af(final Collection<String> letters) {
         ArrayList<LTLFormula> newConjuncts = new ArrayList<>();
         for (LTLFormula f : conjuncts) {
             LTLFormula temp = f.af(letters);
@@ -62,9 +62,7 @@ public class LTLAnd extends LTLFormula {
     @Override
     public int hashCode() {
         HashCodeBuilder hashCodeBuilder = new HashCodeBuilder(911, 19);
-        for (LTLFormula c : conjuncts) {
-            hashCodeBuilder.append(c);
-        }
+        conjuncts.forEach(hashCodeBuilder::append);
         return hashCodeBuilder.toHashCode();
     }
 }

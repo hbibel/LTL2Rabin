@@ -8,12 +8,8 @@ import java.util.Collection;
  * This class represents the X (next) operator in LTL.
  */
 public class LTLXOperator extends LTLFormula {
-    private LTLFormula operand;
+    private final LTLFormula operand;
 
-    /**
-     * The only valid constructor for LTLXOperator.
-     * @param operand The LTLFormula following the operator
-     */
     public LTLXOperator(LTLFormula operand) {
         this.operand = operand;
     }
@@ -34,8 +30,8 @@ public class LTLXOperator extends LTLFormula {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj.getClass() != this.getClass()) return false;
-        return this.operand.equals(((LTLXOperator)obj).operand);
+        return (obj.getClass() == this.getClass())
+                && this.operand.equals(((LTLXOperator)obj).operand);
     }
 
     @Override

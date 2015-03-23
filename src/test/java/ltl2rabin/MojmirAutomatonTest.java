@@ -1,6 +1,7 @@
 package ltl2rabin;
 
 import org.junit.Test;
+
 import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
@@ -14,7 +15,7 @@ public class MojmirAutomatonTest {
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
         MojmirAutomaton mojmirAutomaton = new MojmirAutomaton<LTLFormula, String>(ltlOr, new AfFunction(), alphabet);
 
-        assertEquals(4, mojmirAutomaton.states.size());
+        assertEquals(4, mojmirAutomaton.getStates().size());
     }
 
     @Test
@@ -24,7 +25,7 @@ public class MojmirAutomatonTest {
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
         MojmirAutomaton mojmirAutomaton = new MojmirAutomaton<LTLFormula, String>(ltlOr, new AfFunction(), alphabet);
 
-        assertEquals(3, mojmirAutomaton.states.size());
+        assertEquals(3, mojmirAutomaton.getStates().size());
     }
 
     @Test
@@ -34,7 +35,7 @@ public class MojmirAutomatonTest {
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
         MojmirAutomaton mojmirAutomaton = new MojmirAutomaton<LTLFormula, String>(ltlOr, new AfFunction(), alphabet);
 
-        assertEquals(4, mojmirAutomaton.states.size());
+        assertEquals(4, mojmirAutomaton.getStates().size());
     }
 
     @Test
@@ -44,7 +45,7 @@ public class MojmirAutomatonTest {
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
         MojmirAutomaton mojmirAutomaton = new MojmirAutomaton<LTLFormula, String>(ltlOr, new AfFunction(), alphabet);
 
-        assertEquals(2, mojmirAutomaton.states.size());
+        assertEquals(2, mojmirAutomaton.getStates().size());
     }
 
     @Test
@@ -54,7 +55,7 @@ public class MojmirAutomatonTest {
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
         MojmirAutomaton mojmirAutomaton = new MojmirAutomaton<LTLFormula, String>(ltlOr, new AfFunction(), alphabet);
 
-        assertEquals(3, mojmirAutomaton.states.size());
+        assertEquals(3, mojmirAutomaton.getStates().size());
     }
 
     @Test
@@ -64,7 +65,7 @@ public class MojmirAutomatonTest {
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
         MojmirAutomaton mojmirAutomaton = new MojmirAutomaton<LTLFormula, String>(ltlOr, new AfFunction(), alphabet);
 
-        assertEquals(3, mojmirAutomaton.states.size());
+        assertEquals(3, mojmirAutomaton.getStates().size());
     }
 
     @Test
@@ -74,7 +75,7 @@ public class MojmirAutomatonTest {
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
         MojmirAutomaton mojmirAutomaton = new MojmirAutomaton<LTLFormula, String>(ltlOr, new AfFunction(), alphabet);
 
-        assertEquals(3, mojmirAutomaton.states.size());
+        assertEquals(3, mojmirAutomaton.getStates().size());
     }
 
 

@@ -1,19 +1,18 @@
 package ltl2rabin;
 
 import com.google.common.collect.Sets;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class RabinAutomaton<T, U> {
     public BiFunction<T, Set<U>, T> transitionFunction;
-    Set<State> states;
-    State initialState;
-    public Set<U> alphabet;
+    private Set<State> states = new HashSet<>();
+    private final State initialState;
+    private final Set<U> alphabet;
 
     public RabinAutomaton(MojmirAutomaton<T, U> mojmirAutomaton, Set<U> alphabet) {
         this.alphabet = alphabet;
@@ -29,7 +28,7 @@ public class RabinAutomaton<T, U> {
             for (Set<U> letter : letters) {
                 // read; map e.readLetter to tempStates, then add initialMojmirStates.get(0), then filter duplicates,
                 // then filter sinks, and then transform it back to a List
-                List<MojmirAutomaton.State> newStateList = Stream.concat(tempStates.stream()
+                List<MojmirAutomaton<T, U>.State> newStateList = Stream.concat(tempStates.stream()
                         .map(e -> e.readLetter(letter)), Stream.of(initialMojmirStates.get(0)))
                         // According to the javadocs: For ordered streams, the selection of distinct elements is stable
                         // (for duplicated elements, the element appearing first in the encounter order is preserved.)
@@ -43,12 +42,31 @@ public class RabinAutomaton<T, U> {
     }
 
     public class State{
-        List<MojmirAutomaton<T, U>.State> mojmirStates;
+        private final List<MojmirAutomaton<T, U>.State> mojmirStates;
 
         public State(List<MojmirAutomaton<T, U>.State> mojmirStates) {
             this.mojmirStates = mojmirStates;
         }
 
-        // TODO: equals, hashcode
+        @SuppressWarnings("unchecked")
+        @Override
+        public boolean equals(Object obj) {
+            boolean result = (obj != null)
+                    && (obj.getClass().equals(this.getClass()))
+                    && ((State)obj).mojmirStates.size() == this.mojmirStates.size();
+            if (!result) return false;
+            Iterator<MojmirAutomaton<T, U>.State> itObj = ((State)obj).mojmirStates.iterator();
+            Iterator<MojmirAutomaton<T, U>.State> itThis = this.mojmirStates.iterator();
+            while (itObj.hasNext()) {
+                result = itObj.next().equals(itThis.next());
+                if (!result) return false;
+            }
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            return new HashCodeBuilder(911, 19).append(mojmirStates).toHashCode();
+        }
     }
 }

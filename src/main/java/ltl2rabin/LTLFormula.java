@@ -8,7 +8,7 @@ import java.util.Collection;
 public abstract class LTLFormula {
     public abstract String toString();
 
-    public abstract LTLFormula af(Collection<String> letters);
+    public abstract LTLFormula af(final Collection<String> letters);
 
     /*
      * This equality test tests for propositional equivalence. It is used within the reach() function of the
@@ -16,7 +16,7 @@ public abstract class LTLFormula {
      */
     @Override
     public boolean equals(Object obj) {
-        if (obj.getClass() != this.getClass()) return false;
-        return EquivalenceOfLTLs.arePropositionallyEquivalent((LTLFormula) obj, this);
+        return (obj.getClass() == this.getClass())
+                && EquivalenceOfLTLs.arePropositionallyEquivalent((LTLFormula) obj, this);
     }
 }

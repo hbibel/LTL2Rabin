@@ -9,10 +9,21 @@ import java.util.ArrayList;
 import java.util.HashSet;
 
 public class LTLListener extends LTLBaseListener {
-    LTLFormula ltlTree;
-    LTLParser parser;
-    // There is some optimization potential here. Maybe use a hash set or so.
-    HashSet<String> terminalSymbols = new HashSet<>();
+    private LTLFormula ltlTree;
+    private final LTLParser parser;
+    private final HashSet<String> terminalSymbols = new HashSet<>();
+
+    public LTLListener(LTLParser parser) {
+        this.parser = parser;
+    }
+
+    public LTLFormula getLtlTree() {
+        return ltlTree;
+    }
+
+    public HashSet<String> getTerminalSymbols() {
+        return terminalSymbols;
+    }
 
     /* This is not a very pretty solution. Initially I had this:
     @Override
@@ -30,10 +41,6 @@ public class LTLListener extends LTLBaseListener {
      * then sets the "done" flag and calls the createLTLFormula method.
      */
     private boolean done = false;
-
-    public LTLListener(LTLParser parser) {
-        this.parser = parser;
-    }
 
     @Override
     public void exitEveryRule(ParserRuleContext ctx) {
@@ -110,7 +117,7 @@ public class LTLListener extends LTLBaseListener {
                 return new LTLUOperator(createLTLFormula(ctx.getChild(0)), createLTLFormula(ctx.getChild(2)));
             }
         }
-        else if (ctx instanceof LTLParser.AtomContext) {
+        else {
             if (((LTLParser.AtomContext) ctx).children.size() == 3) {
                 // If the atom has 3 children, it is a formula within parentheses. Child 0 is '(' and child 2 is ')'.
                 return createLTLFormula(ctx.getChild(1));
@@ -139,14 +146,5 @@ public class LTLListener extends LTLBaseListener {
                 }
             }
         }
-        return null;
-    }
-
-    public LTLFormula getLtlTree() {
-        return ltlTree;
-    }
-
-    public HashSet<String> getTerminalSymbols() {
-        return terminalSymbols;
     }
 }

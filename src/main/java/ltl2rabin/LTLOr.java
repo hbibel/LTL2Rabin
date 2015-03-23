@@ -10,7 +10,7 @@ import java.util.Iterator;
  * This class represents a logical disjunction (|) in an LTL formula.
  */
 public class LTLOr extends LTLFormula {
-    private ArrayList<LTLFormula> disjuncts;
+    private final ArrayList<LTLFormula> disjuncts;
 
     /**
      *
@@ -20,13 +20,13 @@ public class LTLOr extends LTLFormula {
         this.disjuncts = disjuncts;
     }
 
-    public LTLOr(LTLFormula l, LTLFormula r) {
+    public LTLOr(final LTLFormula l, final LTLFormula r) {
         // In case you wonder why I created the mergeTwoArguments method: A constructor call (this(...)) must be the
         // first statement in a constructor.
         this(mergeTwoArguments(l, r));
     }
 
-    private static ArrayList<LTLFormula> mergeTwoArguments(LTLFormula l, LTLFormula r) {
+    private static ArrayList<LTLFormula> mergeTwoArguments(final LTLFormula l, final LTLFormula r) {
         ArrayList<LTLFormula> params = new ArrayList<>();
         params.add(l);
         params.add(r);
@@ -48,7 +48,7 @@ public class LTLOr extends LTLFormula {
     }
 
     @Override
-    public LTLFormula af(Collection<String> letters) {
+    public LTLFormula af(final Collection<String> letters) {
         ArrayList<LTLFormula> result = new ArrayList<>();
         for (LTLFormula f : disjuncts) {
             LTLFormula temp = f.af(letters);
@@ -70,9 +70,7 @@ public class LTLOr extends LTLFormula {
     @Override
     public int hashCode() {
         HashCodeBuilder hashCodeBuilder = new HashCodeBuilder(911, 19);
-        for (LTLFormula d : disjuncts) {
-            hashCodeBuilder.append(d);
-        }
+        disjuncts.forEach(hashCodeBuilder::append);
         return hashCodeBuilder.toHashCode();
     }
 }

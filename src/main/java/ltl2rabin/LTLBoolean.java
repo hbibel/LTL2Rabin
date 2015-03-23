@@ -24,14 +24,14 @@ public class LTLBoolean extends LTLFormula {
     }
 
     @Override
-    public LTLFormula af(Collection<String> letters) {
+    public LTLFormula af(final Collection<String> letters) {
         return this;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj.getClass() != this.getClass()) return false;
-        return this.value == ((LTLBoolean)obj).value;
+        return (obj.getClass() == this.getClass())
+                && this.value == ((LTLBoolean)obj).value;
     }
 
     @Override

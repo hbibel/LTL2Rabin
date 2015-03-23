@@ -15,16 +15,15 @@ import java.util.function.BiFunction;
  */
 public class MojmirAutomaton<T, U> {
     // public Set<State> acceptingStates; // yet to be identified
-    public Set<State> sinks;
-    public Set<State> states;
+    private final Set<State> sinks;
+    private final Set<State> states;
+    private final State initialState;
+    private final Set<U> alphabet;
+    private final BiFunction<T, Set<U>, T> transitionFunction;
 
     public State getInitialState() {
         return initialState;
     }
-
-    public State initialState;
-    public Set<U> alphabet;
-    public BiFunction<T, Set<U>, T> transitionFunction;
 
     public MojmirAutomaton(T info, BiFunction<T, Set<U>, T> transitionFunction, HashSet<U> alphabet) {
         this.alphabet = alphabet;
@@ -36,7 +35,15 @@ public class MojmirAutomaton<T, U> {
         reach();
     }
 
-    public void reach() {
+    public Set<State> getSinks() {
+        return sinks;
+    }
+
+    public Set<State> getStates() {
+        return states;
+    }
+
+    private void reach() {
         Queue<State> statesToBeAdded = new ConcurrentLinkedQueue<>(states);
         Set<Set<U>> letters = Sets.powerSet(alphabet);
 
@@ -61,13 +68,13 @@ public class MojmirAutomaton<T, U> {
     }
 
     public class State {
-        T info;
+        private final T info;
+
+        boolean isSink;
 
         public boolean isSink() {
             return isSink;
         }
-
-        boolean isSink;
 
         public State(T info) {
             isSink = false;

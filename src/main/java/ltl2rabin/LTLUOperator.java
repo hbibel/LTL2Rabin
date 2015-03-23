@@ -8,15 +8,15 @@ import java.util.Collection;
  * This class represents the U (until) operator in an LTL formula.
  */
 public class LTLUOperator extends LTLFormula {
-    private LTLFormula left;
-    private LTLFormula right;
+    private final LTLFormula left;
+    private final LTLFormula right;
 
     /**
      * The only valid constructor for LTLUOperator
      * @param left The LTLFormula left of the U operator
      * @param right The LTLFormula right of the U operator
      */
-    public LTLUOperator(LTLFormula left, LTLFormula right) {
+    public LTLUOperator(final LTLFormula left, final LTLFormula right) {
         this.left = left;
         this.right = right;
     }
@@ -66,8 +66,9 @@ public class LTLUOperator extends LTLFormula {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj.getClass() != this.getClass()) return false;
-        return this.left.equals(((LTLUOperator)obj).left) && this.right.equals(((LTLUOperator)obj).right) ;
+        return (obj.getClass() == this.getClass())
+                && this.left.equals(((LTLUOperator)obj).left)
+                && this.right.equals(((LTLUOperator)obj).right) ;
     }
 
     @Override

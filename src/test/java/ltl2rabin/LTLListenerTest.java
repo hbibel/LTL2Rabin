@@ -77,8 +77,7 @@ public class LTLListenerTest {
         LTLOr aobuc = new LTLOr(a, buc);
         LTLAnd aobucanaubuxc = new LTLAnd(aobuc, naubuxc);
         LTLGOperator gaobucanaubuxc = new LTLGOperator(aobucanaubuxc);
-        LTLFOperator fgaobucanaubuxc = new LTLFOperator(gaobucanaubuxc);
-        LTLFOperator expectedTestResult999 = fgaobucanaubuxc;
+        LTLFOperator expectedTestResult999 = new LTLFOperator(gaobucanaubuxc);
         LTLFormula testCase999 = testEnterFormulaHelp("F G (a | b U c) & !a U (b U (X c))").getLtlTree();
         assertEquals(expectedTestResult999.toString(), testCase999.toString());
     }

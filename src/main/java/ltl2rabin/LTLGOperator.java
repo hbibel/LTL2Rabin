@@ -9,7 +9,7 @@ import java.util.Collection;
  * This class represents the G (globally) operator in LTL.
  */
 public class LTLGOperator extends LTLFormula {
-    private LTLFormula operand;
+    private final LTLFormula operand;
 
     /**
      * The only valid constructor for LTLGOperator.
@@ -29,7 +29,7 @@ public class LTLGOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula af(Collection<String> letters) {
+    public LTLFormula af(final Collection<String> letters) {
         ArrayList<LTLFormula> andParameter = new ArrayList<>();
         andParameter.add(this);
         LTLFormula newConjunct = operand.af(letters);
@@ -41,8 +41,8 @@ public class LTLGOperator extends LTLFormula {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj.getClass() != this.getClass()) return false;
-        return this.operand.equals(((LTLGOperator)obj).operand);
+        return (obj.getClass() == this.getClass())
+                && this.operand.equals(((LTLGOperator)obj).operand);
     }
 
     @Override
