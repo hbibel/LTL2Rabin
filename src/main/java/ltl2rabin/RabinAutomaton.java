@@ -4,12 +4,11 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class RabinAutomaton<T, U> {
-    public BiFunction<T, Set<U>, T> transitionFunction;
+    // public BiFunction<T, Set<U>, T> transitionFunction;
     private Set<State> states = new HashSet<>();
     private final State initialState;
     private final Set<U> alphabet;
@@ -38,7 +37,7 @@ public class RabinAutomaton<T, U> {
                         // According to the javadocs: For ordered streams, the selection of distinct elements is stable
                         // (for duplicated elements, the element appearing first in the encounter order is preserved.)
                         .distinct()
-                        .filter(MojmirAutomaton.State::isNoSink)
+                        .filter(e -> mojmirAutomaton.getSinks().contains(e))
                         .collect(Collectors.toList());
                 tempStates = newStateList;
                 reachedFixpoint &= !states.add(new State(newStateList));
