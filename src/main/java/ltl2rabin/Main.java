@@ -8,7 +8,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.util.HashSet;
-import java.util.Iterator;
 
 public class Main {
     public static void main(String[] args) {
@@ -16,11 +15,8 @@ public class Main {
         LTLListener ltlListener = Main.stringToLTLFormula("a | (b U c)");
         LTLFormula ltlOr = ltlListener.getLtlTree();
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton<LTLFormula, String> mojmirAutomaton = new MojmirAutomaton<LTLFormula, String>(ltlOr, new AfFunction(), alphabet);
-        for (Iterator<MojmirAutomaton<LTLFormula, String>.State> iterator = mojmirAutomaton.getStates().iterator(); iterator.hasNext(); ) {
-            MojmirAutomaton.State next =  iterator.next();
-            System.out.println(next.toString() + " isNoSink: " + next.isNoSink());
-        }
+        MojmirAutomaton<LTLFormula, String> mojmirAutomaton = new MojmirAutomaton<>(ltlOr, new AfFunction(), alphabet);
+        System.out.println("");
 
     }
 

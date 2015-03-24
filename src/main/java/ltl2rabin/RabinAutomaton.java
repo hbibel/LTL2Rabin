@@ -37,7 +37,9 @@ public class RabinAutomaton<T, U> {
                         // According to the javadocs: For ordered streams, the selection of distinct elements is stable
                         // (for duplicated elements, the element appearing first in the encounter order is preserved.)
                         .distinct()
-                        .filter(e -> mojmirAutomaton.getSinks().contains(e))
+                        // filter strikes out the elements that do not fulfil the condition specified within the
+                        // parentheses
+                        .filter(e -> !mojmirAutomaton.getSinks().contains(e))
                         .collect(Collectors.toList());
                 tempStates = newStateList;
                 reachedFixpoint &= !states.add(new State(newStateList));
@@ -48,6 +50,11 @@ public class RabinAutomaton<T, U> {
     public class State{
         private final List<MojmirAutomaton<T, U>.State> mojmirStates;
 
+        /**
+         *
+         * @param mojmirStates the list representing the ranking of the states of the corresponding mojmir automaton.
+         *                     The elder states come first in the list.
+         */
         public State(List<MojmirAutomaton<T, U>.State> mojmirStates) {
             this.mojmirStates = mojmirStates;
         }
@@ -71,6 +78,13 @@ public class RabinAutomaton<T, U> {
         @Override
         public int hashCode() {
             return new HashCodeBuilder(911, 19).append(mojmirStates).toHashCode();
+        }
+
+        @Override
+        public String toString() {
+            return "State{" +
+                    "mojmirStates=" + mojmirStates +
+                    '}';
         }
     }
 }
