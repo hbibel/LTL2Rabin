@@ -21,6 +21,13 @@ public class LTLUOperator extends LTLFormula {
         this.right = right;
     }
 
+    public LTLFormula getLeft() {
+        return left;
+    }
+
+    public LTLFormula getRight() {
+        return right;
+    }
 
     @Override
     public String toString() {

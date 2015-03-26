@@ -16,6 +16,7 @@ public class Main {
         LTLFormula ltlOr = ltlListener.getLtlTree();
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
         MojmirAutomaton<LTLFormula, String> mojmirAutomaton = new MojmirAutomaton<>(ltlOr, new AfFunction(), alphabet);
+
         System.out.println("");
 
     }

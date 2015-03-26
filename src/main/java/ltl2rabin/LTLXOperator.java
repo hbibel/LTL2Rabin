@@ -20,7 +20,7 @@ public class LTLXOperator extends LTLFormula {
 
     @Override
     public String toString() {
-        return "X" + operand.toString();
+        return "X " + operand.toString();
     }
 
     @Override

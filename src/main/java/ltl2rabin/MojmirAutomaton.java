@@ -72,13 +72,9 @@ public class MojmirAutomaton<T, U> {
 
         boolean isSink;
 
-        public boolean isSink() {
+/*        public boolean isSink() {
             return isSink;
-        }
-
-        public boolean isNoSink() {
-            return !isSink();
-        }
+        }*/
 
         public State(T info) {
             isSink = false;

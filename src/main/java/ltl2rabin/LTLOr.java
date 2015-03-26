@@ -5,18 +5,19 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class represents a logical disjunction (|) in an LTL formula.
  */
 public class LTLOr extends LTLFormula {
-    private final ArrayList<LTLFormula> disjuncts;
+    private final List<LTLFormula> disjuncts;
 
     /**
      *
      * @param disjuncts The LTL formulae that are connected by the disjunction
      */
-    public LTLOr(ArrayList<LTLFormula> disjuncts) {
+    public LTLOr(List<LTLFormula> disjuncts) {
         this.disjuncts = disjuncts;
     }
 
@@ -26,8 +27,8 @@ public class LTLOr extends LTLFormula {
         this(mergeTwoArguments(l, r));
     }
 
-    private static ArrayList<LTLFormula> mergeTwoArguments(final LTLFormula l, final LTLFormula r) {
-        ArrayList<LTLFormula> params = new ArrayList<>();
+    private static List<LTLFormula> mergeTwoArguments(final LTLFormula l, final LTLFormula r) {
+        List<LTLFormula> params = new ArrayList<>();
         params.add(l);
         params.add(r);
         return params;

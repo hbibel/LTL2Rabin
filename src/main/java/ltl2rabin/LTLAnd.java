@@ -5,23 +5,24 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class represents a logical conjunction (&) in an LTL formula.
  */
 public class LTLAnd extends LTLFormula {
-    private final ArrayList<LTLFormula> conjuncts;
+    private final List<LTLFormula> conjuncts;
 
     /**
      * The only valid constructor for LTLAnd
      * @param conjuncts The LTL formulae that are connected by the conjunction
      */
-    public LTLAnd(ArrayList<LTLFormula> conjuncts) {
+    public LTLAnd(List<LTLFormula> conjuncts) {
         this.conjuncts = conjuncts;
     }
 
     public LTLAnd(LTLFormula l, LTLFormula r) {
-        ArrayList<LTLFormula> params = new ArrayList<>();
+        List<LTLFormula> params = new ArrayList<>();
         params.add(l);
         params.add(r);
         conjuncts = params;
