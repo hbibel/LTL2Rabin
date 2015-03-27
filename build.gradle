@@ -13,7 +13,8 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     antlr "org.antlr:antlr4:4.5"
     compile group: 'com.google.guava', name: 'guava', version: '18.0'
-
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.3.2'
+    compile group: 'net.sf.jbddi', name: 'jbddi-core', version: '1.0.1'
 }
 
 jar {
