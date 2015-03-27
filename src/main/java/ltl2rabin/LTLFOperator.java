@@ -21,7 +21,7 @@ public class LTLFOperator extends LTLFormula {
 
     @Override
     public String toString() {
-        return "F " + operand.toString();
+        return "F (" + operand.toString() + ")";
     }
 
     @Override

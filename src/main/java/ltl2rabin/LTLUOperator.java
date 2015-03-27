@@ -31,7 +31,7 @@ public class LTLUOperator extends LTLFormula {
 
     @Override
     public String toString() {
-        return "(" + left.toString() + " U " + right.toString() + ")";
+        return "( (" + left.toString() + ") U (" + right.toString() + ") )";
     }
 
     @Override

@@ -37,12 +37,13 @@ public class LTLRandomFactory extends LTLFactory<Integer> {
     /**
      *
      * @param complexity    Determines the desired complexity of the returned LTL formula. The value should be between
-     *                      0 (terminal symbols) and 10 (very complex formulae with hundreds of different variables and
+     *                      0 (terminal symbols) and 10 (very complex formulae with hundreds of distinct variables and
      *                      over 1000 (possibly over 2000) operators)
      * @return              An arbitrary random LTLFormula object.
      */
     @Override
     public LTLFormula buildLTL(Integer complexity) {
+        // Make sure the complexity does not surpass 10:
         complexity = complexity > 10 ? 10 : complexity;
         int numVariables = 1+10*complexity;
         // generate the variables:

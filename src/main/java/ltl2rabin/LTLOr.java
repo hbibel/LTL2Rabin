@@ -42,7 +42,7 @@ public class LTLOr extends LTLFormula {
     public String toString() {
         String result = "(";
         for (LTLFormula f : disjuncts) {
-            result = result + f.toString() + " | ";
+            result = result + "(" + f.toString() + ") | ";
         }
         // cut the last | and close the parentheses
         return result.substring(0, result.length()-3) + ")";
