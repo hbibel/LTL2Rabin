@@ -5,7 +5,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -41,7 +44,9 @@ public class EquivalenceOfLTLsTest {
         LTLPropositionalEquivalenceWrapper w2 = new LTLPropositionalEquivalenceWrapper(f2);
         LTLPropositionalEquivalenceWrapper w3 = new LTLPropositionalEquivalenceWrapper(f3);
 
+        // true = true (different objects)
         assertTrue(w1.equals(w3));
+        // true != false
         assertFalse(w1.equals(w2));
     }
 
@@ -52,12 +57,113 @@ public class EquivalenceOfLTLsTest {
         LTLPropositionalEquivalenceWrapper w = new LTLPropositionalEquivalenceWrapper(a);
         LTLPropositionalEquivalenceWrapper notW = new LTLPropositionalEquivalenceWrapper(notA);
 
+        // a = a (different objects)
         assertTrue(w.equals(wrappers.get(0)));
+        // a != !a
         assertFalse(notW.equals(wrappers.get(0)));
+        // a != b
         assertFalse(w.equals(wrappers.get(1)));
     }
 
+    @Test
+    public void operatorPropositionalEquivalenceTest() {
+        List<Function<LTLFormula,LTLFormula> > gfxOperatorConstructors = Arrays.asList(
+                LTLFOperator::new,
+                LTLGOperator::new,
+                LTLXOperator::new
+        );
+        gfxOperatorConstructors.forEach(constructor -> {
+            LTLPropositionalEquivalenceWrapper wa = new LTLPropositionalEquivalenceWrapper(constructor.apply(variables.get(0)));
+            LTLPropositionalEquivalenceWrapper wa2 = new LTLPropositionalEquivalenceWrapper(constructor.apply(variables.get(0)));
+            LTLPropositionalEquivalenceWrapper wb = new LTLPropositionalEquivalenceWrapper(constructor.apply(variables.get(1)));
 
+            // G a = G a (different objects)
+            assertTrue(wa.equals(wa2));
+            // G a = G a (same object)
+            assertTrue(wa.equals(wa));
+            // G a != G b
+            assertFalse(wa.equals(wb));
+        });
+    }
+
+    @Test
+    public void uOperatorPropositionalEquivalenceTest() {
+        LTLPropositionalEquivalenceWrapper w1 = new LTLPropositionalEquivalenceWrapper(new LTLUOperator(variables.get(0), variables.get(1)));
+        LTLPropositionalEquivalenceWrapper w2 = new LTLPropositionalEquivalenceWrapper(new LTLUOperator(variables.get(0), variables.get(1)));
+        LTLPropositionalEquivalenceWrapper w3 = new LTLPropositionalEquivalenceWrapper(new LTLUOperator(variables.get(1), variables.get(0)));
+
+        // a U b = a U b
+        assertTrue(w1.equals(w2));
+        // a U b != b U a
+        assertFalse(w1.equals(w3));
+    }
+
+    @Test
+    public void andPropositionalEquivalenceTest() {
+
+    }
+
+    /********************************
+     * STRUCTURAL EQUIVALENCE TESTS *
+     ********************************/
+
+    @Test
+    public void booleanStructuralEquivalenceTest() {
+        LTLFormula f1 = new LTLBoolean(true);
+        LTLFormula f2 = new LTLBoolean(false);
+        LTLFormula f3 = new LTLBoolean(true);
+
+        // true = true (different objects)
+        assertTrue(f1.equals(f3));
+        // true != false
+        assertFalse(f1.equals(f2));
+    }
+
+    @Test
+    public void variableStructuralEquivalenceTest() {
+        LTLVariable a = new LTLVariable("a");
+        LTLVariable notA = new LTLVariable("a", true);
+
+        // a = a (different objects)
+        assertTrue(a.equals(variables.get(0)));
+        // a != !a
+        assertFalse(notA.equals(variables.get(0)));
+        // a != b
+        assertFalse(a.equals(variables.get(1)));
+    }
+
+    @Test
+    public void operatorStructuralEquivalenceTest() {
+        List<Function<LTLFormula,LTLFormula> > gfxOperatorConstructors = Arrays.asList(
+                LTLFOperator::new,
+                LTLGOperator::new,
+                LTLXOperator::new
+        );
+        gfxOperatorConstructors.forEach(constructor -> {
+            LTLFormula fa = constructor.apply(variables.get(0));
+            LTLFormula fa2 = constructor.apply(variables.get(0));
+            LTLFormula fb = constructor.apply(variables.get(1));
+
+            // G a = G a (different objects)
+            assertTrue(fa.equals(fa2));
+            // G a = G a (same object)
+            assertTrue(fa.equals(fa));
+            // G a != G b
+            assertFalse(fa.equals(fb));
+        });
+    }
+
+    @Test
+    public void uOperatorStructuralEquivalenceTest() {
+        LTLUOperator w1 = new LTLUOperator(variables.get(0), variables.get(1));
+        LTLUOperator w2 = new LTLUOperator(variables.get(0), variables.get(1));
+        LTLUOperator w3 = new LTLUOperator(variables.get(1), variables.get(0));
+
+        // a U b = a U b
+        assertTrue(w1.equals(w2));
+        // a U b != b U a
+        assertFalse(w1.equals(w3));
+    }
 /*
     @Test
     public void testCase2() {
