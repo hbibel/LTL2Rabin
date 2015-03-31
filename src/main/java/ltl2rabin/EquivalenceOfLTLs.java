@@ -1,4 +1,4 @@
-package ltl2rabin;
+/*package ltl2rabin;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
@@ -61,3 +61,4 @@ public class EquivalenceOfLTLs {
         }
     }
 }
+*/

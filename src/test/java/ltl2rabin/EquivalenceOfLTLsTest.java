@@ -1,23 +1,64 @@
 package ltl2rabin;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class EquivalenceOfLTLsTest {
+    List<LTLVariable> variables;
+    List<LTLPropositionalEquivalenceWrapper> wrappers;
+    int variableCount = 2; // should not surpass 26. Otherwise change variable generation in the setUp() method.
+
+    @Before
+    public void setUp () {
+        variables = new ArrayList<>();
+        wrappers = new ArrayList<>();
+        // generate necessary variables
+        for (int i = 0; i < variableCount; i++) {
+            variables.add(new LTLVariable(Character.toString((char) ('a' + i))));
+            wrappers.add(new LTLPropositionalEquivalenceWrapper(variables.get(i)));
+        }
+    }
+
+    @After
+    public void tearDown() {
+        variables.clear();
+        wrappers.clear();
+    }
+
     @Test
-    public void testCase1() {
+    public void booleanPropositionalEquivalenceTest() {
         LTLFormula f1 = new LTLBoolean(true);
         LTLFormula f2 = new LTLBoolean(false);
         LTLFormula f3 = new LTLBoolean(true);
+        LTLPropositionalEquivalenceWrapper w1 = new LTLPropositionalEquivalenceWrapper(f1);
+        LTLPropositionalEquivalenceWrapper w2 = new LTLPropositionalEquivalenceWrapper(f2);
+        LTLPropositionalEquivalenceWrapper w3 = new LTLPropositionalEquivalenceWrapper(f3);
 
-        assertTrue(EquivalenceOfLTLs.arePropositionallyEquivalent(f1, f3));
-        assertFalse(EquivalenceOfLTLs.arePropositionallyEquivalent(f1, f2));
+        assertTrue(w1.equals(w3));
+        assertFalse(w1.equals(w2));
     }
 
+    @Test
+    public void variablePropositionalEquivalenceTest() {
+        LTLVariable a = new LTLVariable("a");
+        LTLVariable notA = new LTLVariable("a", true);
+        LTLPropositionalEquivalenceWrapper w = new LTLPropositionalEquivalenceWrapper(a);
+        LTLPropositionalEquivalenceWrapper notW = new LTLPropositionalEquivalenceWrapper(notA);
+
+        assertTrue(w.equals(wrappers.get(0)));
+        assertFalse(notW.equals(wrappers.get(0)));
+        assertFalse(w.equals(wrappers.get(1)));
+    }
+
+
+/*
     @Test
     public void testCase2() {
         LTLFormula f1 = new LTLFOperator(new LTLVariable("a"));
@@ -41,21 +82,22 @@ public class EquivalenceOfLTLsTest {
         LTLFormula a5 = new LTLAnd(aArgs2);
 
         // F a = F a (different objects)
-        assertTrue(EquivalenceOfLTLs.arePropositionallyEquivalent(f1, f2));
+        assertTrue(f1.propositionallyEquivalent(f2));
         // F a != F b
-        assertFalse(EquivalenceOfLTLs.arePropositionallyEquivalent(f1, f3));
+        // assertFalse(f1.propositionallyEquivalent(f3));
         // (F a) & (F b) = (F b) & (F a)
-        assertTrue(EquivalenceOfLTLs.arePropositionallyEquivalent(a1, a2));
+        assertTrue(a1.propositionallyEquivalent(a2));
         // (F a) | (F b) = (F b) | (F a)
-        assertTrue(EquivalenceOfLTLs.arePropositionallyEquivalent(o1, o2));
+        assertTrue(o1.propositionallyEquivalent(o2));
         // "a" & tt = "a"
-        assertTrue(EquivalenceOfLTLs.arePropositionallyEquivalent(a3, v1));
+        assertTrue(a3.propositionallyEquivalent(v1));
         // "a" | tt = tt
-        assertTrue(EquivalenceOfLTLs.arePropositionallyEquivalent(o3, b1));
+        assertTrue(o3.propositionallyEquivalent(b1));
         // "a" | tt != "a"
-        assertFalse(EquivalenceOfLTLs.arePropositionallyEquivalent(v1, o3));
+        assertFalse(v1.propositionallyEquivalent(o3));
         // "a" & "b" & "c" = "c" & "a" & "b"
-        assertTrue(EquivalenceOfLTLs.arePropositionallyEquivalent(a4, a5));
+        assertTrue(a4.propositionallyEquivalent(a5));
+        // (F (X a)) & b = (F
     }
 
     @Test
@@ -65,6 +107,6 @@ public class EquivalenceOfLTLsTest {
         LTLAnd a1 = new LTLAnd(v1, v2);
         LTLAnd a2 = new LTLAnd(v2, v1);
 
-        assertTrue(a1.equals(a2));
-    }
+        assertTrue(a1.propositionallyEquivalent(a2));
+    }*/
 }

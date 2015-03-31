@@ -21,7 +21,7 @@ andformula
     ;
 
 uformula
-    : atom ('U' atom)*
+    : atom ('U' atom)?
     ;
 
 atom 

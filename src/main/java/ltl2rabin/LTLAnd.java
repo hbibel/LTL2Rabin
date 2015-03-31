@@ -1,5 +1,6 @@
 package ltl2rabin;
 
+import net.sf.javabdd.BDD;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
  */
 public class LTLAnd extends LTLFormula {
     private final List<LTLFormula> conjuncts;
+    private BDD cachedBDD = null;
 
     /**
      * The only valid constructor for LTLAnd
@@ -61,8 +63,26 @@ public class LTLAnd extends LTLFormula {
     }
 
     @Override
+    public LTLFormula afG(final Collection<String> letters) {
+        return af(letters);
+    }
+
+    @Override
+    public BDD getCachedBDD() {
+        if (null != cachedBDD) return cachedBDD;
+        Iterator<LTLFormula> it = getIterator();
+        LTLFormula tempFormula = it.next();
+        BDD result = tempFormula.getCachedBDD();
+        while (it.hasNext()) {
+            tempFormula = it.next();
+            result = result.and(tempFormula.getCachedBDD());
+        }
+        return result;
+    }
+
+    @Override
     public int hashCode() {
-        HashCodeBuilder hashCodeBuilder = new HashCodeBuilder(911, 19);
+        HashCodeBuilder hashCodeBuilder = new HashCodeBuilder(911, 19).append(this.getClass());
         conjuncts.forEach(hashCodeBuilder::append);
         return hashCodeBuilder.toHashCode();
     }

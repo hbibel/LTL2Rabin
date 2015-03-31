@@ -72,6 +72,11 @@ public class LTLUOperator extends LTLFormula {
     }
 
     @Override
+    public LTLFormula afG(Collection<String> letters) {
+        return af(letters);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         return (obj.getClass() == this.getClass())
                 && this.left.equals(((LTLUOperator)obj).left)
@@ -80,6 +85,6 @@ public class LTLUOperator extends LTLFormula {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(911, 19).append(left).append(right).toHashCode();
+        return new HashCodeBuilder(911, 19).append(this.getClass()).append(left).append(right).toHashCode();
     }
 }

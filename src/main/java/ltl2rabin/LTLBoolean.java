@@ -1,5 +1,6 @@
 package ltl2rabin;
 
+import net.sf.javabdd.BDD;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.Collection;
@@ -20,12 +21,22 @@ public class LTLBoolean extends LTLFormula {
 
     @Override
     public String toString() {
-        if (value) return "tt"; else return "ff";
+        return value ? "tt" : "ff";
     }
 
     @Override
     public LTLFormula af(final Collection<String> letters) {
         return this;
+    }
+
+    @Override
+    public LTLFormula afG(Collection<String> letters) {
+        return af(letters);
+    }
+
+    @Override
+    public BDD getCachedBDD() {
+        return value ? Main.bddFactory.one() : Main.bddFactory.zero();
     }
 
     @Override
@@ -36,6 +47,6 @@ public class LTLBoolean extends LTLFormula {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(911, 19).append(value).toHashCode();
+        return new HashCodeBuilder(911, 19).append(this.getClass()).append(value).toHashCode();
     }
 }

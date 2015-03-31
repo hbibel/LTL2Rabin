@@ -1,8 +1,10 @@
 package ltl2rabin;
 
+import net.sf.javabdd.BDD;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 /**
  * Represents a variable (string) with an optional negation ('!') in an LTL Formula.
@@ -10,6 +12,11 @@ import java.util.Collection;
 public class LTLVariable extends LTLFormula {
     private final String value;
     private final boolean negated;
+    private static HashMap<String, BDD> cachedBDDs = new HashMap<>();
+
+    public static void resetVariableSpace() {
+        cachedBDDs.clear();
+    }
 
     /**
      * Default constructor for LTLVariable
@@ -53,6 +60,11 @@ public class LTLVariable extends LTLFormula {
     }
 
     @Override
+    public LTLFormula afG(Collection<String> letters) {
+        return af(letters);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         return (obj.getClass() == this.getClass())
                 && this.value.equals(((LTLVariable)obj).value)
@@ -61,6 +73,15 @@ public class LTLVariable extends LTLFormula {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(911, 19).append(value).append(negated).toHashCode();
+        return new HashCodeBuilder(911, 19).append(this.getClass()).append(value).append(negated).toHashCode();
+    }
+
+    @Override
+    public BDD getCachedBDD() {
+        if (cachedBDDs.get(this.value) == null) {
+            Main.bddFactory.extVarNum(1);
+            cachedBDDs.put(this.value, Main.bddFactory.ithVar(Main.bddVarCount++));
+        }
+        return negated ? cachedBDDs.get(this.value).not() : cachedBDDs.get(this.value);
     }
 }

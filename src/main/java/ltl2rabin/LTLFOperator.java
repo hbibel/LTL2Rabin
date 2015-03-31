@@ -36,6 +36,11 @@ public class LTLFOperator extends LTLFormula {
     }
 
     @Override
+    public LTLFormula afG(Collection<String> letters) {
+        return af(letters);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         return (obj.getClass() == this.getClass())
                 && this.operand.equals(((LTLFOperator)obj).operand);
@@ -43,6 +48,6 @@ public class LTLFOperator extends LTLFormula {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(911, 19).append(operand).toHashCode();
+        return new HashCodeBuilder(911, 19).append(operand).append(this.getClass()).toHashCode();
     }
 }
