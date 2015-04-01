@@ -35,11 +35,6 @@ public class LTLBoolean extends LTLFormula {
     }
 
     @Override
-    public BDD getCachedBDD() {
-        return value ? Main.bddFactory.one() : Main.bddFactory.zero();
-    }
-
-    @Override
     public boolean equals(Object obj) {
         return (obj.getClass() == this.getClass())
                 && this.value == ((LTLBoolean)obj).value;

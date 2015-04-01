@@ -15,7 +15,7 @@ public class LTLPropositionalEquivalenceWrapper  {
     public Class<? extends LTLFormula> getFormulaClass() {
         return formula.getClass();
     }
-
+/*
     @Override
     public int hashCode() {
         return this.getCachedBDD().hashCode();
@@ -37,8 +37,5 @@ public class LTLPropositionalEquivalenceWrapper  {
         }
         return false;
     }
-
-    private BDD getCachedBDD() {
-        return formula.getCachedBDD();
-    }
+*/
 }

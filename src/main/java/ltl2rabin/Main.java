@@ -14,8 +14,6 @@ import java.util.HashSet;
 // Note to self: When parsing several LTLs, don't forget to call LTLVariable.cachedBDDs.clear() in between to clean up
 // the variable space.
 public class Main {
-    protected static int bddVarCount = 0;
-    protected static final BDDFactory bddFactory = BDDFactory.init("java", 2, 2);
 
     public static void main(String[] args) {
         System.out.println("This program runs, but does not do anything useful yet.");
@@ -23,6 +21,8 @@ public class Main {
         LTLFormula ltlOr = ltlListener.getLtlTree();
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
         MojmirAutomaton<LTLFormula, String> mojmirAutomaton = new MojmirAutomaton<>(ltlOr, new AfFunction(), alphabet);
+
+
 
         System.out.println("");
 

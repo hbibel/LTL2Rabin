@@ -6,12 +6,14 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 public class LTLListener extends LTLBaseListener {
     private LTLFormula ltlTree;
     private final LTLParser parser;
-    private final HashSet<String> terminalSymbols = new HashSet<>();
+    // Keeping all variables in a HashMap makes sure no variable gets created more than once.
+    private final HashMap<String, LTLListener.LTLVariablePair> variables = new HashMap<>();
 
     public LTLListener(LTLParser parser) {
         this.parser = parser;
@@ -22,7 +24,7 @@ public class LTLListener extends LTLBaseListener {
     }
 
     public HashSet<String> getTerminalSymbols() {
-        return terminalSymbols;
+        return new HashSet<>(variables.keySet());
     }
 
     /* This is not a very pretty solution. Initially I had this:
@@ -134,17 +136,37 @@ public class LTLListener extends LTLBaseListener {
                 else {
                     // ctx is a terminal symbol, but no boolean
                     String text = ((LTLParser.AtomContext) ctx).Identifier().getText();
-                    if (text.charAt(0) == '!') {
-                        String symbol = text.substring(1);
-                        if (!terminalSymbols.contains(symbol)) terminalSymbols.add(symbol);
-                        return new LTLVariable(symbol, true);
+                    boolean negated = text.charAt(0) == '!';
+                    String symbol = negated ? text.substring(1) : text;
+                    LTLListener.LTLVariablePair variablePair = variables.get(symbol);
+                    if (variablePair == null) {
+                        LTLListener.LTLVariablePair newPair = new LTLVariablePair(symbol);
+                        variables.put(symbol, newPair);
+                        variablePair = newPair;
                     }
-                    else {
-                        if (!terminalSymbols.contains(text)) terminalSymbols.add(text);
-                        return new LTLVariable(text);
-                    }
+                    return negated ? variablePair.getNegatedVariable() : variablePair.getNonNegatedVariable();
                 }
             }
+        }
+    }
+
+    private class LTLVariablePair {
+        LTLVariable negatedVariable;
+        LTLVariable nonNegatedVariable;
+        String symbol;
+
+        LTLVariablePair(String symbol) {
+            this.symbol = symbol;
+            this.negatedVariable = new LTLVariable(symbol, true);
+            this.nonNegatedVariable = new LTLVariable(symbol);
+        }
+
+        public LTLVariable getNegatedVariable() {
+            return negatedVariable;
+        }
+
+        public LTLVariable getNonNegatedVariable() {
+            return nonNegatedVariable;
         }
     }
 }

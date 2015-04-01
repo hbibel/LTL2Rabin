@@ -14,12 +14,4 @@ public abstract class LTLFormula {
     public abstract LTLFormula af(final Collection<String> letters);
 
     public abstract LTLFormula afG(final Collection<String> letters);
-
-    public BDD getCachedBDD() {
-        if (cachedBDD == null) {
-            Main.bddFactory.extVarNum(1);
-            cachedBDD = Main.bddFactory.ithVar(Main.bddVarCount++);
-        }
-        return cachedBDD;
-    }
 }

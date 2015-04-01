@@ -68,19 +68,6 @@ public class LTLAnd extends LTLFormula {
     }
 
     @Override
-    public BDD getCachedBDD() {
-        if (null != cachedBDD) return cachedBDD;
-        Iterator<LTLFormula> it = getIterator();
-        LTLFormula tempFormula = it.next();
-        BDD result = tempFormula.getCachedBDD();
-        while (it.hasNext()) {
-            tempFormula = it.next();
-            result = result.and(tempFormula.getCachedBDD());
-        }
-        return result;
-    }
-
-    @Override
     public int hashCode() {
         HashCodeBuilder hashCodeBuilder = new HashCodeBuilder(911, 19).append(this.getClass());
         conjuncts.forEach(hashCodeBuilder::append);

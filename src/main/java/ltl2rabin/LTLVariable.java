@@ -12,11 +12,6 @@ import java.util.HashMap;
 public class LTLVariable extends LTLFormula {
     private final String value;
     private final boolean negated;
-    private static HashMap<String, BDD> cachedBDDs = new HashMap<>();
-
-    public static void resetVariableSpace() {
-        cachedBDDs.clear();
-    }
 
     /**
      * Default constructor for LTLVariable
@@ -74,14 +69,5 @@ public class LTLVariable extends LTLFormula {
     @Override
     public int hashCode() {
         return new HashCodeBuilder(911, 19).append(this.getClass()).append(value).append(negated).toHashCode();
-    }
-
-    @Override
-    public BDD getCachedBDD() {
-        if (cachedBDDs.get(this.value) == null) {
-            Main.bddFactory.extVarNum(1);
-            cachedBDDs.put(this.value, Main.bddFactory.ithVar(Main.bddVarCount++));
-        }
-        return negated ? cachedBDDs.get(this.value).not() : cachedBDDs.get(this.value);
     }
 }
