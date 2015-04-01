@@ -2,6 +2,7 @@ package ltl2rabin;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -73,23 +74,16 @@ public class LTLPropEquivalenceClass {
 
     @Override
     public boolean equals(Object o) {
-        // first look in formulaBDDMap
-        // TODO
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
         LTLPropEquivalenceClass that = (LTLPropEquivalenceClass) o;
 
-        if (!cachedBDD.equals(that.cachedBDD)) return false;
-
-        return true;
+        return (that.representative.equals(this.representative)) || cachedBDD.equals(that.cachedBDD);
     }
 
     @Override
     public int hashCode() {
-        // TODO
-        int result = representative.hashCode();
-        result = 31 * result + cachedBDD.hashCode();
-        return result;
+        return new HashCodeBuilder(911, 19).append(bddFactory).toHashCode();
     }
 }
