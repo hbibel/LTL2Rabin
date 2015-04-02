@@ -63,6 +63,7 @@ public class LTLOr extends LTLFormula {
             }
             result.add(f.af(letters));
         }
+        // TODO: Remove the stuff below
         // An empty disjunction list means that all disjuncts resolved to false
         if (0 == result.size()) return new LTLBoolean(false);
         // Only one disjunct? Then we don't need an "or".

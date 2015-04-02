@@ -40,11 +40,14 @@ public class LTLPropEquivalenceClass {
                         ((LTLAnd) formula).getIterator() : ((LTLOr) formula).getIterator();
                 LTLFormula tempFormula = it.next();
                 result = getOrCreateBDD(tempFormula);
+                System.out.println(result.toString());
                 Function<BDD, BDD> andOr = formula instanceof LTLAnd ? result::and : result::or;
 
                 while (it.hasNext()) {
                     tempFormula = it.next();
+                    System.out.println(result + "and" + getOrCreateBDD(tempFormula));
                     result = andOr.apply(getOrCreateBDD(tempFormula));
+                    System.out.println(result.toString());
                 }
             } else if (formula instanceof LTLBoolean) {
                 result = ((LTLBoolean) formula).getValue() ? bddFactory.one() : bddFactory.zero();

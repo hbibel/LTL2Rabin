@@ -20,7 +20,7 @@ public class LTLFactoryFromStringTest {
 
     @After
     public void tearDown() throws Exception {
-        LTLVariable.resetVariableSpace();
+        //LTLVariable.resetVariableSpace();
     }
 
     @Test

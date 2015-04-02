@@ -55,6 +55,7 @@ public class LTLAnd extends LTLFormula {
             }
             newConjuncts.add(temp);
         }
+        // TODO: Remove the stuff below
         // An empty disjunction list means that all conjuncts resolved to true
         if (0 == newConjuncts.size()) return new LTLBoolean(true);
         // Only one conjunct? Then we don't need an "and".
