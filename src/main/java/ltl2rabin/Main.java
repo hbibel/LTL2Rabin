@@ -2,12 +2,16 @@ package ltl2rabin;
 
 import ltl2rabin.parser.LTLLexer;
 import ltl2rabin.parser.LTLParser;
-import net.sf.javabdd.BDDFactory;
+import net.sf.javabdd.*;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 
 
@@ -17,12 +21,9 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("This program runs, but does not do anything useful yet.");
-        LTLListener ltlListener = Main.stringToLTLFormula("a | (b U c)");
-        LTLFormula ltlOr = ltlListener.getLtlTree();
-        HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton<LTLFormula, String> mojmirAutomaton = new MojmirAutomaton<>(ltlOr, new AfFunction(), alphabet);
 
-
+        ArrayList<LTLFormula> l1 = new ArrayList<>(Arrays.asList(new LTLVariable("a"), new LTLVariable("b"), new LTLVariable("c")));
+        LTLPropEquivalenceClass c3 = new LTLPropEquivalenceClass(new LTLAnd(l1)); // a & b & c
 
         System.out.println("");
 

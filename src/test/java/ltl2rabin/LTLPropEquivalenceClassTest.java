@@ -99,23 +99,70 @@ public class LTLPropEquivalenceClassTest {
 
     @Test
     public void andPropositionalEquivalenceTest() {
-        //LTLPropEquivalenceClass c1 = new LTLPropEquivalenceClass(new LTLAnd(variables.get(0), variables.get(1))); // a & b
-        //LTLPropEquivalenceClass c2 = new LTLPropEquivalenceClass(new LTLAnd(variables.get(1), variables.get(0))); // b & a
+        LTLPropEquivalenceClass c1 = new LTLPropEquivalenceClass(new LTLAnd(variables.get(0), variables.get(1))); // a & b
+        LTLPropEquivalenceClass c2 = new LTLPropEquivalenceClass(new LTLAnd(variables.get(1), variables.get(0))); // b & a
         ArrayList<LTLFormula> l1 = new ArrayList<>(Arrays.asList(variables.get(0), variables.get(1), variables.get(2)));
         LTLPropEquivalenceClass c3 = new LTLPropEquivalenceClass(new LTLAnd(l1)); // a & b & c
-        //LTLPropEquivalenceClass c4 = new LTLPropEquivalenceClass(new LTLAnd(new LTLAnd(variables.get(0), variables.get(1)), variables.get(2))); // (a & b) & c
-        //LTLPropEquivalenceClass c5 = new LTLPropEquivalenceClass(new LTLAnd(variables.get(0), new LTLAnd(variables.get(1), variables.get(2)))); // a & (b & c)
+        LTLPropEquivalenceClass c4 = new LTLPropEquivalenceClass(new LTLAnd(new LTLAnd(variables.get(0), variables.get(1)), variables.get(2))); // (a & b) & c
+        LTLPropEquivalenceClass c5 = new LTLPropEquivalenceClass(new LTLAnd(variables.get(0), new LTLAnd(variables.get(1), variables.get(2)))); // a & (b & c)
         LTLPropEquivalenceClass c6 = new LTLPropEquivalenceClass(new LTLAnd(variables.get(0), variables.get(2))); // a & c
 
         // a & b = b & a
-        //assertTrue(c1.equals(c2));
+        assertTrue(c1.equals(c2));
         // a & b & c != a & b
-        //assertFalse(c1.equals(c3));
+        assertFalse(c1.equals(c3));
         // a & b & c != a & c
         assertFalse(c3.equals(c6));
         // (a & b) & c = a & (b & c) = a & b & c
-        //assertTrue(c4.equals(c5));
-        //assertTrue(c4.equals(c3));
-        //assertTrue(c5.equals(c3));
+        assertTrue(c4.equals(c5));
+        assertTrue(c4.equals(c3));
+        assertTrue(c5.equals(c3));
+    }
+
+    @Test
+    public void orPropositionalEquivalenceTest() {
+        LTLPropEquivalenceClass c1 = new LTLPropEquivalenceClass(new LTLOr(variables.get(0), variables.get(1))); // a | b
+        LTLPropEquivalenceClass c2 = new LTLPropEquivalenceClass(new LTLOr(variables.get(1), variables.get(0))); // b | a
+        ArrayList<LTLFormula> l1 = new ArrayList<>(Arrays.asList(variables.get(0), variables.get(1), variables.get(2)));
+        LTLPropEquivalenceClass c3 = new LTLPropEquivalenceClass(new LTLOr(l1)); // a | b | c
+        LTLPropEquivalenceClass c4 = new LTLPropEquivalenceClass(new LTLOr(new LTLOr(variables.get(0), variables.get(1)), variables.get(2))); // (a | b) | c
+        LTLPropEquivalenceClass c5 = new LTLPropEquivalenceClass(new LTLOr(variables.get(0), new LTLOr(variables.get(1), variables.get(2)))); // a | (b | c)
+        LTLPropEquivalenceClass c6 = new LTLPropEquivalenceClass(new LTLOr(variables.get(0), variables.get(2))); // a | c
+
+        // a | b = b | a
+        assertTrue(c1.equals(c2));
+        // a | b | c != a | b
+        assertFalse(c1.equals(c3));
+        // a | b | c != a | c
+        assertFalse(c3.equals(c6));
+        // (a | b) | c = a | (b | c) = a | b | c
+        assertTrue(c4.equals(c5));
+        assertTrue(c4.equals(c3));
+        assertTrue(c5.equals(c3));
+    }
+
+    @Test
+    public void booleanLaws() {
+        // Testing against some laws, taken from here: https://en.wikipedia.org/wiki/Boolean_algebra#Laws
+
+        LTLFormula bORc = new LTLOr(variables.get(1), variables.get(2)); // b | c
+        LTLPropEquivalenceClass c1 = new LTLPropEquivalenceClass(new LTLAnd(variables.get(0), bORc)); // a & (b | c)
+        LTLFormula aANDb = new LTLAnd(variables.get(0), variables.get(1)); // a & b
+        LTLFormula aANDc = new LTLAnd(variables.get(0), variables.get(2)); // a & c
+        LTLPropEquivalenceClass c2 = new LTLPropEquivalenceClass(new LTLOr(aANDb, aANDc));
+        // a & (b | c) = (a & b) | (a & c)
+        assertTrue(c1.equals(c2));
+
+        LTLPropEquivalenceClass c3 = new LTLPropEquivalenceClass(new LTLOr(variables.get(0), new LTLBoolean(false))); // a | false
+        LTLPropEquivalenceClass c4 = new LTLPropEquivalenceClass(variables.get(0)); // a
+        // a | false = a
+        assertTrue(c3.equals(c4));
+        // a & true = a
+        LTLPropEquivalenceClass c5 = new LTLPropEquivalenceClass(new LTLAnd(variables.get(0), new LTLBoolean(true))); // a & true
+        assertTrue(c4.equals(c5));
+
+        LTLPropEquivalenceClass c6 = new LTLPropEquivalenceClass(new LTLAnd(variables.get(1), bORc)); // b & (b | c)
+        // b & (b | c) = b
+        assertTrue(c6.equals(new LTLPropEquivalenceClass(variables.get(1))));
     }
 }
