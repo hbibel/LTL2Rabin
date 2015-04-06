@@ -73,7 +73,11 @@ public class LTLOr extends LTLFormula {
 
     @Override
     public LTLFormula afG(Collection<String> letters) {
-        return af(letters);
+        ArrayList<LTLFormula> result = new ArrayList<>();
+        for (LTLFormula f : disjuncts) {
+            result.add(f.afG(letters));
+        }
+        return new LTLOr(result);
     }
 
     @Override

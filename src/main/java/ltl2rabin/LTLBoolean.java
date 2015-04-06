@@ -31,7 +31,7 @@ public class LTLBoolean extends LTLFormula {
 
     @Override
     public LTLFormula afG(Collection<String> letters) {
-        return af(letters);
+        return this;
     }
 
     @Override

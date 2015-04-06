@@ -73,7 +73,9 @@ public class LTLUOperator extends LTLFormula {
 
     @Override
     public LTLFormula afG(Collection<String> letters) {
-        return af(letters);
+        LTLFormula afGLeftSide = left.afG(letters);
+        LTLFormula afGRightSide = right.afG(letters);
+        return new LTLOr(afGRightSide, new LTLAnd(afGLeftSide, this));
     }
 
     @Override

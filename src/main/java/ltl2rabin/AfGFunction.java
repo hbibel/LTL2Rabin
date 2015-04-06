@@ -7,6 +7,6 @@ public class AfGFunction implements BiFunction<LTLPropEquivalenceClass, Set<Stri
 
     @Override
     public LTLPropEquivalenceClass apply(LTLPropEquivalenceClass eqClass, Set<String> strings) {
-        return new LTLPropEquivalenceClass(eqClass.getRepresentative().af(strings));
+        return new LTLPropEquivalenceClass(eqClass.getRepresentative().afG(strings));
     }
 }

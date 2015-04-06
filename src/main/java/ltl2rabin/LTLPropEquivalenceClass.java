@@ -7,6 +7,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * An object of this class represents an equivalence class of LTL formulas.
@@ -94,6 +95,6 @@ public class LTLPropEquivalenceClass {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(911, 19).append(bddFactory).toHashCode();
+        return Objects.hash(cachedBDD);
     }
 }

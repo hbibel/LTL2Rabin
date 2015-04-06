@@ -30,7 +30,7 @@ public class LTLXOperator extends LTLFormula {
 
     @Override
     public LTLFormula afG(Collection<String> letters) {
-        return af(letters);
+        return operand;
     }
 
     @Override

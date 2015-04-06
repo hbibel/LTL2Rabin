@@ -56,7 +56,7 @@ public class LTLVariable extends LTLFormula {
 
     @Override
     public LTLFormula afG(Collection<String> letters) {
-        return af(letters);
+        return new LTLBoolean(negated != (letters.contains(value)));
     }
 
     @Override

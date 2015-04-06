@@ -14,13 +14,10 @@ public class MojmirAutomatonTest {
         LTLListener ltlListener = Main.stringToLTLFormula("a | (b U c)");
         LTLFormula ltlOr = ltlListener.getLtlTree();
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton mojmirAutomaton = new MojmirAutomaton<LTLFormula, String>(ltlOr, new AfFunction(), alphabet);
 
         MojmirAutomaton<LTLPropEquivalenceClass, String> classyMojmir = new MojmirAutomaton<>(
                 new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet);
         assertEquals(4, classyMojmir.getStates().size());
-
-        assertEquals(4, mojmirAutomaton.getStates().size());
     }
 
     @Test
@@ -28,13 +25,10 @@ public class MojmirAutomatonTest {
         LTLListener ltlListener = Main.stringToLTLFormula("a | b | c");
         LTLFormula ltlOr = ltlListener.getLtlTree();
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton mojmirAutomaton = new MojmirAutomaton<LTLFormula, String>(ltlOr, new AfFunction(), alphabet);
 
         MojmirAutomaton<LTLPropEquivalenceClass, String> classyMojmir = new MojmirAutomaton<>(
                 new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet);
         assertEquals(3, classyMojmir.getStates().size());
-
-        assertEquals(3, mojmirAutomaton.getStates().size());
     }
 
     @Test
@@ -42,13 +36,10 @@ public class MojmirAutomatonTest {
         LTLListener ltlListener = Main.stringToLTLFormula("X b");
         LTLFormula ltlOr = ltlListener.getLtlTree();
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton mojmirAutomaton = new MojmirAutomaton<LTLFormula, String>(ltlOr, new AfFunction(), alphabet);
 
         MojmirAutomaton<LTLPropEquivalenceClass, String> classyMojmir = new MojmirAutomaton<>(
                 new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet);
         assertEquals(4, classyMojmir.getStates().size());
-
-        assertEquals(4, mojmirAutomaton.getStates().size());
     }
 
     @Test
@@ -56,13 +47,10 @@ public class MojmirAutomatonTest {
         LTLListener ltlListener = Main.stringToLTLFormula("F b");
         LTLFormula ltlOr = ltlListener.getLtlTree();
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton mojmirAutomaton = new MojmirAutomaton<LTLFormula, String>(ltlOr, new AfFunction(), alphabet);
 
         MojmirAutomaton<LTLPropEquivalenceClass, String> classyMojmir = new MojmirAutomaton<>(
                 new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet);
         assertEquals(2, classyMojmir.getStates().size());
-
-        assertEquals(2, mojmirAutomaton.getStates().size());
     }
 
     @Test
@@ -70,13 +58,10 @@ public class MojmirAutomatonTest {
         LTLListener ltlListener = Main.stringToLTLFormula("a & b & c");
         LTLFormula ltlOr = ltlListener.getLtlTree();
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton mojmirAutomaton = new MojmirAutomaton<LTLFormula, String>(ltlOr, new AfFunction(), alphabet);
 
         MojmirAutomaton<LTLPropEquivalenceClass, String> classyMojmir = new MojmirAutomaton<>(
                 new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet);
         assertEquals(3, classyMojmir.getStates().size());
-
-        assertEquals(3, mojmirAutomaton.getStates().size());
     }
 
     @Test
@@ -84,13 +69,10 @@ public class MojmirAutomatonTest {
         LTLListener ltlListener = Main.stringToLTLFormula("a U b");
         LTLFormula ltlOr = ltlListener.getLtlTree();
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton mojmirAutomaton = new MojmirAutomaton<LTLFormula, String>(ltlOr, new AfFunction(), alphabet);
 
         MojmirAutomaton<LTLPropEquivalenceClass, String> classyMojmir = new MojmirAutomaton<>(
                 new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet);
         assertEquals(3, classyMojmir.getStates().size());
-
-        assertEquals(3, mojmirAutomaton.getStates().size());
     }
 
     @Test
@@ -98,13 +80,10 @@ public class MojmirAutomatonTest {
         LTLListener ltlListener = Main.stringToLTLFormula("a");
         LTLFormula ltlOr = ltlListener.getLtlTree();
         HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton mojmirAutomaton = new MojmirAutomaton<LTLFormula, String>(ltlOr, new AfFunction(), alphabet);
 
         MojmirAutomaton<LTLPropEquivalenceClass, String> classyMojmir = new MojmirAutomaton<>(
                 new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet);
         assertEquals(3, classyMojmir.getStates().size());
-
-        assertEquals(3, mojmirAutomaton.getStates().size());
     }
 
 

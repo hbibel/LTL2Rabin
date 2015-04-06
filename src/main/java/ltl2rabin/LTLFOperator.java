@@ -37,7 +37,10 @@ public class LTLFOperator extends LTLFormula {
 
     @Override
     public LTLFormula afG(Collection<String> letters) {
-        return af(letters);
+        ArrayList<LTLFormula> orParameter = new ArrayList<>();
+        orParameter.add(this);
+        orParameter.add(this.operand.afG(letters));
+        return new LTLOr(orParameter);
     }
 
     @Override

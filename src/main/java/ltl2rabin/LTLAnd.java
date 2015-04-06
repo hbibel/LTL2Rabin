@@ -3,17 +3,13 @@ package ltl2rabin;
 import net.sf.javabdd.BDD;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class represents a logical conjunction (&) in an LTL formula.
  */
 public class LTLAnd extends LTLFormula {
     private final List<LTLFormula> conjuncts;
-    private BDD cachedBDD = null;
 
     /**
      * The only valid constructor for LTLAnd
@@ -55,23 +51,32 @@ public class LTLAnd extends LTLFormula {
             }
             newConjuncts.add(temp);
         }
-        // TODO: Remove the stuff below
-        // An empty disjunction list means that all conjuncts resolved to true
-        if (0 == newConjuncts.size()) return new LTLBoolean(true);
-        // Only one conjunct? Then we don't need an "and".
-        if (1 == newConjuncts.size()) return newConjuncts.get(0);
         return new LTLAnd(newConjuncts);
     }
 
     @Override
     public LTLFormula afG(final Collection<String> letters) {
-        return af(letters);
+        ArrayList<LTLFormula> newConjuncts = new ArrayList<>();
+        for (LTLFormula f : conjuncts) {
+            LTLFormula temp = f.afG(letters);
+            newConjuncts.add(temp);
+        }
+        return new LTLAnd(newConjuncts);
     }
 
     @Override
     public int hashCode() {
-        HashCodeBuilder hashCodeBuilder = new HashCodeBuilder(911, 19).append(this.getClass());
-        conjuncts.forEach(hashCodeBuilder::append);
-        return hashCodeBuilder.toHashCode();
+        return Objects.hash(this.getClass(), conjuncts);
+    }
+
+    // Since this equals method tests for structural equivalence, a & b does NOT equal b & a.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LTLAnd ltlAnd = (LTLAnd) o;
+
+        return !(conjuncts != null ? !conjuncts.equals(ltlAnd.conjuncts) : ltlAnd.conjuncts != null);
     }
 }

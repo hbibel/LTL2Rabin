@@ -14,7 +14,7 @@ import java.util.function.BiFunction;
  * @param <U> The type that represents the "letters", e.g. String
  */
 public class MojmirAutomaton<T, U> {
-    // public Set<State> acceptingStates; // TODO yet to be identified
+    // public Set<State> acceptingStates; // TODO yet to be identified, if necessary
     private final Set<State> sinks;
     private final Set<State> states;
     private final State initialState;
@@ -72,12 +72,8 @@ public class MojmirAutomaton<T, U> {
 
         boolean isSink;
 
-/*        public boolean isSink() {
-            return isSink;
-        }*/
-
         public State(T info) {
-         isSink = false;
+            isSink = false;
             this.info = info;
         }
 
