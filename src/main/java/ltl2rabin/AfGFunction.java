@@ -3,10 +3,10 @@ package ltl2rabin;
 import java.util.Set;
 import java.util.function.BiFunction;
 
-public class AfGFunction implements BiFunction<LTLFormula, Set<String>, LTLFormula> {
+public class AfGFunction implements BiFunction<LTLPropEquivalenceClass, Set<String>, LTLPropEquivalenceClass> {
 
     @Override
-    public LTLFormula apply(LTLFormula formula, Set<String> strings) {
-        return formula.af(strings);
+    public LTLPropEquivalenceClass apply(LTLPropEquivalenceClass eqClass, Set<String> strings) {
+        return new LTLPropEquivalenceClass(eqClass.getRepresentative().af(strings));
     }
 }

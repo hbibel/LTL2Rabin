@@ -28,6 +28,10 @@ public class LTLPropEquivalenceClass {
         this.cachedBDD = getOrCreateBDD(representative);
     }
 
+    public LTLFormula getRepresentative() {
+        return representative;
+    }
+
     private static BDD getOrCreateBDD(final LTLFormula formula) {
         BDD result = formulaBDDMap.get(formula);
         if (result != null) {
@@ -73,6 +77,7 @@ public class LTLPropEquivalenceClass {
                 result = bddFactory.ithVar(bddVarCount++);
             }
             formulaBDDMap.put(formula, result);
+
             return result;
         }
     }
