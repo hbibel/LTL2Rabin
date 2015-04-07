@@ -1,9 +1,8 @@
 package ltl2rabin;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * This class represents the G (globally) operator in LTL.
@@ -50,6 +49,6 @@ public class LTLGOperator extends LTLFormula {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(911, 19).append(operand).append(this.getClass()).toHashCode();
+        return Objects.hash(operand, this.getClass());
     }
 }

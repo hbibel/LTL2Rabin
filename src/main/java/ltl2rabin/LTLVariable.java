@@ -1,10 +1,7 @@
 package ltl2rabin;
 
-import net.sf.javabdd.BDD;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * Represents a variable (string) with an optional negation ('!') in an LTL Formula.
@@ -68,6 +65,6 @@ public class LTLVariable extends LTLFormula {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(911, 19).append(this.getClass()).append(value).append(negated).toHashCode();
+        return Objects.hash(this.getClass(), value, negated);
     }
 }

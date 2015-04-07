@@ -1,8 +1,7 @@
 package ltl2rabin;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * This class represents the X (next) operator in LTL.
@@ -41,6 +40,6 @@ public class LTLXOperator extends LTLFormula {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(911, 19).append(this.getClass()).append(operand).toHashCode();
+        return Objects.hash(this.getClass(), operand);
     }
 }

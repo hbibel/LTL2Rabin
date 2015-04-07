@@ -6,17 +6,20 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class EquivalenceOfLTLsTest {
     List<LTLVariable> variables;
-    int variableCount = 2; // should not surpass 26. Otherwise change variable generation in the setUp() method.
+    int variableCount = 3; // should not surpass 26. Otherwise change variable generation in the setUp() method.
 
+    private LTLFormula get(int i) {
+        return variables.get(i);
+    }
     @Before
     public void setUp () {
         variables = new ArrayList<>();
@@ -92,55 +95,53 @@ public class EquivalenceOfLTLsTest {
         // a U b != b U a
         assertFalse(w1.equals(w3));
     }
-/*
-    @Test
-    public void testCase2() {
-        LTLFormula f1 = new LTLFOperator(new LTLVariable("a"));
-        LTLFormula f2 = new LTLFOperator(new LTLVariable("a"));
-        LTLFormula f3 = new LTLFOperator(new LTLVariable("b"));
-        LTLFormula a1 = new LTLAnd(f1, f3);
-        LTLFormula a2 = new LTLAnd(f3, f1);
-        LTLFormula o1 = new LTLOr(f1, f3);
-        LTLFormula o2 = new LTLOr(f3, f1);
-        LTLFormula v1 = new LTLVariable("a");
-        LTLFormula b1 = new LTLBoolean(true);
-        LTLFormula a3 = new LTLAnd(v1, b1);
-        LTLFormula o3 = new LTLOr(v1, b1);
-        LTLFormula v2 = new LTLVariable("b");
-        LTLFormula v3 = new LTLVariable("c");
-        ArrayList<LTLFormula> aArgs1 = new ArrayList<>();
-        aArgs1.add(v1); aArgs1.add(v2); aArgs1.add(v3);
-        ArrayList<LTLFormula> aArgs2 = new ArrayList<>();
-        aArgs2.add(v3); aArgs2.add(v1); aArgs2.add(v2);
-        LTLFormula a4 = new LTLAnd(aArgs1);
-        LTLFormula a5 = new LTLAnd(aArgs2);
 
-        // F a = F a (different objects)
-        assertTrue(f1.propositionallyEquivalent(f2));
-        // F a != F b
-        // assertFalse(f1.propositionallyEquivalent(f3));
-        // (F a) & (F b) = (F b) & (F a)
-        assertTrue(a1.propositionallyEquivalent(a2));
-        // (F a) | (F b) = (F b) | (F a)
-        assertTrue(o1.propositionallyEquivalent(o2));
-        // "a" & tt = "a"
-        assertTrue(a3.propositionallyEquivalent(v1));
-        // "a" | tt = tt
-        assertTrue(o3.propositionallyEquivalent(b1));
-        // "a" | tt != "a"
-        assertFalse(v1.propositionallyEquivalent(o3));
-        // "a" & "b" & "c" = "c" & "a" & "b"
-        assertTrue(a4.propositionallyEquivalent(a5));
-        // (F (X a)) & b = (F
+    @Test
+    public void andOrStructuralEquivalenceTest() {
+        List<Function<List<LTLFormula>, LTLFormula>> constructorsAndOr = Arrays.asList(
+                LTLAnd::new,
+                LTLOr::new
+            );
+        for (Function<List<LTLFormula>, LTLFormula> constructor : constructorsAndOr) {
+            // a & b = a & b
+            ArrayList<LTLFormula> l1 = new ArrayList<>(Arrays.asList(get(0), get(1)));
+            LTLFormula f1 = constructor.apply(l1);
+            LTLFormula f2 = constructor.apply(l1);
+            assertTrue(f2.equals(f1));
+
+            // a & b != b & a
+            l1 = new ArrayList<>(Arrays.asList(get(1), get(0)));
+            f2 = constructor.apply(l1);
+            assertFalse(f1.equals(f2));
+
+            // a & b & c != a & c
+            l1 = new ArrayList<>(Arrays.asList(get(0), get(1), get(2)));
+            ArrayList<LTLFormula> l2 = new ArrayList<>(Arrays.asList(get(0), get(2)));
+            f1 = constructor.apply(l1);
+            f2 = constructor.apply(l2);
+            assertFalse(f1.equals(f2));
+
+            // a & b & c = a & b & c
+            f2 = constructor.apply(l1);
+            assertTrue(f1.equals(f2));
+
+            // a & (a & b) = a & (a & b)
+            l1 = new ArrayList<>(Arrays.asList(get(0), get(1)));
+            f1 = constructor.apply(l1);
+            l2 = new ArrayList<>(Arrays.asList(get(0), f1));
+            f2 = constructor.apply(l2);
+            ArrayList<LTLFormula> l3 = new ArrayList<>(Arrays.asList(get(0), get(1)));
+            LTLFormula f3 = constructor.apply(l3);
+            ArrayList<LTLFormula> l4 = new ArrayList<>(Arrays.asList(get(0), f3));
+            LTLFormula f4 = constructor.apply(l4);
+            assertTrue(f2.equals(f4));
+
+            // a = a
+            l1 = new ArrayList<>(Collections.singletonList(get(0)));
+            f1 = constructor.apply(l1);
+            l2 = new ArrayList<>(Collections.singletonList(get(0)));
+            f2 = constructor.apply(l2);
+            assertTrue(f1.equals(f2));
+        }
     }
-
-    @Test
-    public void testCase3() {
-        LTLVariable v1 = new LTLVariable("a");
-        LTLVariable v2 = new LTLVariable("b");
-        LTLAnd a1 = new LTLAnd(v1, v2);
-        LTLAnd a2 = new LTLAnd(v2, v1);
-
-        assertTrue(a1.propositionallyEquivalent(a2));
-    }*/
 }

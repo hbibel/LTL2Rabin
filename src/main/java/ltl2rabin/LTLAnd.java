@@ -1,8 +1,5 @@
 package ltl2rabin;
 
-import net.sf.javabdd.BDD;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.*;
 
 /**
@@ -77,6 +74,6 @@ public class LTLAnd extends LTLFormula {
 
         LTLAnd ltlAnd = (LTLAnd) o;
 
-        return !(conjuncts != null ? !conjuncts.equals(ltlAnd.conjuncts) : ltlAnd.conjuncts != null);
+        return conjuncts != null ? conjuncts.equals(ltlAnd.conjuncts) : ltlAnd.conjuncts == null;
     }
 }

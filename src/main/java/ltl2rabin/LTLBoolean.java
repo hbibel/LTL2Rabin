@@ -1,9 +1,7 @@
 package ltl2rabin;
 
-import net.sf.javabdd.BDD;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a boolean value in an LTL formula (true or false)
@@ -42,6 +40,6 @@ public class LTLBoolean extends LTLFormula {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(911, 19).append(this.getClass()).append(value).toHashCode();
+        return Objects.hash(this.getClass(), value);
     }
 }

@@ -1,8 +1,7 @@
 package ltl2rabin;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * This class represents the U (until) operator in an LTL formula.
@@ -87,6 +86,6 @@ public class LTLUOperator extends LTLFormula {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(911, 19).append(this.getClass()).append(left).append(right).toHashCode();
+        return Objects.hash(this.getClass(), left, right);
     }
 }

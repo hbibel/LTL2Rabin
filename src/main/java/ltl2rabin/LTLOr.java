@@ -1,12 +1,8 @@
 package ltl2rabin;
 
 import net.sf.javabdd.BDD;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class represents a logical disjunction (|) in an LTL formula.
@@ -82,8 +78,17 @@ public class LTLOr extends LTLFormula {
 
     @Override
     public int hashCode() {
-        HashCodeBuilder hashCodeBuilder = new HashCodeBuilder(911, 19).append(this.getClass());
-        disjuncts.forEach(hashCodeBuilder::append);
-        return hashCodeBuilder.toHashCode();
+        return Objects.hash(this.getClass(), disjuncts);
+    }
+
+    // Since this equals method tests for structural equivalence, a & b does NOT equal b & a.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        LTLOr ltlOr = (LTLOr) o;
+
+        return disjuncts != null ? disjuncts.equals(ltlOr.disjuncts) : ltlOr.disjuncts == null;
     }
 }

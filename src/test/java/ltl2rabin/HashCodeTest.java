@@ -6,6 +6,8 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+
+// TODO: Remove or expand
 public class HashCodeTest {
     LTLVariable a;
     LTLVariable a2;
