@@ -5,10 +5,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
@@ -50,20 +47,65 @@ public class RabinAutomatonTest {
 
     @Test
     public void test() {
-        MojmirAutomaton<LTLPropEquivalenceClass, String> mockMA = (MojmirAutomaton<LTLPropEquivalenceClass, String>) mock(MojmirAutomaton.class);
-        MojmirAutomaton<LTLPropEquivalenceClass, String>.State mockInitMAState = mock(MojmirAutomaton.State.class);
-        MojmirAutomaton<LTLPropEquivalenceClass, String>.State mock2ndMAState = mock(MojmirAutomaton.State.class);
-        when(mockMA.getInitialState()).thenReturn(mockInitMAState);
-        HashSet<MojmirAutomaton<ltl2rabin.LTLPropEquivalenceClass, java.lang.String>.State> sinks = new HashSet<>();
-        sinks.add(mock2ndMAState);
-        when(mockMA.getSinks()).thenReturn(sinks);
-        Set<String> alphabet = Main.stringToLTLFormula("a").getTerminalSymbols();
-        Set<Set<String>> letters = Sets.powerSet(alphabet);
-        for (Set<String> l : letters) {
-            when(mockInitMAState.readLetter(l)).thenReturn(mock2ndMAState);
-        }
+        Set<String> alphabet = generateAlphabet(1);
+        Set<StateTransition> transitions = new HashSet<>();
+        HashSet<String> letter = new HashSet<>();
+        letter.add("a");
+        transitions.add(new StateTransition(0, letter, 1));
+        letter.clear();
+        transitions.add(new StateTransition(0, letter, 1));
+        letter.clear();
+        letter.add("a");
+        transitions.add(new StateTransition(1, letter, 1));
+        letter.clear();
+        transitions.add(new StateTransition(1, letter, 1));
+        List<Integer> sinks = new ArrayList<>();
+        sinks.add(1);
+
+        MojmirAutomaton<LTLPropEquivalenceClass, String> mockMA = mockMA(2, transitions, sinks);
+
         RabinAutomaton<LTLPropEquivalenceClass, String> ra = new RabinAutomaton(mockMA, alphabet);
         assertEquals(1, ra.getStates().size());
+    }
+
+    private class StateTransition {
+        int from;
+        Set<String> letter;
+        int to;
+
+        StateTransition(int from, Set<String> letter, int to) {
+            this.from = from;
+            this.letter = letter;
+            this.to = to;
+        }
+    }
+
+    private MojmirAutomaton mockMA(int numStates, Collection<StateTransition> transitions, Collection<Integer> sinks) {
+        MojmirAutomaton<LTLPropEquivalenceClass, String> result = mock(MojmirAutomaton.class);
+        ArrayList<MojmirAutomaton.State> states = new ArrayList<>();
+        for (int i = 0; i < numStates; i++) {
+            states.add(mock(MojmirAutomaton.State.class));
+        }
+
+        when(result.getInitialState()).thenReturn(states.get(0));
+
+        HashSet<MojmirAutomaton<ltl2rabin.LTLPropEquivalenceClass, java.lang.String>.State> sinkStates = new HashSet<>();
+        sinks.forEach(i -> sinkStates.add(states.get(i)));
+        when(result.getSinks()).thenReturn(sinkStates);
+
+        for (StateTransition t : transitions) {
+            when(states.get(t.from).readLetter(t.letter)).thenReturn(states.get(t.to));
+        }
+
+        return result;
+    }
+
+    Set<String> generateAlphabet (int numLetters) {
+        Set<String> result = new HashSet<>();
+        for (int i = 0; i < numLetters; i++) {
+            result.add(Character.toString((char) ('a' + i)));
+        }
+        return result;
     }
 /*
     @Test
