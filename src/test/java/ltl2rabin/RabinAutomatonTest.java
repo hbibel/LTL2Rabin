@@ -1,13 +1,17 @@
 package ltl2rabin;
 
+import com.google.common.collect.Sets;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
-// import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
 
 public class RabinAutomatonTest {
     LTLVariable variable_a;
@@ -46,7 +50,20 @@ public class RabinAutomatonTest {
 
     @Test
     public void test() {
-        LTLFormula f = factory.buildLTL("a | (b U c)");
+        MojmirAutomaton<LTLPropEquivalenceClass, String> mockMA = (MojmirAutomaton<LTLPropEquivalenceClass, String>) mock(MojmirAutomaton.class);
+        MojmirAutomaton<LTLPropEquivalenceClass, String>.State mockInitMAState = mock(MojmirAutomaton.State.class);
+        MojmirAutomaton<LTLPropEquivalenceClass, String>.State mock2ndMAState = mock(MojmirAutomaton.State.class);
+        when(mockMA.getInitialState()).thenReturn(mockInitMAState);
+        HashSet<MojmirAutomaton<ltl2rabin.LTLPropEquivalenceClass, java.lang.String>.State> sinks = new HashSet<>();
+        sinks.add(mock2ndMAState);
+        when(mockMA.getSinks()).thenReturn(sinks);
+        Set<String> alphabet = Main.stringToLTLFormula("a").getTerminalSymbols();
+        Set<Set<String>> letters = Sets.powerSet(alphabet);
+        for (Set<String> l : letters) {
+            when(mockInitMAState.readLetter(l)).thenReturn(mock2ndMAState);
+        }
+        RabinAutomaton<LTLPropEquivalenceClass, String> ra = new RabinAutomaton(mockMA, alphabet);
+        assertEquals(1, ra.getStates().size());
     }
 /*
     @Test
