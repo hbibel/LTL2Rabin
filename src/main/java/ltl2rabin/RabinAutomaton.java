@@ -50,6 +50,10 @@ public class RabinAutomaton<T, U> {
     public class State{
         private final List<MojmirAutomaton<T, U>.State> mojmirStates;
 
+        public List<MojmirAutomaton<T, U>.State> getMojmirStates() {
+            return mojmirStates;
+        }
+
         /**
          *
          * @param mojmirStates the list representing the ranking of the states of the corresponding mojmir automaton.

@@ -7,8 +7,9 @@ import org.junit.Test;
 
 import java.util.*;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RabinAutomatonTest {
     LTLVariable variable_a;
@@ -46,7 +47,7 @@ public class RabinAutomatonTest {
     }
 
     @Test
-    public void test() {
+    public void test1() {
         Set<String> alphabet = generateAlphabet(1);
         Set<StateTransition> transitions = new HashSet<>();
         HashSet<String> letter = new HashSet<>();
@@ -68,6 +69,50 @@ public class RabinAutomatonTest {
         assertEquals(1, ra.getStates().size());
     }
 
+    @Test
+    public void test2() {
+        // Example from the paper, figure 3
+        Set<String> alphabet = generateAlphabet(3);
+        Set<StateTransition> transitions = new HashSet<>();
+        HashSet<String> letter = new HashSet<>();
+
+        Set<Set<String>> letters = Sets.powerSet(alphabet);
+        for (Set<String> l : letters) {
+            if (l.contains("a")) {
+                transitions.add(new StateTransition(0, l, 1));
+            }
+            else {
+                transitions.add(new StateTransition(0, l, 2));
+            }
+            if (l.contains("c")) {
+                transitions.add(new StateTransition(1, l, 3));
+            }
+            else if (l.contains("b")) {
+                transitions.add(new StateTransition(1, l, 1));
+            }
+            else {
+                transitions.add(new StateTransition(1, l, 2));
+            }
+            transitions.add(new StateTransition(2, l, 2));
+            transitions.add(new StateTransition(3, l, 3));
+        }
+        List<Integer> sinks = new ArrayList<>();
+        sinks.add(2);
+        sinks.add(3);
+
+        MojmirAutomaton<LTLPropEquivalenceClass, String> mockMA = mockMA(4, transitions, sinks);
+
+        RabinAutomaton<LTLPropEquivalenceClass, String> ra = new RabinAutomaton(mockMA, alphabet);
+        assertEquals(2, ra.getStates().size());
+        int counter = 0;
+        for (RabinAutomaton.State s : ra.getStates()) {
+            System.out.println("Ranking for RA state #" + counter++);
+            for (Object m : s.getMojmirStates()) {
+                System.out.println(((MojmirAutomaton.State)m).getLabel().toString());
+            }
+        }
+    }
+
     private class StateTransition {
         int from;
         Set<String> letter;
@@ -85,6 +130,7 @@ public class RabinAutomatonTest {
         ArrayList<MojmirAutomaton.State> states = new ArrayList<>();
         for (int i = 0; i < numStates; i++) {
             states.add(mock(MojmirAutomaton.State.class));
+            when(states.get(i).getLabel()).thenReturn("q" + i);
         }
 
         when(result.getInitialState()).thenReturn(states.get(0));
@@ -107,91 +153,4 @@ public class RabinAutomatonTest {
         }
         return result;
     }
-/*
-    @Test
-    public void testCase1() throws Exception {
-        LTLListener ltlListener = Main.stringToLTLFormula("a | (b U c)");
-        LTLFormula ltlOr = ltlListener.getLtlTree();
-        HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton<LTLFormula, String> mojmirAutomaton = new MojmirAutomaton<>(ltlOr, new AfFunction(), alphabet);
-        RabinAutomaton<LTLFormula, String> rabinAutomaton = new RabinAutomaton<>(mojmirAutomaton, alphabet);
-
-        assertEquals(2, rabinAutomaton.getStates().size());
-
-        LTLUOperator u = new LTLUOperator(variable_b, variable_c);
-        LTLOr o = new LTLOr(variable_a, u);
-        List<LTLFormula> state1List = new ArrayList<>();
-        state1List.add(u); state1List.add(o);
-        List<LTLFormula> state2List = new ArrayList<>();
-        state2List.add(o);
-        List<String> expectedResultList = new ArrayList<>();
-        expectedResultList.add(rabinStateStringFromList(state1List));expectedResultList.add(rabinStateStringFromList(state2List));
-        assertEquals(expectedResultList.toString(), rabinAutomaton.getStates().toString());
-    }
-
-    @Test
-    public void testCase2() throws Exception {
-        LTLListener ltlListener = Main.stringToLTLFormula("a | b | c");
-        LTLFormula ltlOr = ltlListener.getLtlTree();
-        HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton<LTLFormula, String> mojmirAutomaton = new MojmirAutomaton<>(ltlOr, new AfFunction(), alphabet);
-        RabinAutomaton<LTLFormula, String> rabinAutomaton = new RabinAutomaton<>(mojmirAutomaton, alphabet);
-
-        assertEquals(1, rabinAutomaton.getStates().size());
-    }
-
-    @Test
-    public void testCase3() throws Exception {
-        LTLListener ltlListener = Main.stringToLTLFormula("X b");
-        LTLFormula ltlOr = ltlListener.getLtlTree();
-        HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton<LTLFormula, String> mojmirAutomaton = new MojmirAutomaton<>(ltlOr, new AfFunction(), alphabet);
-        RabinAutomaton<LTLFormula, String> rabinAutomaton = new RabinAutomaton<>(mojmirAutomaton, alphabet);
-
-        assertEquals(2, rabinAutomaton.getStates().size());
-    }
-
-    @Test
-    public void testCase4() throws Exception {
-        LTLListener ltlListener = Main.stringToLTLFormula("F b");
-        LTLFormula ltlOr = ltlListener.getLtlTree();
-        HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton<LTLFormula, String> mojmirAutomaton = new MojmirAutomaton<>(ltlOr, new AfFunction(), alphabet);
-        RabinAutomaton<LTLFormula, String> rabinAutomaton = new RabinAutomaton<>(mojmirAutomaton, alphabet);
-
-        assertEquals(1, rabinAutomaton.getStates().size());
-    }
-
-    @Test
-    public void testCase5() throws Exception {
-        LTLListener ltlListener = Main.stringToLTLFormula("a & b & c");
-        LTLFormula ltlOr = ltlListener.getLtlTree();
-        HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton<LTLFormula, String> mojmirAutomaton = new MojmirAutomaton<>(ltlOr, new AfFunction(), alphabet);
-        RabinAutomaton<LTLFormula, String> rabinAutomaton = new RabinAutomaton<>(mojmirAutomaton, alphabet);
-
-        assertEquals(1, rabinAutomaton.getStates().size());
-    }
-
-    @Test
-    public void testCase6() throws Exception {
-        LTLListener ltlListener = Main.stringToLTLFormula("a U b");
-        LTLFormula ltlOr = ltlListener.getLtlTree();
-        HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton<LTLFormula, String> mojmirAutomaton = new MojmirAutomaton<>(ltlOr, new AfFunction(), alphabet);
-        RabinAutomaton<LTLFormula, String> rabinAutomaton = new RabinAutomaton<>(mojmirAutomaton, alphabet);
-
-        assertEquals(1, rabinAutomaton.getStates().size());
-    }
-
-    @Test
-    public void testCase7() throws Exception {
-        LTLListener ltlListener = Main.stringToLTLFormula("a");
-        LTLFormula ltlOr = ltlListener.getLtlTree();
-        HashSet<String> alphabet = ltlListener.getTerminalSymbols();
-        MojmirAutomaton<LTLFormula, String> mojmirAutomaton = new MojmirAutomaton<>(ltlOr, new AfFunction(), alphabet);
-        RabinAutomaton<LTLFormula, String> rabinAutomaton = new RabinAutomaton<>(mojmirAutomaton, alphabet);
-
-        assertEquals(1, rabinAutomaton.getStates().size());
-    }*/
 }

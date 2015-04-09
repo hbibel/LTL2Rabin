@@ -51,8 +51,8 @@ public class MojmirAutomaton<T, U> {
             State temp = statesToBeAdded.poll();
             boolean isSink = true;
             for (Set<U> letter : letters) {
-                T newStateInfo = transitionFunction.apply(temp.info, letter);
-                if (newStateInfo.equals(temp.info)) continue;
+                T newStateInfo = transitionFunction.apply(temp.label, letter);
+                if (newStateInfo.equals(temp.label)) continue;
                 // A sink is a state that only has self-loops as outgoing transitions. If temp is a sink, this
                 // line never will be reached.
                 isSink = false;
@@ -68,13 +68,17 @@ public class MojmirAutomaton<T, U> {
     }
 
     public class State {
-        private final T info;
+        private final T label;
+
+        public T getLabel() {
+            return label;
+        }
 
         boolean isSink;
 
-        public State(T info) {
+        public State(T label) {
             isSink = false;
-            this.info = info;
+            this.label = label;
         }
 
         public void setSink(boolean isSink) {
@@ -83,24 +87,24 @@ public class MojmirAutomaton<T, U> {
 
         // Alternative: Keep all state transitions in a mapping: letter --> State
         public State readLetter(Set<U> letter) {
-            T newInfo = transitionFunction.apply(this.info, letter);
+            T newInfo = transitionFunction.apply(this.label, letter);
             return new State(newInfo);
         }
 
         @SuppressWarnings("unchecked")
         @Override
         public boolean equals(Object obj) {
-            return (obj != null) && (obj.getClass().equals(this.getClass())) && (((State) obj).info.equals(this.info));
+            return (obj != null) && (obj.getClass().equals(this.getClass())) && (((State) obj).label.equals(this.label));
         }
 
         @Override
         public int hashCode() {
-            return info.hashCode();
+            return label.hashCode();
         }
 
         @Override
         public String toString() {
-            return "state(" + info.toString() + ")";
+            return "state(" + label.toString() + ")";
         }
     }
 }
