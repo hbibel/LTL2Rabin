@@ -1,7 +1,5 @@
 package ltl2rabin;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -28,17 +26,8 @@ public class LTLGOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula af(final Collection<String> letters) {
-        ArrayList<LTLFormula> andParameter = new ArrayList<>();
-        andParameter.add(this);
-        LTLFormula newConjunct = operand.af(letters);
-        andParameter.add(newConjunct);
-        return new LTLAnd(andParameter);
-    }
-
-    @Override
-    public LTLFormula afG(Collection<String> letters) {
-        return this;
+    public void accept(ILTLFormulaVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package ltl2rabin;
 
-import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -23,13 +22,8 @@ public class LTLBoolean extends LTLFormula {
     }
 
     @Override
-    public LTLFormula af(final Collection<String> letters) {
-        return this;
-    }
-
-    @Override
-    public LTLFormula afG(Collection<String> letters) {
-        return this;
+    public void accept(ILTLFormulaVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override

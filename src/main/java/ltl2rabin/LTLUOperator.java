@@ -1,6 +1,5 @@
 package ltl2rabin;
 
-import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -34,47 +33,8 @@ public class LTLUOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula af(Collection<String> letters) {
-        LTLFormula afLeftSide = left.af(letters);
-        LTLFormula afRightSide = right.af(letters);
-
-        /*
-        r   l   result
-        ----------------
-        ff  ff  ff
-        ff  tt  this
-        tt  ff  tt
-        tt  tt  tt
-        x   ff  afRightSide
-        x   tt  afRightSide OR this
-        tt  x   afLeftSide AND this
-        tt  x   tt
-        x   x   afRightSide OR (afLeftSide AND this)
-
-        x = "is not instance of LTLBoolean"
-         */
-        if (afRightSide instanceof LTLBoolean) {
-            if (((LTLBoolean) afRightSide).getValue()) return new LTLBoolean(true);
-            if (afLeftSide instanceof LTLBoolean) {
-                if(((LTLBoolean) afLeftSide).getValue()) return this;
-                else return new LTLBoolean(false);
-            }
-            else {
-                return new LTLAnd(afLeftSide, this);
-            }
-        }
-        if (afLeftSide instanceof LTLBoolean) {
-            if (!((LTLBoolean) afLeftSide).getValue()) return afRightSide;
-            else return new LTLOr(afRightSide, this);
-        }
-        return new LTLOr(afRightSide, new LTLAnd(afLeftSide, this));
-    }
-
-    @Override
-    public LTLFormula afG(Collection<String> letters) {
-        LTLFormula afGLeftSide = left.afG(letters);
-        LTLFormula afGRightSide = right.afG(letters);
-        return new LTLOr(afGRightSide, new LTLAnd(afGLeftSide, this));
+    public void accept(ILTLFormulaVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override

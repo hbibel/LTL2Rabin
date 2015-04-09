@@ -1,6 +1,9 @@
 package ltl2rabin;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * This class represents a logical conjunction (&) in an LTL formula.
@@ -28,37 +31,17 @@ public class LTLAnd extends LTLFormula {
     }
 
     @Override
+    public void accept(ILTLFormulaVisitor visitor) {
+        visitor.visit(this);
+    }
+
+    @Override
     public String toString() {
         String result = "(";
         for (LTLFormula f : conjuncts) {
             result = result + "(" + f.toString() + ") & ";
         }
         return result.substring(0, result.length()-3) + ")";
-    }
-
-    @Override
-    public LTLFormula af(final Collection<String> letters) {
-        ArrayList<LTLFormula> newConjuncts = new ArrayList<>();
-        for (LTLFormula f : conjuncts) {
-            LTLFormula temp = f.af(letters);
-            // false & something = false
-            if (temp instanceof LTLBoolean) {
-                if (!((LTLBoolean) temp).getValue()) return new LTLBoolean(false);
-                else continue;
-            }
-            newConjuncts.add(temp);
-        }
-        return new LTLAnd(newConjuncts);
-    }
-
-    @Override
-    public LTLFormula afG(final Collection<String> letters) {
-        ArrayList<LTLFormula> newConjuncts = new ArrayList<>();
-        for (LTLFormula f : conjuncts) {
-            LTLFormula temp = f.afG(letters);
-            newConjuncts.add(temp);
-        }
-        return new LTLAnd(newConjuncts);
     }
 
     @Override

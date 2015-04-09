@@ -2,7 +2,10 @@ package ltl2rabin;
 
 import net.sf.javabdd.BDD;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * This class represents a logical disjunction (|) in an LTL formula.
@@ -47,33 +50,8 @@ public class LTLOr extends LTLFormula {
     }
 
     @Override
-    public LTLFormula af(final Collection<String> letters) {
-        ArrayList<LTLFormula> result = new ArrayList<>();
-        for (LTLFormula f : disjuncts) {
-            LTLFormula temp = f.af(letters);
-            if (temp instanceof LTLBoolean) {
-                // true | something = true
-                if (((LTLBoolean) temp).getValue()) return new LTLBoolean(true);
-                // false | something = something
-                if (!((LTLBoolean) temp).getValue()) continue;
-            }
-            result.add(f.af(letters));
-        }
-        // TODO: Remove the stuff below
-        // An empty disjunction list means that all disjuncts resolved to false
-        if (0 == result.size()) return new LTLBoolean(false);
-        // Only one disjunct? Then we don't need an "or".
-        if (1 == result.size()) return result.get(0);
-        return new LTLOr(result);
-    }
-
-    @Override
-    public LTLFormula afG(Collection<String> letters) {
-        ArrayList<LTLFormula> result = new ArrayList<>();
-        for (LTLFormula f : disjuncts) {
-            result.add(f.afG(letters));
-        }
-        return new LTLOr(result);
+    public void accept(ILTLFormulaVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override

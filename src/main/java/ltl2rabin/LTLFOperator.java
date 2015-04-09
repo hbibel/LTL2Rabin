@@ -1,7 +1,5 @@
 package ltl2rabin;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -24,22 +22,8 @@ public class LTLFOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula af(final Collection<String> letters) {
-        ArrayList<LTLFormula> orParameter = new ArrayList<>();
-        orParameter.add(this);
-        LTLFormula newDisjunct = this.operand.af(letters);
-        if (newDisjunct.equals(new LTLBoolean(true))) return new LTLBoolean(true);
-        else if (newDisjunct.equals(new LTLBoolean(false))) return orParameter.get(0);
-        orParameter.add(newDisjunct);
-        return new LTLOr(orParameter);
-    }
-
-    @Override
-    public LTLFormula afG(Collection<String> letters) {
-        ArrayList<LTLFormula> orParameter = new ArrayList<>();
-        orParameter.add(this);
-        orParameter.add(this.operand.afG(letters));
-        return new LTLOr(orParameter);
+    public void accept(ILTLFormulaVisitor visitor) {
+        visitor.visit(this);
     }
 
     @Override
