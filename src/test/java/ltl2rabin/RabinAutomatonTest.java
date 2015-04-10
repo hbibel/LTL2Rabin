@@ -1,6 +1,7 @@
 package ltl2rabin;
 
 import com.google.common.collect.Sets;
+import ltl2rabin.AutomatonMockFactory.StateTransition;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,14 +9,13 @@ import org.junit.Test;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class RabinAutomatonTest {
     LTLVariable variable_a;
     LTLVariable variable_b;
     LTLVariable variable_c;
     LTLFactoryFromString factory;
+    AutomatonMockFactory.MAMockFactory automatonMockFactory = new AutomatonMockFactory.MAMockFactory();
 
     private String mojmirStateStringFromLTL(LTLFormula f) {
         return "state(" + f.toString() + ")";
@@ -48,7 +48,7 @@ public class RabinAutomatonTest {
 
     @Test
     public void test1() {
-        Set<String> alphabet = generateAlphabet(1);
+        Set<String> alphabet = automatonMockFactory.generateAlphabet(1);
         Set<StateTransition> transitions = new HashSet<>();
         HashSet<String> letter = new HashSet<>();
         letter.add("a");
@@ -63,7 +63,7 @@ public class RabinAutomatonTest {
         List<Integer> sinks = new ArrayList<>();
         sinks.add(1);
 
-        MojmirAutomaton<LTLPropEquivalenceClass, String> mockMA = mockMA(2, transitions, sinks);
+        MojmirAutomaton<LTLPropEquivalenceClass, String> mockMA = automatonMockFactory.mockMe(2, transitions, sinks);
 
         RabinAutomaton<LTLPropEquivalenceClass, String> ra = new RabinAutomaton(mockMA, alphabet);
         assertEquals(1, ra.getStates().size());
@@ -72,9 +72,8 @@ public class RabinAutomatonTest {
     @Test
     public void test2() {
         // Example from the paper, figure 3
-        Set<String> alphabet = generateAlphabet(3);
+        Set<String> alphabet = automatonMockFactory.generateAlphabet(3);
         Set<StateTransition> transitions = new HashSet<>();
-        HashSet<String> letter = new HashSet<>();
 
         Set<Set<String>> letters = Sets.powerSet(alphabet);
         for (Set<String> l : letters) {
@@ -100,7 +99,7 @@ public class RabinAutomatonTest {
         sinks.add(2);
         sinks.add(3);
 
-        MojmirAutomaton<LTLPropEquivalenceClass, String> mockMA = mockMA(4, transitions, sinks);
+        MojmirAutomaton<LTLPropEquivalenceClass, String> mockMA = automatonMockFactory.mockMe(4, transitions, sinks);
 
         RabinAutomaton<LTLPropEquivalenceClass, String> ra = new RabinAutomaton(mockMA, alphabet);
         assertEquals(2, ra.getStates().size());
@@ -111,46 +110,5 @@ public class RabinAutomatonTest {
                 System.out.println(((MojmirAutomaton.State)m).getLabel().toString());
             }
         }
-    }
-
-    private class StateTransition {
-        int from;
-        Set<String> letter;
-        int to;
-
-        StateTransition(int from, Set<String> letter, int to) {
-            this.from = from;
-            this.letter = letter;
-            this.to = to;
-        }
-    }
-
-    private MojmirAutomaton mockMA(int numStates, Collection<StateTransition> transitions, Collection<Integer> sinks) {
-        MojmirAutomaton<LTLPropEquivalenceClass, String> result = mock(MojmirAutomaton.class);
-        ArrayList<MojmirAutomaton.State> states = new ArrayList<>();
-        for (int i = 0; i < numStates; i++) {
-            states.add(mock(MojmirAutomaton.State.class));
-            when(states.get(i).getLabel()).thenReturn("q" + i);
-        }
-
-        when(result.getInitialState()).thenReturn(states.get(0));
-
-        HashSet<MojmirAutomaton<ltl2rabin.LTLPropEquivalenceClass, java.lang.String>.State> sinkStates = new HashSet<>();
-        sinks.forEach(i -> sinkStates.add(states.get(i)));
-        when(result.getSinks()).thenReturn(sinkStates);
-
-        for (StateTransition t : transitions) {
-            when(states.get(t.from).readLetter(t.letter)).thenReturn(states.get(t.to));
-        }
-
-        return result;
-    }
-
-    Set<String> generateAlphabet (int numLetters) {
-        Set<String> result = new HashSet<>();
-        for (int i = 0; i < numLetters; i++) {
-            result.add(Character.toString((char) ('a' + i)));
-        }
-        return result;
     }
 }

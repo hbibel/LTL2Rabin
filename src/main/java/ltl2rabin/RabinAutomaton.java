@@ -39,7 +39,8 @@ public class RabinAutomaton<T, U> {
                         .distinct()
                         // filter strikes out the elements that do not fulfil the condition specified within the
                         // parentheses
-                        .filter(e -> !mojmirAutomaton.getSinks().contains(e))
+                        // TODO: The e==null part might be removed, since it only fails with the most simple test
+                        .filter(e -> !mojmirAutomaton.getSinks().contains(e) && !(e == null))
                         .collect(Collectors.toList());
                 tempStates = newStateList;
                 reachedFixpoint &= !states.add(new State(newStateList));
@@ -52,6 +53,10 @@ public class RabinAutomaton<T, U> {
 
         public List<MojmirAutomaton<T, U>.State> getMojmirStates() {
             return mojmirStates;
+        }
+
+        public State readLetter(Set<U> letter) {
+            return null; // TODO: Save state transitions
         }
 
         /**
