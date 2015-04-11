@@ -1,6 +1,7 @@
 package ltl2rabin;
 
 import com.google.common.collect.Sets;
+import org.apache.commons.collections4.set.ListOrderedSet;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.*;
@@ -9,11 +10,12 @@ import java.util.stream.Stream;
 
 public class RabinAutomaton<T, U> {
     // public BiFunction<T, Set<U>, T> transitionFunction;
-    private Set<State> states = new HashSet<>();
+    private ListOrderedSet<State> states = new ListOrderedSet<>();
     private final State initialState;
     private final Set<U> alphabet;
+    private int stateCounter = 0;
 
-    public Set<State> getStates() {
+    public ListOrderedSet<State> getStates() {
         return states;
     }
 
@@ -27,6 +29,7 @@ public class RabinAutomaton<T, U> {
         boolean reachedFixpoint = false;
         Set<Set<U>> letters = Sets.powerSet(alphabet);
         List<MojmirAutomaton<T, U>.State> tempStates = initialMojmirStates;
+        State previousState = initialState;
         while (!reachedFixpoint) {
             reachedFixpoint = true;
             for (Set<U> letter : letters) {
@@ -42,21 +45,48 @@ public class RabinAutomaton<T, U> {
                         // TODO: The e==null part might be removed, since it only fails with the most simple test
                         .filter(e -> !mojmirAutomaton.getSinks().contains(e) && !(e == null))
                         .collect(Collectors.toList());
+                State newState = new State(newStateList);
+                int indexOfExistingState = states.indexOf(newState);
+                if (indexOfExistingState != -1) {
+                    newState = states.get(indexOfExistingState);
+                    --stateCounter;
+                }
+                previousState.setTransition(letter, newState);
+
+                reachedFixpoint &= !states.add(newState);
                 tempStates = newStateList;
-                reachedFixpoint &= !states.add(new State(newStateList));
             }
         }
     }
 
+    public State run(List<Set<U>> word) {
+        Iterator<Set<U>> iteratorOverLetters = word.iterator();
+        State nextState = initialState;
+        while (iteratorOverLetters.hasNext()) {
+            nextState = nextState.readLetter(iteratorOverLetters.next());
+        }
+        return nextState;
+    }
+
     public class State{
         private final List<MojmirAutomaton<T, U>.State> mojmirStates;
+        private Map<Set<U>, State> transitions = new HashMap<>();
+        private String label = "rq" + stateCounter++;
+
+        public void setTransition(Set<U> letter, State to) {
+            transitions.put(letter, to);
+        }
 
         public List<MojmirAutomaton<T, U>.State> getMojmirStates() {
             return mojmirStates;
         }
 
         public State readLetter(Set<U> letter) {
-            return null; // TODO: Save state transitions
+            return transitions.get(letter);
+        }
+
+        public String getLabel () {
+            return label;
         }
 
         /**

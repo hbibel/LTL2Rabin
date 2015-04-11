@@ -14,6 +14,8 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '18.0'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.3.2'
     compile group: 'net.sf.jbddi', name: 'jbddi-core', version: '1.0.1'
+    compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.0'
+    compile group: 'org.mockito', name: 'mockito-core', version: '1.9.5'
 }
 
 jar {

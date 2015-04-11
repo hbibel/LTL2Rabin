@@ -67,6 +67,10 @@ public class RabinAutomatonTest {
 
         RabinAutomaton<LTLPropEquivalenceClass, String> ra = new RabinAutomaton(mockMA, alphabet);
         assertEquals(1, ra.getStates().size());
+
+        List<Set<String>> word1 = createWord("", "a");
+        List<Set<String>> word2 = createWord("a");
+        assertEquals(ra.run(word1), ra.run(word2));
     }
 
     @Test
@@ -103,12 +107,40 @@ public class RabinAutomatonTest {
 
         RabinAutomaton<LTLPropEquivalenceClass, String> ra = new RabinAutomaton(mockMA, alphabet);
         assertEquals(2, ra.getStates().size());
-        int counter = 0;
+
         for (RabinAutomaton.State s : ra.getStates()) {
-            System.out.println("Ranking for RA state #" + counter++);
+            System.out.println("Ranking for RA state " + s.getLabel());
             for (Object m : s.getMojmirStates()) {
                 System.out.println(((MojmirAutomaton.State)m).getLabel().toString());
             }
         }
+
+        List<Set<String>> emptyWord = createWord("");
+        assertEquals(ra.getStates().get(0), ra.run(emptyWord));
+
+        List<Set<String>> wordB = createWord("b");
+        assertEquals(ra.getStates().get(0), ra.run(wordB));
+
+        List<Set<String>> wordA = createWord("a");
+        assertEquals(ra.getStates().get(1), ra.run(wordA));
+
+        List<Set<String>> wordABC = createWord("a", "bc");
+        assertEquals(ra.getStates().get(0), ra.run(wordABC));
+
+        List<Set<String>> wordACEtc = createWord("ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac");
+        assertEquals(ra.getStates().get(1), ra.run(wordACEtc));
+    }
+
+    List<Set<String>> createWord(String... letters) {
+        List<Set<String>> result = new ArrayList<>();
+        for (String l : letters) {
+            char[] parts = l.toCharArray();
+            List<String> partsAsStrings = new ArrayList<>();
+            for (int i = 0; i < parts.length; i++) {
+                partsAsStrings.add("" + parts[i]);
+            }
+            result.add(new HashSet<>(partsAsStrings));
+        }
+        return result;
     }
 }

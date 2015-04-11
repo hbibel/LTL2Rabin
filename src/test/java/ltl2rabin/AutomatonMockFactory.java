@@ -16,7 +16,7 @@ public abstract class AutomatonMockFactory<T> {
             ArrayList<MojmirAutomaton.State> states = new ArrayList<>();
             for (int i = 0; i < numStates; i++) {
                 states.add(mock(MojmirAutomaton.State.class));
-                when(states.get(i).getLabel()).thenReturn("q" + i);
+                when(states.get(i).getLabel()).thenReturn("mq" + i);
             }
 
             when(result.getInitialState()).thenReturn(states.get(0));
