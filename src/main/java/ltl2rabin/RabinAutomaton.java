@@ -37,13 +37,13 @@ public class RabinAutomaton<T, U> {
                 for (Set<U> letter : letters) {
                     List<MojmirAutomaton<T, U>.State> newStateList = Stream.concat(tempMojmirStates.stream()
                             .map(e -> e.readLetter(letter)), Stream.of(initialMojmirStates.get(0)))
-                            // According to the javadocs: For ordered streams, the selection of distinct elements is stable
-                            // (for duplicated elements, the element appearing first in the encounter order is preserved.)
+                            // According to the javadocs: For ordered streams, the selection of distinct elements is
+                            // stable (for duplicated elements, the element appearing first in the encounter order is
+                            // preserved.)
                             .distinct()
-                                    // filter strikes out the elements that do not fulfil the condition specified within the
-                                    // parentheses
-                                    // TODO: The e==null part might be removed, since it only fails with the most simple test
-                            .filter(e -> !mojmirAutomaton.getSinks().contains(e) && !(e == null))
+                            // filter strikes out the elements that do not fulfil the condition specified within the
+                            // parentheses
+                            .filter(e -> !mojmirAutomaton.getSinks().contains(e))
                             .collect(Collectors.toList());
                     State newState = new State(newStateList);
                     int indexOfExistingState = states.indexOf(newState);

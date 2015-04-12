@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class RabinAutomatonTest {
     LTLVariable variable_a;
@@ -53,12 +54,12 @@ public class RabinAutomatonTest {
         HashSet<String> letter = new HashSet<>();
         letter.add("a");
         transitions.add(new StateTransition(0, letter, 1));
-        letter.clear();
+        letter = new HashSet<>();
         transitions.add(new StateTransition(0, letter, 1));
-        letter.clear();
+        letter = new HashSet<>();
         letter.add("a");
         transitions.add(new StateTransition(1, letter, 1));
-        letter.clear();
+        letter = new HashSet<>();
         transitions.add(new StateTransition(1, letter, 1));
         List<Integer> sinks = new ArrayList<>();
         sinks.add(1);
@@ -108,19 +109,10 @@ public class RabinAutomatonTest {
         RabinAutomaton<LTLPropEquivalenceClass, String> ra = new RabinAutomaton(mockMA, alphabet);
         assertEquals(2, ra.getStates().size());
 
-        for (RabinAutomaton.State s : ra.getStates()) {
-            System.out.println("Ranking for RA state " + s.getLabel());
-            for (Object m : s.getMojmirStates()) {
-                System.out.println(((MojmirAutomaton.State)m).getLabel().toString());
-            }
-        }
-
         List<Set<String>> emptyWord = createWord("");
         assertEquals(ra.getStates().get(0), ra.run(emptyWord));
 
         List<Set<String>> wordB = createWord("b");
-        MojmirAutomaton.State debug = mockMA.getInitialState().readLetter(wordB.get(0));
-        System.out.println(mockMA.getInitialState().getLabel() + " reading b = " + debug.getLabel());
         assertEquals(ra.getStates().get(0), ra.run(wordB));
 
         List<Set<String>> wordA = createWord("a");
@@ -131,6 +123,56 @@ public class RabinAutomatonTest {
 
         List<Set<String>> wordACEtc = createWord("ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac");
         assertEquals(ra.getStates().get(1), ra.run(wordACEtc));
+    }
+
+    @Test
+    public void test3() {
+        Set<String> alphabet = automatonMockFactory.generateAlphabet(2);
+        Set<StateTransition> transitions = new HashSet<>();
+
+        Set<Set<String>> letters = Sets.powerSet(alphabet);
+        for (Set<String> l : letters) {
+            transitions.add(new StateTransition(4, l, 4));
+            transitions.add(new StateTransition(3, l, 3));
+            transitions.add(new StateTransition(2, l, 3));
+            transitions.add(new StateTransition(1, l, 3));
+        }
+        Set<String> l = new HashSet<>();
+        l.add("a");
+        transitions.add(new StateTransition(0, l, 2));
+        l = new HashSet<>();
+        l.add("b");
+        transitions.add(new StateTransition(0, l, 1));
+        l = new HashSet<>();
+        transitions.add(new StateTransition(0, l, 4));
+        l = new HashSet<>();
+        l.add("a");
+        l.add("b");
+        transitions.add(new StateTransition(0, l, 4));
+
+        List<Integer> sinks = new ArrayList<>();
+        sinks.add(3);
+        sinks.add(4);
+
+        MojmirAutomaton<LTLPropEquivalenceClass, String> mockMA = automatonMockFactory.mockMe(5, transitions, sinks);
+
+        RabinAutomaton<LTLPropEquivalenceClass, String> ra = new RabinAutomaton(mockMA, alphabet);
+        assertEquals(3, ra.getStates().size());
+
+        List<Set<String>> emptyWord = createWord("");
+        assertEquals(ra.getStates().get(0), ra.run(emptyWord));
+
+        List<Set<String>> wordAB = createWord("ab");
+        assertEquals(ra.getStates().get(0), ra.run(wordAB));
+        assertEquals(ra.run(wordAB), ra.run(emptyWord));
+
+        List<Set<String>> wordBBBB = createWord("b", "b", "b", "b", "b", "b", "b");
+        List<Set<String>> wordBBBBB = createWord("b", "b", "b", "b", "b", "b", "b", "b");
+        List<Set<String>> wordAAAA = createWord("a", "a", "a", "a", "a", "a", "a", "a", "a", "a");
+        List<Set<String>> wordAAAAB = createWord("a", "a", "a", "a", "a", "a", "a", "a", "a", "b");
+        assertFalse(ra.run(wordBBBB).equals(ra.run(wordAAAA)));
+        assertEquals(ra.run(wordBBBB), ra.run(wordBBBBB));
+        assertEquals(ra.run(wordAAAAB), ra.run(wordBBBB));
     }
 
     List<Set<String>> createWord(String... letters) {
