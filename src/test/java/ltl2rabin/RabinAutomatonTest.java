@@ -119,6 +119,8 @@ public class RabinAutomatonTest {
         assertEquals(ra.getStates().get(0), ra.run(emptyWord));
 
         List<Set<String>> wordB = createWord("b");
+        MojmirAutomaton.State debug = mockMA.getInitialState().readLetter(wordB.get(0));
+        System.out.println(mockMA.getInitialState().getLabel() + " reading b = " + debug.getLabel());
         assertEquals(ra.getStates().get(0), ra.run(wordB));
 
         List<Set<String>> wordA = createWord("a");

@@ -5,6 +5,7 @@ import org.apache.commons.collections4.set.ListOrderedSet;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -21,40 +22,41 @@ public class RabinAutomaton<T, U> {
 
     public RabinAutomaton(final MojmirAutomaton<T, U> mojmirAutomaton, Set<U> alphabet) {
         this.alphabet = alphabet;
-        List<MojmirAutomaton<T, U>.State> initialMojmirStates = new ArrayList<>();
-        initialMojmirStates.add(mojmirAutomaton.getInitialState());
+        List<MojmirAutomaton<T, U>.State> initialMojmirStates = new ArrayList<>(Collections.singletonList(mojmirAutomaton.getInitialState()));
         initialState = new State(initialMojmirStates);
         states.add(initialState);
 
-        boolean reachedFixpoint = false;
         Set<Set<U>> letters = Sets.powerSet(alphabet);
-        List<MojmirAutomaton<T, U>.State> tempStates = initialMojmirStates;
-        State previousState = initialState;
-        while (!reachedFixpoint) {
-            reachedFixpoint = true;
-            for (Set<U> letter : letters) {
-                // read; map e.readLetter to tempStates, then add initialMojmirStates.get(0), then filter duplicates,
-                // then filter sinks, and then transform it back to a List
-                List<MojmirAutomaton<T, U>.State> newStateList = Stream.concat(tempStates.stream()
-                        .map(e -> e.readLetter(letter)), Stream.of(initialMojmirStates.get(0)))
-                        // According to the javadocs: For ordered streams, the selection of distinct elements is stable
-                        // (for duplicated elements, the element appearing first in the encounter order is preserved.)
-                        .distinct()
-                        // filter strikes out the elements that do not fulfil the condition specified within the
-                        // parentheses
-                        // TODO: The e==null part might be removed, since it only fails with the most simple test
-                        .filter(e -> !mojmirAutomaton.getSinks().contains(e) && !(e == null))
-                        .collect(Collectors.toList());
-                State newState = new State(newStateList);
-                int indexOfExistingState = states.indexOf(newState);
-                if (indexOfExistingState != -1) {
-                    newState = states.get(indexOfExistingState);
-                    --stateCounter;
+        ConcurrentLinkedQueue<State> queue = new ConcurrentLinkedQueue<>();
+        queue.add(initialState);
+        while (!queue.isEmpty()) {
+            State tempState = queue.poll();
+            if (tempState.transitions.size() != letters.size()) {
+                // tempState has transitions for any letter ==> tempState has been visited before
+                List<MojmirAutomaton<T, U>.State> tempMojmirStates = tempState.mojmirStates;
+                for (Set<U> letter : letters) {
+                    List<MojmirAutomaton<T, U>.State> newStateList = Stream.concat(tempMojmirStates.stream()
+                            .map(e -> e.readLetter(letter)), Stream.of(initialMojmirStates.get(0)))
+                            // According to the javadocs: For ordered streams, the selection of distinct elements is stable
+                            // (for duplicated elements, the element appearing first in the encounter order is preserved.)
+                            .distinct()
+                                    // filter strikes out the elements that do not fulfil the condition specified within the
+                                    // parentheses
+                                    // TODO: The e==null part might be removed, since it only fails with the most simple test
+                            .filter(e -> !mojmirAutomaton.getSinks().contains(e) && !(e == null))
+                            .collect(Collectors.toList());
+                    State newState = new State(newStateList);
+                    int indexOfExistingState = states.indexOf(newState);
+                    if (indexOfExistingState != -1) {
+                        newState = states.get(indexOfExistingState);
+                        --stateCounter;
+                    }
+                    else {
+                        states.add(newState);
+                    }
+                    tempState.setTransition(letter, newState);
+                    queue.add(newState);
                 }
-                previousState.setTransition(letter, newState);
-
-                reachedFixpoint &= !states.add(newState);
-                tempStates = newStateList;
             }
         }
     }
