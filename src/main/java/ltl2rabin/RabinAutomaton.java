@@ -13,7 +13,7 @@ public class RabinAutomaton<T, U> {
     // public BiFunction<T, Set<U>, T> transitionFunction;
     private ListOrderedSet<State> states = new ListOrderedSet<>();
     private final State initialState;
-    private final Set<U> alphabet;
+    //private final Set<U> alphabet;
     private int stateCounter = 0;
 
     public ListOrderedSet<State> getStates() {
@@ -21,7 +21,7 @@ public class RabinAutomaton<T, U> {
     }
 
     public RabinAutomaton(final MojmirAutomaton<T, U> mojmirAutomaton, Set<U> alphabet) {
-        this.alphabet = alphabet;
+        //this.alphabet = alphabet;
         List<MojmirAutomaton<T, U>.State> initialMojmirStates = new ArrayList<>(Collections.singletonList(mojmirAutomaton.getInitialState()));
         initialState = new State(initialMojmirStates);
         states.add(initialState);

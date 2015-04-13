@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import org.apache.commons.collections4.set.ListOrderedSet;
+
 import java.util.*;
 
 import static org.mockito.Mockito.mock;
@@ -42,7 +44,7 @@ public abstract class AutomatonMockFactory<T> {
         @Override
         public RabinAutomaton mockMe(int numStates, Collection<StateTransition> transitions) {
             RabinAutomaton<LTLPropEquivalenceClass, String> result = mock(RabinAutomaton.class);
-            ArrayList<RabinAutomaton.State> states = new ArrayList<>();
+            ArrayList<RabinAutomaton<LTLPropEquivalenceClass, String>.State> states = new ArrayList<>();
             for (int i = 0; i < numStates; i++) {
                 states.add(mock(RabinAutomaton.State.class));
             }
@@ -51,11 +53,14 @@ public abstract class AutomatonMockFactory<T> {
                 when(states.get(t.from).readLetter(t.letter)).thenReturn(states.get(t.to));
             }
 
+            ListOrderedSet<RabinAutomaton<LTLPropEquivalenceClass, String>.State> stateListOrderedSet = ListOrderedSet.listOrderedSet(states);
+            when(result.getStates()).thenReturn(stateListOrderedSet);
+
             return result;
         }
     }
 
-    public Set<String> generateAlphabet (int numLetters) {
+    public static Set<String> generateAlphabet (int numLetters) {
         Set<String> result = new HashSet<>();
         for (int i = 0; i < numLetters; i++) {
             result.add(Character.toString((char) ('a' + i)));
@@ -73,5 +78,18 @@ public abstract class AutomatonMockFactory<T> {
             this.letter = letter;
             this.to = to;
         }
+    }
+
+    public static List<Set<String>> createWord(String... letters) {
+        List<Set<String>> result = new ArrayList<>();
+        for (String l : letters) {
+            char[] parts = l.toCharArray();
+            List<String> partsAsStrings = new ArrayList<>();
+            for (int i = 0; i < parts.length; i++) {
+                partsAsStrings.add("" + parts[i]);
+            }
+            result.add(new HashSet<>(partsAsStrings));
+        }
+        return result;
     }
 }

@@ -49,7 +49,7 @@ public class RabinAutomatonTest {
 
     @Test
     public void test1() {
-        Set<String> alphabet = automatonMockFactory.generateAlphabet(1);
+        Set<String> alphabet = AutomatonMockFactory.generateAlphabet(1);
         Set<StateTransition> transitions = new HashSet<>();
         HashSet<String> letter = new HashSet<>();
         letter.add("a");
@@ -69,15 +69,15 @@ public class RabinAutomatonTest {
         RabinAutomaton<LTLPropEquivalenceClass, String> ra = new RabinAutomaton(mockMA, alphabet);
         assertEquals(1, ra.getStates().size());
 
-        List<Set<String>> word1 = createWord("", "a");
-        List<Set<String>> word2 = createWord("a");
+        List<Set<String>> word1 = AutomatonMockFactory.createWord("", "a");
+        List<Set<String>> word2 = AutomatonMockFactory.createWord("a");
         assertEquals(ra.run(word1), ra.run(word2));
     }
 
     @Test
     public void test2() {
         // Example from the paper, figure 3
-        Set<String> alphabet = automatonMockFactory.generateAlphabet(3);
+        Set<String> alphabet = AutomatonMockFactory.generateAlphabet(3);
         Set<StateTransition> transitions = new HashSet<>();
 
         Set<Set<String>> letters = Sets.powerSet(alphabet);
@@ -109,25 +109,25 @@ public class RabinAutomatonTest {
         RabinAutomaton<LTLPropEquivalenceClass, String> ra = new RabinAutomaton(mockMA, alphabet);
         assertEquals(2, ra.getStates().size());
 
-        List<Set<String>> emptyWord = createWord("");
+        List<Set<String>> emptyWord = AutomatonMockFactory.createWord("");
         assertEquals(ra.getStates().get(0), ra.run(emptyWord));
 
-        List<Set<String>> wordB = createWord("b");
+        List<Set<String>> wordB = AutomatonMockFactory.createWord("b");
         assertEquals(ra.getStates().get(0), ra.run(wordB));
 
-        List<Set<String>> wordA = createWord("a");
+        List<Set<String>> wordA = AutomatonMockFactory.createWord("a");
         assertEquals(ra.getStates().get(1), ra.run(wordA));
 
-        List<Set<String>> wordABC = createWord("a", "bc");
+        List<Set<String>> wordABC = AutomatonMockFactory.createWord("a", "bc");
         assertEquals(ra.getStates().get(0), ra.run(wordABC));
 
-        List<Set<String>> wordACEtc = createWord("ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac");
+        List<Set<String>> wordACEtc = AutomatonMockFactory.createWord("ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac");
         assertEquals(ra.getStates().get(1), ra.run(wordACEtc));
     }
 
     @Test
     public void test3() {
-        Set<String> alphabet = automatonMockFactory.generateAlphabet(2);
+        Set<String> alphabet = AutomatonMockFactory.generateAlphabet(2);
         Set<StateTransition> transitions = new HashSet<>();
 
         Set<Set<String>> letters = Sets.powerSet(alphabet);
@@ -159,32 +159,21 @@ public class RabinAutomatonTest {
         RabinAutomaton<LTLPropEquivalenceClass, String> ra = new RabinAutomaton(mockMA, alphabet);
         assertEquals(3, ra.getStates().size());
 
-        List<Set<String>> emptyWord = createWord("");
+        List<Set<String>> emptyWord = AutomatonMockFactory.createWord("");
         assertEquals(ra.getStates().get(0), ra.run(emptyWord));
 
-        List<Set<String>> wordAB = createWord("ab");
+        List<Set<String>> wordAB = AutomatonMockFactory.createWord("ab");
         assertEquals(ra.getStates().get(0), ra.run(wordAB));
         assertEquals(ra.run(wordAB), ra.run(emptyWord));
 
-        List<Set<String>> wordBBBB = createWord("b", "b", "b", "b", "b", "b", "b");
-        List<Set<String>> wordBBBBB = createWord("b", "b", "b", "b", "b", "b", "b", "b");
-        List<Set<String>> wordAAAA = createWord("a", "a", "a", "a", "a", "a", "a", "a", "a", "a");
-        List<Set<String>> wordAAAAB = createWord("a", "a", "a", "a", "a", "a", "a", "a", "a", "b");
+        List<Set<String>> wordBBBB = AutomatonMockFactory.createWord("b", "b", "b", "b", "b", "b", "b");
+        List<Set<String>> wordBBBBB = AutomatonMockFactory.createWord("b", "b", "b", "b", "b", "b", "b", "b");
+        List<Set<String>> wordAAAA = AutomatonMockFactory.createWord("a", "a", "a", "a", "a", "a", "a", "a", "a", "a");
+        List<Set<String>> wordAAAAB = AutomatonMockFactory.createWord("a", "a", "a", "a", "a", "a", "a", "a", "a", "b");
         assertFalse(ra.run(wordBBBB).equals(ra.run(wordAAAA)));
         assertEquals(ra.run(wordBBBB), ra.run(wordBBBBB));
         assertEquals(ra.run(wordAAAAB), ra.run(wordBBBB));
     }
 
-    List<Set<String>> createWord(String... letters) {
-        List<Set<String>> result = new ArrayList<>();
-        for (String l : letters) {
-            char[] parts = l.toCharArray();
-            List<String> partsAsStrings = new ArrayList<>();
-            for (int i = 0; i < parts.length; i++) {
-                partsAsStrings.add("" + parts[i]);
-            }
-            result.add(new HashSet<>(partsAsStrings));
-        }
-        return result;
-    }
+
 }
