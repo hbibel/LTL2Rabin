@@ -39,6 +39,10 @@ public class LTLOr extends LTLFormula {
         return disjuncts.iterator();
     }
 
+    public List<LTLFormula> getDisjuncts() {
+        return disjuncts;
+    }
+
     @Override
     public String toString() {
         String result = "(";

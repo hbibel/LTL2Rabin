@@ -3,17 +3,21 @@ package ltl2rabin;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class LTLAfGVisitor implements ILTLFormulaVisitor<LTLFormula> {
-    private LTLFormula result;
-    Set<String> letter;
+    private final Set<String> letter;
+
+    public LTLAfGVisitor(Set<String> letter) {
+        this.letter = letter;
+    }
 
     public LTLFormula visit(LTLAnd formula) {
         ArrayList<LTLFormula> newConjuncts = new ArrayList<>();
         Iterator<LTLFormula> iterator = formula.getIterator();
         while (iterator.hasNext()) {
             LTLFormula temp = iterator.next();
-            newConjuncts.add(afG(temp, letter));
+            newConjuncts.add(afG(temp));
         }
         return new LTLAnd(newConjuncts);
     }
@@ -25,7 +29,7 @@ public class LTLAfGVisitor implements ILTLFormulaVisitor<LTLFormula> {
     public LTLFormula visit(LTLFOperator formula) {
         ArrayList<LTLFormula> orParameter = new ArrayList<>();
         orParameter.add(formula);
-        orParameter.add(afG(formula.getOperand(), letter));
+        orParameter.add(afG(formula.getOperand()));
         return new LTLOr(orParameter);
     }
 
@@ -38,14 +42,15 @@ public class LTLAfGVisitor implements ILTLFormulaVisitor<LTLFormula> {
         Iterator<LTLFormula> iterator = formula.getIterator();
         while (iterator.hasNext()) {
             LTLFormula temp = iterator.next();
-            newDisjuncts.add(afG(temp, letter));
+            newDisjuncts.add(afG(temp));
         }
+        // newDisjuncts = formula.getDisjuncts().stream().map(d -> this::afG).collect(Collectors.toList());
         return new LTLOr(newDisjuncts);
     }
 
     public LTLFormula visit(LTLUOperator formula) {
-        LTLFormula afGLeftSide = afG(formula.getLeft(), letter);
-        LTLFormula afGRightSide = afG(formula.getRight(), letter);
+        LTLFormula afGLeftSide = afG(formula.getLeft());
+        LTLFormula afGRightSide = afG(formula.getRight());
         return new LTLOr(afGRightSide, new LTLAnd(afGLeftSide, formula));
     }
 
@@ -57,8 +62,7 @@ public class LTLAfGVisitor implements ILTLFormulaVisitor<LTLFormula> {
         return formula.getOperand();
     }
 
-    public LTLFormula afG(IVisitable<LTLFormula> formula, Set<String> letter) {
-        this.letter = letter;
+    public LTLFormula afG(IVisitable<LTLFormula> formula) {
         return formula.accept(this);
     }
 }

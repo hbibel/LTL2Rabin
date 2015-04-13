@@ -26,6 +26,10 @@ public class LTLAnd extends LTLFormula {
         conjuncts = params;
     }
 
+    public List<LTLFormula> getConjuncts() {
+        return conjuncts;
+    }
+
     public Iterator<LTLFormula> getIterator() {
         return conjuncts.iterator();
     }
