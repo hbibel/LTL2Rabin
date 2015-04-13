@@ -36,7 +36,7 @@ public class ProductAutomatonTest {
         List<Set<String>> emptyWord = AutomatonMockFactory.createWord();
         List<Set<String>> twoLetterWord = AutomatonMockFactory.createWord("a", "a");
         List<Set<String>> oneLetterWord = AutomatonMockFactory.createWord("a");
-        // assertEquals(productAutomaton.run(emptyWord), productAutomaton.run(twoLetterWord));
-        // assertFalse(productAutomaton.run(emptyWord).equals(productAutomaton.run(oneLetterWord)));
+        assertEquals(productAutomaton.run(emptyWord), productAutomaton.run(twoLetterWord));
+        assertFalse(productAutomaton.run(emptyWord).equals(productAutomaton.run(oneLetterWord)));
     }
 }

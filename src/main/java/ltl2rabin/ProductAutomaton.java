@@ -10,6 +10,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class ProductAutomaton<T, U> {
     private ListOrderedSet<State> states = new ListOrderedSet<>();
     private State initialState;
+    private int stateCounter = 0; // Remove in final version
 
     public ProductAutomaton(Iterable<RabinAutomaton<T, U>> rabinAutomata, Set<U> alphabet) {
         List<RabinAutomaton<T, U>.State> initialRaStates = new ArrayList<>();
@@ -28,6 +29,7 @@ public class ProductAutomaton<T, U> {
                 int index = states.indexOf(newState);
                 if (index >= 0) {
                     newState = states.get(index);
+                    stateCounter--;
                 }
                 else {
                     states.add(newState);
@@ -35,8 +37,6 @@ public class ProductAutomaton<T, U> {
                 tempState.setTransition(letter, newState);
                 if (newState.transitions.size() < letters.size()) {
                     stateQueue.add(newState);
-                    System.out.println(newState.transitions.size() + "<" + letters.size());
-                    System.out.println(states.size());
                 }
             }
         }
@@ -62,6 +62,11 @@ public class ProductAutomaton<T, U> {
     public class State {
         private List<RabinAutomaton<T, U>.State> rabinStates;
         private HashMap<Set<U>, State> transitions = new HashMap<>();
+        private String label = "rq" + stateCounter++;
+
+        public String getLabel() {
+            return label;
+        }
 
         public State(List<RabinAutomaton<T, U>.State> rabinStates) {
             this.rabinStates = rabinStates;
@@ -80,13 +85,12 @@ public class ProductAutomaton<T, U> {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             State state = (State) o;
-            return Objects.equals(rabinStates, state.rabinStates) &&
-                    Objects.equals(transitions, state.transitions);
+            return Objects.equals(rabinStates, state.rabinStates);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(rabinStates, transitions);
+            return Objects.hash(rabinStates);
         }
     }
 }
