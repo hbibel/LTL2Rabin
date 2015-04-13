@@ -55,6 +55,7 @@ public abstract class AutomatonMockFactory<T> {
 
             ListOrderedSet<RabinAutomaton<LTLPropEquivalenceClass, String>.State> stateListOrderedSet = ListOrderedSet.listOrderedSet(states);
             when(result.getStates()).thenReturn(stateListOrderedSet);
+            when(result.getInitialState()).thenReturn(states.get(0));
 
             return result;
         }

@@ -13,6 +13,11 @@ public class RabinAutomaton<T, U> {
     // public BiFunction<T, Set<U>, T> transitionFunction;
     private ListOrderedSet<State> states = new ListOrderedSet<>();
     private final State initialState;
+
+    public State getInitialState() {
+        return initialState;
+    }
+
     //private final Set<U> alphabet;
     private int stateCounter = 0;
 

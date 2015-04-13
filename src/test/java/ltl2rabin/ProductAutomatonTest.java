@@ -31,7 +31,7 @@ public class ProductAutomatonTest {
 
         ProductAutomaton productAutomaton = new ProductAutomaton(ras, alphabet);
 
-        // assertEquals(2, productAutomaton.getStates().size());
+        assertEquals(2, productAutomaton.getStates().size());
 
         List<Set<String>> emptyWord = AutomatonMockFactory.createWord();
         List<Set<String>> twoLetterWord = AutomatonMockFactory.createWord("a", "a");
