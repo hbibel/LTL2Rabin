@@ -62,7 +62,7 @@ public class ProductAutomaton<T, U> {
     public class State {
         private List<RabinAutomaton<T, U>.State> rabinStates;
         private HashMap<Set<U>, State> transitions = new HashMap<>();
-        private String label = "rq" + stateCounter++;
+        private String label = "pq" + stateCounter++;
 
         public String getLabel() {
             return label;

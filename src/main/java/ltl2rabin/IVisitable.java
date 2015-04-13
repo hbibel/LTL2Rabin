@@ -1,5 +1,5 @@
 package ltl2rabin;
 
-public interface IVisitable {
-    void accept(ILTLFormulaVisitor visitor);
+public interface IVisitable<T> {
+    T accept(ILTLFormulaVisitor<T> visitor);
 }

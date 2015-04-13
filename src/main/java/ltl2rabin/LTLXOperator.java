@@ -22,8 +22,8 @@ public class LTLXOperator extends LTLFormula {
     }
 
     @Override
-    public void accept(ILTLFormulaVisitor visitor) {
-        visitor.visit(this);
+    public LTLFormula accept(ILTLFormulaVisitor<LTLFormula> visitor) {
+        return visitor.visit(this);
     }
 
     @Override
