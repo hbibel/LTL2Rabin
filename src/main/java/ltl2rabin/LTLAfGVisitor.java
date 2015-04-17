@@ -2,6 +2,7 @@ package ltl2rabin;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -11,7 +12,7 @@ public class LTLAfGVisitor implements ILTLFormulaVisitor<LTLFormula> {
     public LTLAfGVisitor(Set<String> letter) {
         this.letter = letter;
     }
-
+// TODO: See LTLOr
     public LTLFormula visit(LTLAnd formula) {
         ArrayList<LTLFormula> newConjuncts = new ArrayList<>();
         Iterator<LTLFormula> iterator = formula.getIterator();
@@ -38,14 +39,7 @@ public class LTLAfGVisitor implements ILTLFormulaVisitor<LTLFormula> {
     }
 
     public LTLFormula visit(LTLOr formula) {
-        ArrayList<LTLFormula> newDisjuncts = new ArrayList<>();
-        Iterator<LTLFormula> iterator = formula.getIterator();
-        while (iterator.hasNext()) {
-            LTLFormula temp = iterator.next();
-            newDisjuncts.add(afG(temp));
-        }
-        // newDisjuncts = formula.getDisjuncts().stream().map(d -> this::afG).collect(Collectors.toList());
-        return new LTLOr(newDisjuncts);
+        return new LTLOr(formula.getDisjuncts().stream().map(this::afG).collect(Collectors.toList()));
     }
 
     public LTLFormula visit(LTLUOperator formula) {
