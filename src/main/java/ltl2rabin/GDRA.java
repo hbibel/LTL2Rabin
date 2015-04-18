@@ -6,7 +6,7 @@ import org.apache.commons.collections4.set.ListOrderedSet;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class GDRA<T, U> {
+public class GDRA<T, U extends Collection> {
     private State initialState;
     private ListOrderedSet<State> states = new ListOrderedSet<>();
     private int stateCounter = 0; // Remove in final version
@@ -18,10 +18,9 @@ public class GDRA<T, U> {
 
         Queue<State> stateQueue = new ConcurrentLinkedQueue<>();
         stateQueue.add(initialState);
-        Set<Set<U>> letters = Sets.powerSet(alphabet);
         while (!stateQueue.isEmpty()) {
             State tempState = stateQueue.poll();
-            for (Set<U> letter : letters) {
+            for (U letter : alphabet) {
                 MojmirAutomaton<T, U>.State nextMojmirState = tempState.mojmirState.readLetter(letter);
                 ProductAutomaton<T, U>.State nextPAState = tempState.paState.readLetter(letter);
 
@@ -35,7 +34,7 @@ public class GDRA<T, U> {
                     states.add(newState);
                 }
                 tempState.setTransition(letter, newState);
-                if (newState.transitions.size() < letters.size()) {
+                if (newState.transitions.size() < alphabet.size()) {
                     stateQueue.add(newState);
                 }
             }
@@ -45,7 +44,7 @@ public class GDRA<T, U> {
     public class State {
         MojmirAutomaton<T, U>.State mojmirState;
         ProductAutomaton<T, U>.State paState;
-        HashMap<Set<U>, State> transitions;
+        HashMap<U, State> transitions;
         String label = "gq" + stateCounter;
 
         public State(MojmirAutomaton<T, U>.State mojmirState, ProductAutomaton<T, U>.State paState) {
@@ -53,7 +52,7 @@ public class GDRA<T, U> {
             this.paState = paState;
         }
 
-        public void setTransition(Set<U> letter, State to) {
+        public void setTransition(U letter, State to) {
             transitions.put(letter, to);
         }
 

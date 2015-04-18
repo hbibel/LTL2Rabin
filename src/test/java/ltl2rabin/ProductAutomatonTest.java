@@ -13,12 +13,11 @@ public class ProductAutomatonTest {
 
     @Test
     public void threeRAsWithTwoAlternatingStates() {
-        Set<String> alphabet = AutomatonMockFactory.generateAlphabet(1);
+        Set<Set<String>> alphabet = AutomatonMockFactory.generateAlphabet(1);
 
         // All three RAs have the same transition function:
         Set<AutomatonMockFactory.StateTransition> transitions = new HashSet<>();
-        Set<Set<String>> letters = Sets.powerSet(alphabet);
-        for (Set<String> letter : letters) {
+        for (Set<String> letter : alphabet) {
             transitions.add(new AutomatonMockFactory.StateTransition(0, letter, 1));
             transitions.add(new AutomatonMockFactory.StateTransition(1, letter, 0));
         }

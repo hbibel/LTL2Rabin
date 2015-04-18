@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class RabinAutomaton<T, U> {
+public class RabinAutomaton<T, U extends Collection> {
     // public BiFunction<T, Set<U>, T> transitionFunction;
     private ListOrderedSet<State> states = new ListOrderedSet<>();
     private final State initialState;
@@ -31,15 +31,14 @@ public class RabinAutomaton<T, U> {
         initialState = new State(initialMojmirStates);
         states.add(initialState);
 
-        Set<Set<U>> letters = Sets.powerSet(alphabet);
         ConcurrentLinkedQueue<State> queue = new ConcurrentLinkedQueue<>();
         queue.add(initialState);
         while (!queue.isEmpty()) {
             State tempState = queue.poll();
-            if (tempState.transitions.size() != letters.size()) {
+            if (tempState.transitions.size() != alphabet.size()) {
                 // tempState has transitions for any letter ==> tempState has been visited before
                 List<MojmirAutomaton<T, U>.State> tempMojmirStates = tempState.mojmirStates;
-                for (Set<U> letter : letters) {
+                for (U letter : alphabet) {
                     List<MojmirAutomaton<T, U>.State> newStateList = Stream.concat(tempMojmirStates.stream()
                             .map(e -> e.readLetter(letter)), Stream.of(initialMojmirStates.get(0)))
                             // According to the javadocs: For ordered streams, the selection of distinct elements is
@@ -66,8 +65,8 @@ public class RabinAutomaton<T, U> {
         }
     }
 
-    public State run(List<Set<U>> word) {
-        Iterator<Set<U>> iteratorOverLetters = word.iterator();
+    public State run(List<U> word) {
+        Iterator<U> iteratorOverLetters = word.iterator();
         State nextState = initialState;
         while (iteratorOverLetters.hasNext()) {
             nextState = nextState.readLetter(iteratorOverLetters.next());
@@ -77,10 +76,10 @@ public class RabinAutomaton<T, U> {
 
     public class State{
         private final List<MojmirAutomaton<T, U>.State> mojmirStates;
-        private Map<Set<U>, State> transitions = new HashMap<>();
+        private Map<U, State> transitions = new HashMap<>();
         private String label = "rq" + stateCounter++;
 
-        public void setTransition(Set<U> letter, State to) {
+        public void setTransition(U letter, State to) {
             transitions.put(letter, to);
         }
 
@@ -88,7 +87,7 @@ public class RabinAutomaton<T, U> {
             return mojmirStates;
         }
 
-        public State readLetter(Set<U> letter) {
+        public State readLetter(U letter) {
             return transitions.get(letter);
         }
 

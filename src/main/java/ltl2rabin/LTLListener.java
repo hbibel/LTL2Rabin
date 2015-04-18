@@ -8,6 +8,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 public class LTLListener extends LTLBaseListener {
     private LTLFormula ltlTree;
@@ -23,7 +24,7 @@ public class LTLListener extends LTLBaseListener {
         return ltlTree;
     }
 
-    public HashSet<String> getTerminalSymbols() {
+    public Set<String> getTerminalSymbols() {
         return new HashSet<>(variables.keySet());
     }
 

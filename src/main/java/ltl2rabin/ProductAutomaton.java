@@ -7,7 +7,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 // U: usually String
-public class ProductAutomaton<T, U> {
+// TODO: Refactor Set<U> -> U
+public class ProductAutomaton<T, U extends Collection> {
     private ListOrderedSet<State> states = new ListOrderedSet<>();
     private State initialState;
     private int stateCounter = 0; // Remove in final version
@@ -19,10 +20,9 @@ public class ProductAutomaton<T, U> {
 
         Queue<State> stateQueue = new ConcurrentLinkedQueue<>();
         stateQueue.add(initialState);
-        Set<Set<U>> letters = Sets.powerSet(alphabet);
         while (!stateQueue.isEmpty()) {
             State tempState = stateQueue.poll();
-            for (Set<U> letter : letters) {
+            for (U letter : alphabet) {
                 final List<RabinAutomaton<T, U>.State> tempRaStates = new ArrayList<>();
                 tempState.rabinStates.forEach(rs -> tempRaStates.add(rs.readLetter(letter)));
                 State newState = new State(tempRaStates);
@@ -35,7 +35,7 @@ public class ProductAutomaton<T, U> {
                     states.add(newState);
                 }
                 tempState.setTransition(letter, newState);
-                if (newState.transitions.size() < letters.size()) {
+                if (newState.transitions.size() < alphabet.size()) {
                     stateQueue.add(newState);
                 }
             }
@@ -50,8 +50,8 @@ public class ProductAutomaton<T, U> {
         return states;
     }
 
-    public State run(List<Set<U>> word) {
-        Iterator<Set<U>> iteratorOverLetters = word.iterator();
+    public State run(List<U> word) {
+        Iterator<U> iteratorOverLetters = word.iterator();
         State nextState = initialState;
         while (iteratorOverLetters.hasNext()) {
             nextState = nextState.readLetter(iteratorOverLetters.next());
@@ -61,7 +61,7 @@ public class ProductAutomaton<T, U> {
 
     public class State {
         private List<RabinAutomaton<T, U>.State> rabinStates;
-        private HashMap<Set<U>, State> transitions = new HashMap<>();
+        private HashMap<U, State> transitions = new HashMap<>();
         private String label = "pq" + stateCounter++;
 
         public String getLabel() {
@@ -72,11 +72,11 @@ public class ProductAutomaton<T, U> {
             this.rabinStates = rabinStates;
         }
 
-        public void setTransition(Set<U> letter, State to) {
+        public void setTransition(U letter, State to) {
             transitions.put(letter, to);
         }
 
-        public State readLetter(Set<U> letter) {
+        public State readLetter(U letter) {
             return transitions.get(letter);
         }
 

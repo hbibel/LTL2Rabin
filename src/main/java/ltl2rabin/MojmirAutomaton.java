@@ -11,21 +11,21 @@ import java.util.function.BiFunction;
 /**
  * This class describes a mojmir automaton.
  * @param <T> The type of information associated with a state, e.g. its corresponding LTL formula
- * @param <U> The type that represents the "letters", e.g. String
+ * @param <U> The type that represents the "letters", e.g. Set of Strings
  */
-public class MojmirAutomaton<T, U> {
+public class MojmirAutomaton<T, U> extends Automaton<T, U> {
     // public Set<State> acceptingStates; // TODO yet to be identified, if necessary
     private final Set<State> sinks;
     private final Set<State> states;
     private final State initialState;
     private final Set<U> alphabet;
-    private final BiFunction<T, Set<U>, T> transitionFunction;
+    private final BiFunction<T, U, T> transitionFunction;
 
     public State getInitialState() {
         return initialState;
     }
 
-    public MojmirAutomaton(T info, BiFunction<T, Set<U>, T> transitionFunction, HashSet<U> alphabet) {
+    public MojmirAutomaton(T info, BiFunction<T, U, T> transitionFunction, Set<U> alphabet) {
         this.alphabet = alphabet;
         states = new HashSet<> ();
         initialState = new State(info);
@@ -45,12 +45,11 @@ public class MojmirAutomaton<T, U> {
 
     private void reach() {
         Queue<State> statesToBeAdded = new ConcurrentLinkedQueue<>(states);
-        Set<Set<U>> letters = Sets.powerSet(alphabet);
 
         while (!statesToBeAdded.isEmpty()) {
             State temp = statesToBeAdded.poll();
             boolean isSink = true;
-            for (Set<U> letter : letters) {
+            for (U letter : alphabet) {
                 T newStateInfo = transitionFunction.apply(temp.label, letter);
                 if (newStateInfo.equals(temp.label)) continue;
                 // A sink is a state that only has self-loops as outgoing transitions. If temp is a sink, this
@@ -67,7 +66,7 @@ public class MojmirAutomaton<T, U> {
         }
     }
 
-    public class State {
+    public class State extends Automaton<T, U>.State {
         private final T label;
 
         public T getLabel() {
@@ -86,7 +85,7 @@ public class MojmirAutomaton<T, U> {
         }
 
         // Alternative: Keep all state transitions in a mapping: letter --> State
-        public State readLetter(Set<U> letter) {
+        public State readLetter(U letter) {
             T newInfo = transitionFunction.apply(this.label, letter);
             return new State(newInfo);
         }
