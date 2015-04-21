@@ -7,6 +7,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 /**
  * This class describes a mojmir automaton.
@@ -14,12 +15,14 @@ import java.util.function.BiFunction;
  * @param <U> The type that represents the "letters", e.g. Set of Strings
  */
 public class MojmirAutomaton<T, U> extends Automaton<T, U> {
-    // public Set<State> acceptingStates; // TODO yet to be identified, if necessary
+    private Set<State> acceptingStates = new HashSet<>(); // TODO yet to be identified, if necessary
     private final Set<State> sinks;
     private final Set<State> states;
     private final State initialState;
     private final Set<U> alphabet;
     private final BiFunction<T, U, T> transitionFunction;
+    private int maxRank;
+    private Function<MojmirAutomaton<T, U>.State, Boolean> accFunction;
 
     public State getInitialState() {
         return initialState;
@@ -33,6 +36,20 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
         sinks = new HashSet<>();
         this.transitionFunction = transitionFunction;
         reach();
+        maxRank = states.size(); // Has to be executed after reach()
+    }
+
+    public MojmirAutomaton(T info, BiFunction<T, U, T> transitionFunction, Set<U> alphabet,
+                           Function<MojmirAutomaton<T, U>.State, Boolean> accFunction) {
+        this.alphabet = alphabet;
+        states = new HashSet<> ();
+        initialState = new State(info);
+        states.add(initialState);
+        sinks = new HashSet<>();
+        this.transitionFunction = transitionFunction;
+        this.accFunction = accFunction;
+        reach();
+        maxRank = states.size(); // Has to be executed after reach()
     }
 
     public Set<State> getSinks() {
@@ -48,6 +65,7 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
 
         while (!statesToBeAdded.isEmpty()) {
             State temp = statesToBeAdded.poll();
+            if (accFunction.apply(temp)) { acceptingStates.add(temp); }
             boolean isSink = true;
             for (U letter : alphabet) {
                 T newStateInfo = transitionFunction.apply(temp.label, letter);

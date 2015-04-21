@@ -18,7 +18,7 @@ public class MojmirAutomatonTest {
         Set<Set<String>> alphabet = Sets.powerSet(ltlListener.getTerminalSymbols());
 
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> classyMojmir = new MojmirAutomaton<>(
-                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet);
+                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, new StateAcceptanceFunction());
         assertEquals(4, classyMojmir.getStates().size());
     }
 
