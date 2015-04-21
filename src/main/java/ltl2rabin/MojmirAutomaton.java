@@ -22,7 +22,7 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
     private final Set<U> alphabet;
     private final BiFunction<T, U, T> transitionFunction;
     private int maxRank;
-    private Function<MojmirAutomaton<T, U>.State, Boolean> accFunction;
+    private MojmirStateAcceptanceFunction<T> accFunction;
 
     public State getInitialState() {
         return initialState;
@@ -40,7 +40,7 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
     }
 
     public MojmirAutomaton(T info, BiFunction<T, U, T> transitionFunction, Set<U> alphabet,
-                           Function<MojmirAutomaton<T, U>.State, Boolean> accFunction) {
+                           MojmirStateAcceptanceFunction<T> accFunction) {
         this.alphabet = alphabet;
         states = new HashSet<> ();
         initialState = new State(info);

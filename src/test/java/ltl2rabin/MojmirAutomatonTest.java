@@ -1,15 +1,20 @@
 package ltl2rabin;
 
 import com.google.common.collect.Sets;
+import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashSet;
 import java.util.Set;
-import java.util.function.BiFunction;
 
 import static org.junit.Assert.assertEquals;
 
 public class MojmirAutomatonTest {
+    MojmirStateAcceptanceFunction<LTLPropEquivalenceClass> f;
+
+    @Before
+    public void setUp() {
+        f = new MojmirStateAcceptanceFunction<>();
+    }
 
     @Test
     public void testCase1() throws Exception {
@@ -18,7 +23,7 @@ public class MojmirAutomatonTest {
         Set<Set<String>> alphabet = Sets.powerSet(ltlListener.getTerminalSymbols());
 
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> classyMojmir = new MojmirAutomaton<>(
-                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, new StateAcceptanceFunction());
+                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, f);
         assertEquals(4, classyMojmir.getStates().size());
     }
 
@@ -29,7 +34,7 @@ public class MojmirAutomatonTest {
         Set<Set<String>> alphabet = Sets.powerSet(ltlListener.getTerminalSymbols());
 
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> classyMojmir = new MojmirAutomaton<>(
-                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet);
+                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, f);
         assertEquals(3, classyMojmir.getStates().size());
     }
 
@@ -40,7 +45,7 @@ public class MojmirAutomatonTest {
         Set<Set<String>> alphabet = Sets.powerSet(ltlListener.getTerminalSymbols());
 
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> classyMojmir = new MojmirAutomaton<>(
-                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet);
+                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, f);
         assertEquals(4, classyMojmir.getStates().size());
     }
 
@@ -51,7 +56,7 @@ public class MojmirAutomatonTest {
         Set<Set<String>> alphabet = Sets.powerSet(ltlListener.getTerminalSymbols());
 
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> classyMojmir = new MojmirAutomaton<>(
-                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet);
+                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, f);
         assertEquals(2, classyMojmir.getStates().size());
     }
 
@@ -62,7 +67,7 @@ public class MojmirAutomatonTest {
         Set<Set<String>> alphabet = Sets.powerSet(ltlListener.getTerminalSymbols());
 
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> classyMojmir = new MojmirAutomaton<>(
-                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet);
+                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, f);
         assertEquals(3, classyMojmir.getStates().size());
     }
 
@@ -73,7 +78,7 @@ public class MojmirAutomatonTest {
         Set<Set<String>> alphabet = Sets.powerSet(ltlListener.getTerminalSymbols());
 
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> classyMojmir = new MojmirAutomaton<>(
-                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet);
+                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, f);
         assertEquals(3, classyMojmir.getStates().size());
     }
 
@@ -84,7 +89,7 @@ public class MojmirAutomatonTest {
         Set<Set<String>> alphabet = Sets.powerSet(ltlListener.getTerminalSymbols());
 
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> classyMojmir = new MojmirAutomaton<>(
-                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet);
+                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, f);
         assertEquals(3, classyMojmir.getStates().size());
     }
 
