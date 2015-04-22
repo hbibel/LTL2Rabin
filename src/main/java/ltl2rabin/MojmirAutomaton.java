@@ -28,17 +28,6 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
         return initialState;
     }
 
-    public MojmirAutomaton(T info, BiFunction<T, U, T> transitionFunction, Set<U> alphabet) {
-        this.alphabet = alphabet;
-        states = new HashSet<> ();
-        initialState = new State(info);
-        states.add(initialState);
-        sinks = new HashSet<>();
-        this.transitionFunction = transitionFunction;
-        reach();
-        maxRank = states.size(); // Has to be executed after reach()
-    }
-
     public MojmirAutomaton(T info, BiFunction<T, U, T> transitionFunction, Set<U> alphabet,
                            MojmirStateAcceptanceFunction<T> accFunction) {
         this.alphabet = alphabet;
@@ -65,7 +54,6 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
 
         while (!statesToBeAdded.isEmpty()) {
             State temp = statesToBeAdded.poll();
-            if (accFunction.apply(temp)) { acceptingStates.add(temp); }
             boolean isSink = true;
             for (U letter : alphabet) {
                 T newStateInfo = transitionFunction.apply(temp.label, letter);
@@ -86,20 +74,30 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
 
     public class State extends Automaton<T, U>.State {
         private final T label;
+        private boolean accepting;
 
         public T getLabel() {
             return label;
         }
 
-        boolean isSink;
+        private boolean isSink;
 
         public State(T label) {
             isSink = false;
+            accepting = accFunction.apply(this);
             this.label = label;
+        }
+
+        public boolean isAccepting() {
+            return this.accepting;
         }
 
         public void setSink(boolean isSink) {
             this.isSink = isSink;
+        }
+
+        public boolean isSink() {
+            return isSink;
         }
 
         // Alternative: Keep all state transitions in a mapping: letter --> State

@@ -63,11 +63,14 @@ public class RabinAutomatonTest {
         transitions.add(new StateTransition(1, letter, 1));
         List<Integer> sinks = new ArrayList<>();
         sinks.add(1);
+        List<Integer> acceptingStates = new ArrayList<>();
 
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = automatonMockFactory.mockMe(2, transitions, sinks);
+        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = automatonMockFactory.mockMe(2, transitions, sinks, acceptingStates);
 
         RabinAutomaton<LTLPropEquivalenceClass, Set<String>> ra = new RabinAutomaton(mockMA, alphabet);
         assertEquals(1, ra.getStates().size());
+
+        assertEquals(0, ra.failTransitions().size());
 
         List<Set<String>> word1 = AutomatonMockFactory.createWord("", "a");
         List<Set<String>> word2 = AutomatonMockFactory.createWord("a");
@@ -102,11 +105,14 @@ public class RabinAutomatonTest {
         List<Integer> sinks = new ArrayList<>();
         sinks.add(2);
         sinks.add(3);
+        List<Integer> acceptingStates = new ArrayList<>();
+        acceptingStates.add(3);
 
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = automatonMockFactory.mockMe(4, transitions, sinks);
+        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = automatonMockFactory.mockMe(4, transitions, sinks, acceptingStates);
 
         RabinAutomaton<LTLPropEquivalenceClass, Set<String>> ra = new RabinAutomaton(mockMA, alphabet);
         assertEquals(2, ra.getStates().size());
+        assertEquals(6, ra.failTransitions().size());
 
         List<Set<String>> emptyWord = AutomatonMockFactory.createWord("");
         assertEquals(ra.getStates().get(0), ra.run(emptyWord));
@@ -151,8 +157,9 @@ public class RabinAutomatonTest {
         List<Integer> sinks = new ArrayList<>();
         sinks.add(3);
         sinks.add(4);
+        List<Integer> acceptingStates = new ArrayList<>(); // TODO
 
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = automatonMockFactory.mockMe(5, transitions, sinks);
+        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = automatonMockFactory.mockMe(5, transitions, sinks, acceptingStates);
 
         RabinAutomaton<LTLPropEquivalenceClass, Set<String>> ra = new RabinAutomaton(mockMA, alphabet);
         assertEquals(3, ra.getStates().size());

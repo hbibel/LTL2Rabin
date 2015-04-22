@@ -14,7 +14,8 @@ public abstract class AutomatonMockFactory<T> {
 
     public static class MAMockFactory extends AutomatonMockFactory<MojmirAutomaton> {
 
-        public MojmirAutomaton mockMe(int numStates, Collection<StateTransition> transitions, Collection<Integer> sinks) {
+        public MojmirAutomaton mockMe(int numStates, Collection<StateTransition> transitions, Collection<Integer> sinks,
+                                      Collection<Integer> acceptingStates) {
             MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> result = mock(MojmirAutomaton.class);
             ArrayList<MojmirAutomaton.State> states = new ArrayList<>();
             for (int i = 0; i < numStates; i++) {
@@ -25,7 +26,14 @@ public abstract class AutomatonMockFactory<T> {
             when(result.getInitialState()).thenReturn(states.get(0));
 
             HashSet<MojmirAutomaton<LTLPropEquivalenceClass, Set<String>>.State> sinkStates = new HashSet<>();
-            sinks.forEach(i -> sinkStates.add(states.get(i)));
+            sinks.forEach(i -> {
+                sinkStates.add(states.get(i));
+                when(states.get(i).isSink()).thenReturn(true);
+            });
+            acceptingStates.forEach(i -> {
+                when(states.get(i).isAccepting()).thenReturn(true);
+            });
+
             when(result.getSinks()).thenReturn(sinkStates);
 
             for (StateTransition t : transitions) {
@@ -36,8 +44,8 @@ public abstract class AutomatonMockFactory<T> {
         }
 
         public MojmirAutomaton mockMe(int numStates, Collection<StateTransition> transitions) {
-            Collection<Integer> sinks = Collections.EMPTY_LIST;
-            return mockMe(numStates, transitions, sinks);
+            Collection<Integer> emptyList = Collections.EMPTY_LIST;
+            return mockMe(numStates, transitions, emptyList, emptyList);
         }
     }
 
