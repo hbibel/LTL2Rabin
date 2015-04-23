@@ -1,6 +1,5 @@
 package ltl2rabin;
 
-import com.google.common.collect.Sets;
 import ltl2rabin.AutomatonMockFactory.StateTransition;
 import org.junit.After;
 import org.junit.Before;
@@ -70,7 +69,7 @@ public class RabinAutomatonTest {
         RabinAutomaton<LTLPropEquivalenceClass, Set<String>> ra = new RabinAutomaton(mockMA, alphabet);
         assertEquals(1, ra.getStates().size());
 
-        assertEquals(0, ra.failTransitions().size());
+        assertEquals(2, ra.fail().size());
 
         List<Set<String>> word1 = AutomatonMockFactory.createWord("", "a");
         List<Set<String>> word2 = AutomatonMockFactory.createWord("a");
@@ -112,7 +111,7 @@ public class RabinAutomatonTest {
 
         RabinAutomaton<LTLPropEquivalenceClass, Set<String>> ra = new RabinAutomaton(mockMA, alphabet);
         assertEquals(2, ra.getStates().size());
-        assertEquals(6, ra.failTransitions().size());
+        assertEquals(9, ra.fail().size());
 
         List<Set<String>> emptyWord = AutomatonMockFactory.createWord("");
         assertEquals(ra.getStates().get(0), ra.run(emptyWord));

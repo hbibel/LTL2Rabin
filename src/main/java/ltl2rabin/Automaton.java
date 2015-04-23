@@ -2,10 +2,7 @@ package ltl2rabin;
 
 import org.apache.commons.collections4.set.ListOrderedSet;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public abstract class Automaton<T, U> {
     private ListOrderedSet<State> states = new ListOrderedSet<>();
@@ -36,6 +33,21 @@ public abstract class Automaton<T, U> {
             this.from = from;
             this.to = to;
             this.letter = letter;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Transition that = (Transition) o;
+            return Objects.equals(from, that.from) &&
+                    Objects.equals(to, that.to) &&
+                    Objects.equals(letter, that.letter);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(from, to, letter);
         }
     }
 }

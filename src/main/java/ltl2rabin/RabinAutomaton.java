@@ -12,7 +12,10 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U>{
     // public BiFunction<T, Set<U>, T> transitionFunction;
     private ListOrderedSet<State> states = new ListOrderedSet<>();
     private final State initialState;
+    private Set<Transition> transitions = new HashSet<>();
     private Set<Transition> fail = new ListOrderedSet<>();
+    private List<Set<Transition>> buy = new ArrayList<>();
+    private List<Set<Transition>> succeed = new ArrayList<>();
 
     public State getInitialState() {
         return initialState;
@@ -47,7 +50,7 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U>{
                             .distinct()
                             // filter strikes out the elements that do not fulfil the condition specified within the
                             // parentheses
-                            .filter(e -> !mojmirAutomaton.getSinks().contains(e))
+                            .filter(e -> !e.isSink())
                             .collect(Collectors.toList());
                     State newState = new State(newMojmirStateList);
                     int indexOfExistingState = states.indexOf(newState);
@@ -59,28 +62,85 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U>{
                         states.add(newState);
                     }
                     tempState.setTransition(letter, newState);
+                    transitions.add(new Transition(tempState, letter, newState));
                     queue.add(newState);
                 }
             }
         }
 
         // a token moves from mojmir state q into non-acc sink q' ==> fail
-        states.forEach( state -> {
-            state.getMojmirStates().forEach( ms -> {
-                alphabet.forEach( letter -> {
-                    MojmirAutomaton<T, U>.State nextState = ms.readLetter(letter);
-                    if (nextState.isSink() && !nextState.isAccepting()) {
-                        fail.add(new Transition(state, letter, nextState));
+        states.forEach(rState -> {
+            rState.getMojmirStates().forEach(mState -> {
+                alphabet.forEach(letter -> {
+                    MojmirAutomaton<T, U>.State nextMState = mState.readLetter(letter);
+                    if (nextMState.isSink() && !nextMState.isAccepting()) {
+                        fail.add(new Transition(rState, letter, rState.readLetter(letter)));
                     }
                 });
             });
         });
 
 
+        // one token with rank = i buys another or gets bought
+        for (int rank = 0; rank < mojmirAutomaton.getMaxRank(); rank++) {
+            Set<Transition> buyI = new ListOrderedSet<>();
+            final int finalRank = rank;
+            transitions.forEach(transition -> {
+                if (buysOrGetBought(transition, finalRank, mojmirAutomaton.getInitialState())) {
+                    buyI.add(transition);
+                }
+            });
+            buy.add(buyI);
+        }
+
+        for (int rank = 0; rank < mojmirAutomaton.getMaxRank(); rank++) {
+            Set<Transition> succeedI = new ListOrderedSet<>();
+            final int finalRank = rank;
+            for (U letter : alphabet) {
+                succeedI.addAll(transitions.stream()
+                        .filter(transition -> transition.getFrom().getMojmirStates().size() > finalRank)
+                        .filter(transition -> !transition.getFrom().getMojmirStates().get(finalRank).isAccepting()
+                                || transition.getFrom().getMojmirStates().get(finalRank).equals(mojmirAutomaton.getInitialState()))
+                        .filter(transition -> transition.getFrom().getMojmirStates().get(finalRank).readLetter(letter).isAccepting())
+                        .filter(transition -> transition.letter.equals(letter))
+                        .collect(Collectors.toList()));
+            }
+            succeed.add(succeedI);
+        }
     }
 
-    public Set<Transition> failTransitions() {
+    private boolean buysOrGetBought(Transition transition, int rank, MojmirAutomaton<T, U>.State mInitialState) {
+        if (rank >= transition.getFrom().getMojmirStates().size()) {
+            return false;
+        }
+        MojmirAutomaton<T, U>.State mFromState = transition.getFrom().getMojmirStates().get(rank); // q
+        MojmirAutomaton<T, U>.State mToState = mFromState.readLetter(transition.getLetter()); // q'
+        if (mToState.equals(mInitialState)) {
+            return true;
+        }
+        else {
+            List<MojmirAutomaton<T, U>.State> mStatesAfterReadingLetter = transition.getFrom().getMojmirStates().stream()
+                    .filter(ms -> !ms.equals(mFromState))
+                    .map(ms -> ms.readLetter(transition.getLetter()))
+                    .filter(ms -> ms.equals(mToState))
+                    .collect(Collectors.toList());
+            if (mStatesAfterReadingLetter.size() > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Set<Transition> fail() {
         return fail;
+    }
+
+    public Set<Transition> buy(int rank) {
+        Set<Transition> result = new ListOrderedSet<>();
+        for (int i = 0; i < rank; i++) {
+            result.addAll(buy.get(i));
+        }
+        return result;
     }
 
     public State run(List<U> word) {
@@ -152,8 +212,30 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U>{
     }
 
     public class Transition extends Automaton<T, U>.Transition {
-        public Transition(Automaton<T, U>.State from, U letter, Automaton<T, U>.State to) {
+        private State from;
+        private State to;
+        private U letter;
+
+        public Transition(RabinAutomaton<T, U>.State from, U letter, RabinAutomaton<T, U>.State to) {
             super(from, letter, to);
+            // TODO: Lines below necessary?
+            this.from = from;
+            this.to = to;
+            this.letter = letter;
         }
+
+        public State getFrom() {
+            return from;
+        }
+
+        public State getTo() {
+            return to;
+        }
+
+        public U getLetter() {
+            return letter;
+        }
+
+
     }
 }

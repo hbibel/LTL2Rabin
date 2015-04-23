@@ -31,12 +31,12 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
     public MojmirAutomaton(T info, BiFunction<T, U, T> transitionFunction, Set<U> alphabet,
                            MojmirStateAcceptanceFunction<T> accFunction) {
         this.alphabet = alphabet;
+        this.transitionFunction = transitionFunction;
+        this.accFunction = accFunction;
         states = new HashSet<> ();
         initialState = new State(info);
         states.add(initialState);
         sinks = new HashSet<>();
-        this.transitionFunction = transitionFunction;
-        this.accFunction = accFunction;
         reach();
         maxRank = states.size(); // Has to be executed after reach()
     }
@@ -47,6 +47,10 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
 
     public Set<State> getStates() {
         return states;
+    }
+
+    public int getMaxRank() {
+        return maxRank;
     }
 
     private void reach() {

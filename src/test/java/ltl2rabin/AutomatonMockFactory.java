@@ -40,6 +40,8 @@ public abstract class AutomatonMockFactory<T> {
                 when(states.get(t.from).readLetter(t.letter)).thenReturn(states.get(t.to));
             }
 
+            when(result.getMaxRank()).thenReturn(states.size());
+
             return result;
         }
 
