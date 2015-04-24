@@ -2,7 +2,6 @@ package ltl2rabin;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,7 +55,7 @@ public class LTLAfGVisitor implements ILTLFormulaVisitor<LTLFormula> {
         return formula.getOperand();
     }
 
-    public LTLFormula afG(IVisitable<LTLFormula> formula) {
+    public LTLFormula afG(IVisitableFormula<LTLFormula> formula) {
         return formula.accept(this);
     }
 }

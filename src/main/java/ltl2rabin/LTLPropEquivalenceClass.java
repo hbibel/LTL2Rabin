@@ -82,6 +82,10 @@ public class LTLPropEquivalenceClass {
         }
     }
 
+    boolean isTautology() {
+        return cachedBDD.isOne();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

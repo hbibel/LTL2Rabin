@@ -1,6 +1,7 @@
 package ltl2rabin;
 
 import org.apache.commons.collections4.set.ListOrderedSet;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.*;
 
@@ -14,8 +15,8 @@ public abstract class Automaton<T, U> {
         return initialState;
     }
 
-    public abstract class State {
-        public abstract State readLetter(U letter);
+    public static abstract class State<R, S> {
+        public abstract State readLetter(S letter);
 
         @Override
         public abstract boolean equals(Object obj);
@@ -24,12 +25,12 @@ public abstract class Automaton<T, U> {
         public abstract int hashCode();
     }
 
-    public abstract class Transition {
-        private State from;
-        private State to;
-        private U letter;
+    public static class Transition<P, Q> {
+        private final State from;
+        private final State to;
+        private final Q letter;
 
-        protected Transition(State from, U letter, State to) {
+        protected Transition(State from, Q letter, State to) {
             this.from = from;
             this.to = to;
             this.letter = letter;

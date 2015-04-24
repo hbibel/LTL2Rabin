@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.*;
@@ -42,7 +44,7 @@ public class LTLRandomFactory extends LTLFactory<Integer> {
      * @return              An arbitrary random LTLFormula object.
      */
     @Override
-    public LTLFormula buildLTL(Integer complexity) {
+    public Pair<LTLFormula, Set<Set<String>>> buildLTL(Integer complexity) {
         // Make sure the complexity does not surpass 10:
         complexity = complexity > 10 ? 10 : complexity;
         int numVariables = 1+10*complexity;
@@ -60,16 +62,17 @@ public class LTLRandomFactory extends LTLFactory<Integer> {
         LTLFormula result = createRandomFormula();
         operatorCount=0;
 
-        return result;
+        Set<Set<String>> alphabet = Sets.powerSet(ImmutableSet.of("There is no alphabet."));
+        return new Pair<>(result, alphabet);
     }
 
     // If the generated LTLFormula should not contain any G-subformulae set the gFree parameter to true
-    public LTLFormula buildLTL(Integer complexity, boolean gFree) {
+    public Pair<LTLFormula, Set<Set<String>>> buildLTL(Integer complexity, boolean gFree) {
         List<Supplier<LTLFormula>> savedList = nonTerminatingGeneratingFunctions;
         if (gFree) {
             nonTerminatingGeneratingFunctions = gFreeNonTerminatingGeneratingFunctions;
         }
-        LTLFormula result = buildLTL(complexity);
+        Pair<LTLFormula, Set<Set<String>>> result = buildLTL(complexity);
         if (gFree) {
             nonTerminatingGeneratingFunctions = savedList;
         }

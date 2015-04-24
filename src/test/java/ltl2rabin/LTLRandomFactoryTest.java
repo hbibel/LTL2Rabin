@@ -20,7 +20,7 @@ public class LTLRandomFactoryTest {
         System.out.println("i  | operatorCount | variableCount ");
         System.out.println("-----------------------------------");
         for (int i = 0; i < 11; i++) {
-            LTLFormula f = factory.buildLTL(i);
+            LTLFormula f = factory.buildLTL(i).getFirst();
             HashSet<String> distinctVariables = new HashSet<>();
             int operatorCount = 0;
             Queue<LTLFormula> toBeAnalyzed = new LinkedList<>();
@@ -48,7 +48,7 @@ public class LTLRandomFactoryTest {
 
     @Test
     public void testGFreeNess() throws Exception {
-        LTLFormula f = factory.buildLTL(10, true);
+        LTLFormula f = factory.buildLTL(10, true).getFirst();
         Queue<LTLFormula> toBeAnalyzed = new LinkedList<>();
         toBeAnalyzed.add(f);
         while (!toBeAnalyzed.isEmpty()) {

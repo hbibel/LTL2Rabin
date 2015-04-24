@@ -8,8 +8,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U>{
-    // public BiFunction<T, Set<U>, T> transitionFunction;
+public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
     private ListOrderedSet<State> states = new ListOrderedSet<>();
     private final State initialState;
     private Set<Transition> transitions = new HashSet<>();
@@ -30,7 +29,7 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U>{
 
     public RabinAutomaton(final MojmirAutomaton<T, U> mojmirAutomaton, Set<U> alphabet) {
         //this.alphabet = alphabet;
-        List<MojmirAutomaton<T, U>.State> initialMojmirStates = new ArrayList<>(Collections.singletonList(mojmirAutomaton.getInitialState()));
+        List<MojmirAutomaton.State<T, U>> initialMojmirStates = new ArrayList<>(Collections.singletonList(mojmirAutomaton.getInitialState()));
         initialState = new State(initialMojmirStates);
         states.add(initialState);
 
@@ -40,9 +39,9 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U>{
             State tempState = queue.poll();
             if (tempState.transitions.size() != alphabet.size()) {
                 // tempState has transitions for any letter ==> tempState has been visited before
-                List<MojmirAutomaton<T, U>.State> tempMojmirStates = tempState.mojmirStates;
+                List<MojmirAutomaton.State<T, U>> tempMojmirStates = tempState.mojmirStates;
                 for (U letter : alphabet) {
-                    List<MojmirAutomaton<T, U>.State> newMojmirStateList = Stream.concat(tempMojmirStates.stream()
+                    List<MojmirAutomaton.State<T, U>> newMojmirStateList = Stream.concat(tempMojmirStates.stream()
                             .map(e -> e.readLetter(letter)), Stream.of(initialMojmirStates.get(0)))
                             // According to the javadocs: For ordered streams, the selection of distinct elements is
                             // stable (for duplicated elements, the element appearing first in the encounter order is
@@ -72,7 +71,7 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U>{
         states.forEach(rState -> {
             rState.getMojmirStates().forEach(mState -> {
                 alphabet.forEach(letter -> {
-                    MojmirAutomaton<T, U>.State nextMState = mState.readLetter(letter);
+                    MojmirAutomaton.State<T, U> nextMState = mState.readLetter(letter);
                     if (nextMState.isSink() && !nextMState.isAccepting()) {
                         fail.add(new Transition(rState, letter, rState.readLetter(letter)));
                     }
@@ -109,17 +108,17 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U>{
         }
     }
 
-    private boolean buysOrGetBought(Transition transition, int rank, MojmirAutomaton<T, U>.State mInitialState) {
+    private boolean buysOrGetBought(Transition transition, int rank, MojmirAutomaton.State<T, U> mInitialState) {
         if (rank >= transition.getFrom().getMojmirStates().size()) {
             return false;
         }
-        MojmirAutomaton<T, U>.State mFromState = transition.getFrom().getMojmirStates().get(rank); // q
-        MojmirAutomaton<T, U>.State mToState = mFromState.readLetter(transition.getLetter()); // q'
+        MojmirAutomaton.State<T, U> mFromState = transition.getFrom().getMojmirStates().get(rank); // q
+        MojmirAutomaton.State<T, U> mToState = mFromState.readLetter(transition.getLetter()); // q'
         if (mToState.equals(mInitialState)) {
             return true;
         }
         else {
-            List<MojmirAutomaton<T, U>.State> mStatesAfterReadingLetter = transition.getFrom().getMojmirStates().stream()
+            List<MojmirAutomaton.State<T, U>> mStatesAfterReadingLetter = transition.getFrom().getMojmirStates().stream()
                     .filter(ms -> !ms.equals(mFromState))
                     .map(ms -> ms.readLetter(transition.getLetter()))
                     .filter(ms -> ms.equals(mToState))
@@ -152,8 +151,8 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U>{
         return nextState;
     }
 
-    public class State extends Automaton<T, U>.State {
-        private final List<MojmirAutomaton<T, U>.State> mojmirStates;
+    public class State extends Automaton.State<T, U> {
+        private final List<MojmirAutomaton.State<T, U>> mojmirStates;
         private Map<U, State> transitions = new HashMap<>();
         private String label = "rq" + stateCounter++;
 
@@ -161,7 +160,7 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U>{
             transitions.put(letter, to);
         }
 
-        public List<MojmirAutomaton<T, U>.State> getMojmirStates() {
+        public List<MojmirAutomaton.State<T, U>> getMojmirStates() {
             return mojmirStates;
         }
 
@@ -178,7 +177,7 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U>{
          * @param mojmirStates the list representing the ranking of the states of the corresponding mojmir automaton.
          *                     The elder states come first in the list.
          */
-        public State(List<MojmirAutomaton<T, U>.State> mojmirStates) {
+        public State(List<MojmirAutomaton.State<T, U>> mojmirStates) {
             this.mojmirStates = mojmirStates;
         }
 
@@ -189,8 +188,8 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U>{
                     && (obj.getClass().equals(this.getClass()))
                     && ((State)obj).mojmirStates.size() == this.mojmirStates.size();
             if (!result) return false;
-            Iterator<MojmirAutomaton<T, U>.State> itObj = ((State)obj).mojmirStates.iterator();
-            Iterator<MojmirAutomaton<T, U>.State> itThis = this.mojmirStates.iterator();
+            Iterator<MojmirAutomaton.State<T, U>> itObj = ((State)obj).mojmirStates.iterator();
+            Iterator<MojmirAutomaton.State<T, U>> itThis = this.mojmirStates.iterator();
             while (itObj.hasNext()) {
                 result = itObj.next().equals(itThis.next());
                 if (!result) return false;
@@ -211,7 +210,7 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U>{
         }
     }
 
-    public class Transition extends Automaton<T, U>.Transition {
+    public class Transition extends Automaton.Transition {
         private State from;
         private State to;
         private U letter;

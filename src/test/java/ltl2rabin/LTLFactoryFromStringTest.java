@@ -26,8 +26,8 @@ public class LTLFactoryFromStringTest {
     @Test
     public void testAgainstRandom() throws Exception {
         for (int i = 0; i < 5; i++) {
-            LTLFormula randomFormula = randomFactory.buildLTL(1+i);
-            LTLFormula generatedFormula = factory.buildLTL(randomFormula.toString());
+            LTLFormula randomFormula = randomFactory.buildLTL(1+i).getFirst();
+            LTLFormula generatedFormula = factory.buildLTL(randomFormula.toString()).getFirst();
 
             assertEquals(randomFormula, generatedFormula);
         }

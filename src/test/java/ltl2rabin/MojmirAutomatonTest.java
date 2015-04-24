@@ -9,88 +9,53 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 
 public class MojmirAutomatonTest {
-    MojmirStateAcceptanceFunction<LTLPropEquivalenceClass> f;
+    MojmirAutomatonFactory automatonFactory;
 
     @Before
     public void setUp() {
-        f = new MojmirStateAcceptanceFunction<>();
+        automatonFactory = new MojmirAutomatonFactory();
     }
 
     @Test
     public void testCase1() throws Exception {
-        LTLListener ltlListener = Main.stringToLTLFormula("a | (b U c)");
-        LTLFormula ltlOr = ltlListener.getLtlTree();
-        Set<Set<String>> alphabet = Sets.powerSet(ltlListener.getTerminalSymbols());
-
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> classyMojmir = new MojmirAutomaton<>(
-                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, f);
-        assertEquals(4, classyMojmir.getStates().size());
+        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a | (b U c)");
+        assertEquals(4, mojmirAutomaton.getStates().size());
     }
 
     @Test
     public void testCase2() throws Exception {
-        LTLListener ltlListener = Main.stringToLTLFormula("a | b | c");
-        LTLFormula ltlOr = ltlListener.getLtlTree();
-        Set<Set<String>> alphabet = Sets.powerSet(ltlListener.getTerminalSymbols());
-
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> classyMojmir = new MojmirAutomaton<>(
-                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, f);
-        assertEquals(3, classyMojmir.getStates().size());
+        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a | b | c");
+        assertEquals(3, mojmirAutomaton.getStates().size());
     }
 
     @Test
     public void testCase3() throws Exception {
-        LTLListener ltlListener = Main.stringToLTLFormula("X b");
-        LTLFormula ltlOr = ltlListener.getLtlTree();
-        Set<Set<String>> alphabet = Sets.powerSet(ltlListener.getTerminalSymbols());
-
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> classyMojmir = new MojmirAutomaton<>(
-                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, f);
-        assertEquals(4, classyMojmir.getStates().size());
+        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("X b");
+        assertEquals(4, mojmirAutomaton.getStates().size());
     }
 
     @Test
     public void testCase4() throws Exception {
-        LTLListener ltlListener = Main.stringToLTLFormula("F b");
-        LTLFormula ltlOr = ltlListener.getLtlTree();
-        Set<Set<String>> alphabet = Sets.powerSet(ltlListener.getTerminalSymbols());
-
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> classyMojmir = new MojmirAutomaton<>(
-                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, f);
-        assertEquals(2, classyMojmir.getStates().size());
+        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("F b");
+        assertEquals(2, mojmirAutomaton.getStates().size());
     }
 
     @Test
     public void testCase5() throws Exception {
-        LTLListener ltlListener = Main.stringToLTLFormula("a & b & c");
-        LTLFormula ltlOr = ltlListener.getLtlTree();
-        Set<Set<String>> alphabet = Sets.powerSet(ltlListener.getTerminalSymbols());
-
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> classyMojmir = new MojmirAutomaton<>(
-                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, f);
-        assertEquals(3, classyMojmir.getStates().size());
+        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a & b & c");
+        assertEquals(3, mojmirAutomaton.getStates().size());
     }
 
     @Test
     public void testCase6() throws Exception {
-        LTLListener ltlListener = Main.stringToLTLFormula("a U b");
-        LTLFormula ltlOr = ltlListener.getLtlTree();
-        Set<Set<String>> alphabet = Sets.powerSet(ltlListener.getTerminalSymbols());
-
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> classyMojmir = new MojmirAutomaton<>(
-                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, f);
-        assertEquals(3, classyMojmir.getStates().size());
+        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a U b");
+        assertEquals(3, mojmirAutomaton.getStates().size());
     }
 
     @Test
     public void testCase7() throws Exception {
-        LTLListener ltlListener = Main.stringToLTLFormula("a");
-        LTLFormula ltlOr = ltlListener.getLtlTree();
-        Set<Set<String>> alphabet = Sets.powerSet(ltlListener.getTerminalSymbols());
-
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> classyMojmir = new MojmirAutomaton<>(
-                new LTLPropEquivalenceClass(ltlOr), new AfGFunction(), alphabet, f);
-        assertEquals(3, classyMojmir.getStates().size());
+        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a");
+        assertEquals(3, mojmirAutomaton.getStates().size());
     }
 
 

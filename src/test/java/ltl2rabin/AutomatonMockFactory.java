@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("unchecked") // TODO: Might want to check assignments
 public abstract class AutomatonMockFactory<T> {
-    public abstract T mockMe(int numStates, Collection<StateTransition> transitions);
+/*    public abstract T mockMe(int numStates, Collection<StateTransition> transitions);
 
     public static class MAMockFactory extends AutomatonMockFactory<MojmirAutomaton> {
 
@@ -34,7 +34,7 @@ public abstract class AutomatonMockFactory<T> {
                 when(states.get(i).isAccepting()).thenReturn(true);
             });
 
-            when(result.getSinks()).thenReturn(sinkStates);
+            when(result.getOld_sinks()).thenReturn(sinkStates);
 
             for (StateTransition t : transitions) {
                 when(states.get(t.from).readLetter(t.letter)).thenReturn(states.get(t.to));
@@ -103,5 +103,5 @@ public abstract class AutomatonMockFactory<T> {
             result.add(new HashSet<>(partsAsStrings));
         }
         return result;
-    }
+    }*/
 }
