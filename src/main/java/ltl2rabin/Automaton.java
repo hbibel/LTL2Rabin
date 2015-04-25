@@ -25,15 +25,27 @@ public abstract class Automaton<T, U> {
         public abstract int hashCode();
     }
 
-    public static class Transition<P, Q> {
-        private final State from;
-        private final State to;
+    public static class Transition<P extends State, Q> {
+        private final P from;
+        private final P to;
         private final Q letter;
 
-        protected Transition(State from, Q letter, State to) {
+        protected Transition(P from, Q letter, P to) {
             this.from = from;
             this.to = to;
             this.letter = letter;
+        }
+
+        public P getFrom() {
+            return from;
+        }
+
+        public P getTo() {
+            return to;
+        }
+
+        public Q getLetter() {
+            return letter;
         }
 
         @Override

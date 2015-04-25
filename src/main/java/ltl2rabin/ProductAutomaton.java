@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 // U: usually String
 // TODO: Refactor Set<U> -> U
 public class ProductAutomaton<T, U extends Collection> {
-    private ListOrderedSet<State> states = new ListOrderedSet<>();
+/*    private ListOrderedSet<State> states = new ListOrderedSet<>();
     private State initialState;
     private int stateCounter = 0; // Remove in final version
 
@@ -92,5 +92,5 @@ public class ProductAutomaton<T, U extends Collection> {
         public int hashCode() {
             return Objects.hash(rabinStates);
         }
-    }
+    }*/
 }

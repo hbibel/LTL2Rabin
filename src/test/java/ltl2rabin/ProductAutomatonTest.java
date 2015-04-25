@@ -9,7 +9,7 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 public class ProductAutomatonTest {
-/*    AutomatonMockFactory.RAMockFactory factory = new AutomatonMockFactory.RAMockFactory();
+/*    AutomatonMockFactory.RAMockFactory ltlFactoryFromString = new AutomatonMockFactory.RAMockFactory();
 
     @Test
     public void threeRAsWithTwoAlternatingStates() {
@@ -22,9 +22,9 @@ public class ProductAutomatonTest {
             transitions.add(new AutomatonMockFactory.StateTransition(1, letter, 0));
         }
 
-        RabinAutomaton mockRA1 = factory.mockMe(2, transitions);
-        RabinAutomaton mockRA2 = factory.mockMe(2, transitions);
-        RabinAutomaton mockRA3 = factory.mockMe(2, transitions);
+        RabinAutomaton mockRA1 = ltlFactoryFromString.mockMe(2, transitions);
+        RabinAutomaton mockRA2 = ltlFactoryFromString.mockMe(2, transitions);
+        RabinAutomaton mockRA3 = ltlFactoryFromString.mockMe(2, transitions);
 
         ArrayList<RabinAutomaton> ras = new ArrayList<>(Arrays.asList(mockRA1, mockRA2, mockRA3));
 

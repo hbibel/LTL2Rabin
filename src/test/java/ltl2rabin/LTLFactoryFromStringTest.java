@@ -20,7 +20,6 @@ public class LTLFactoryFromStringTest {
 
     @After
     public void tearDown() throws Exception {
-        //LTLVariable.resetVariableSpace();
     }
 
     @Test
@@ -36,7 +35,7 @@ public class LTLFactoryFromStringTest {
     @Test
     public void testVariable() throws Exception {
         LTLVariable expectedTestResult1 = new LTLVariable("a");
-        assertEquals(expectedTestResult1, factory.buildLTL("a"));
+        assertEquals(expectedTestResult1, factory.buildLTL("a").getFirst());
     }
 
     @Test
@@ -47,7 +46,7 @@ public class LTLFactoryFromStringTest {
         op2.add(ol);
         op2.add(or);
         LTLOr expectedTestResult2 = new LTLOr(op2);
-        assertEquals(expectedTestResult2, factory.buildLTL("a | b"));
+        assertEquals(expectedTestResult2, factory.buildLTL("a | b").getFirst());
     }
 
     @Test
@@ -58,7 +57,7 @@ public class LTLFactoryFromStringTest {
         op3.add(ol3);
         op3.add(or3);
         LTLOr expectedTestResult3 = new LTLOr(op3);
-        assertEquals(expectedTestResult3, factory.buildLTL("(a | b)"));
+        assertEquals(expectedTestResult3, factory.buildLTL("(a | b)").getFirst());
     }
 
     @Test
@@ -68,14 +67,14 @@ public class LTLFactoryFromStringTest {
         op4.add(new LTLVariable("b"));
         op4.add(new LTLVariable("c"));
         LTLOr expectedTestResult4 = new LTLOr(op4);
-        assertEquals(expectedTestResult4, factory.buildLTL("a | b | c"));
+        assertEquals(expectedTestResult4, factory.buildLTL("a | b | c").getFirst());
     }
 
     @Test
         public void testUntilOr() throws Exception {
         LTLUOperator aub5 = new LTLUOperator(new LTLVariable("a"), new LTLVariable("b"));
         LTLOr expectedTestResult5 = new LTLOr(aub5, new LTLVariable("c"));
-        assertEquals(expectedTestResult5, factory.buildLTL("(a U b | c)"));
+        assertEquals(expectedTestResult5, factory.buildLTL("(a U b | c)").getFirst());
     }
 
     @Test
@@ -92,6 +91,6 @@ public class LTLFactoryFromStringTest {
         LTLAnd aobucanaubuxc = new LTLAnd(aobuc, naubuxc);
         LTLGOperator gaobucanaubuxc = new LTLGOperator(aobucanaubuxc);
         LTLFOperator expectedTestResult6 = new LTLFOperator(gaobucanaubuxc);
-        assertEquals(expectedTestResult6, factory.buildLTL("F G (a | b U c) & !a U (b U (X c))"));
+        assertEquals(expectedTestResult6, factory.buildLTL("F G (a | b U c) & !a U (b U (X c))").getFirst());
     }
 }

@@ -13,7 +13,6 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
     private final ImmutableSet<State<T, U>> states;
     private final State<T, U> initialState;
     private final ImmutableSet<U> alphabet;
-    private final int maxRank;
 
     public ImmutableSet<State<T, U>> getStates() {
         return states;
@@ -24,7 +23,7 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
     }
 
     public int getMaxRank() {
-        return maxRank;
+        return states.size() - 1;
     }
 
     public State<T, U> getInitialState() {
@@ -32,18 +31,18 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
     }
 
     public MojmirAutomaton(ImmutableSet<State<T, U>> states, State<T, U> initialState,
-                           ImmutableSet<U> alphabet, int maxRank) {
+                           ImmutableSet<U> alphabet) {
         this.states = states;
         this.initialState = initialState;
         this.alphabet = alphabet;
-        this.maxRank = maxRank;
     }
 
     public static class State<R, S> extends Automaton.State<R, S> {
+        // TODO: Make this class immutable
         private final R label;
         private final boolean accepting;
         private boolean isSink;
-        private Map<S, State> transitions;
+        private Map<S, State<R, S>> transitions;
 
         public State(R label, boolean accepting) {
             isSink = false;
@@ -67,7 +66,7 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
             return isSink;
         }
 
-        public void setTransitions(Map<S, State> transitions) {
+        public void setTransitions(Map<S, State<R, S>> transitions) {
             this.transitions = transitions;
         }
 

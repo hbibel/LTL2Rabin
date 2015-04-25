@@ -7,11 +7,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiFunction;
 
 public class MojmirAutomatonFactory extends AutomatonFactory<String, LTLPropEquivalenceClass, Set<String>> {
-    private BiFunction<LTLPropEquivalenceClass, Set<String>, LTLPropEquivalenceClass> transitionFunction;
-    private MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> result;
 
     @Override
     public MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> createFrom(String ltlFormula) {
+        // TODO: Use Builders for immutable collections
         LTLFactoryFromString ltlFactory = new LTLFactoryFromString();
         Pair<LTLFormula, Set<Set<String>>> parserResult = ltlFactory.buildLTL(ltlFormula);
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(parserResult.getSecond());
@@ -19,12 +18,11 @@ public class MojmirAutomatonFactory extends AutomatonFactory<String, LTLPropEqui
 
         LTLPropEquivalenceClass initialLabel = new LTLPropEquivalenceClass(formula);
         MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> initialState =
-                new MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>(initialLabel, initialLabel.isTautology());
+                new MojmirAutomaton.State<>(initialLabel, initialLabel.isTautology());
         Set<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> reachResult = reach(initialState, alphabet);
         ImmutableSet<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> states = ImmutableSet.copyOf(reachResult);
-        int maxRank = reachResult.size() - 1;
 
-        return new MojmirAutomaton<>(states, initialState, alphabet, maxRank);
+        return new MojmirAutomaton<>(states, initialState, alphabet);
     }
 
     private Set<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> reach(MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> initialState,
@@ -37,7 +35,7 @@ public class MojmirAutomatonFactory extends AutomatonFactory<String, LTLPropEqui
 
         while (!statesToBeAdded.isEmpty()) {
             MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> temp = statesToBeAdded.poll();
-            Map<Set<String>, MojmirAutomaton.State> transitions = new HashMap<>();
+            Map<Set<String>, MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> transitions = new HashMap<>();
 
             boolean isSink = true;
             for (Set<String> letter : alphabet) {
