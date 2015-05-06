@@ -18,7 +18,7 @@ public class RabinAutomatonTest {
     LTLVariable variable_c;
     LTLFactoryFromString ltlFactoryFromString;
     AutomatonMockFactory.MAMockFactory automatonMockFactory = new AutomatonMockFactory.MAMockFactory();
-    RabinAutomatonFactory rabinAutomatonFactory = new RabinAutomatonFactory();
+    RabinAutomatonFromMojmirFactory rabinAutomatonFactory = new RabinAutomatonFromMojmirFactory();
 
     private String mojmirStateStringFromLTL(LTLFormula f) {
         return "state(" + f.toString() + ")";

@@ -44,7 +44,7 @@ public class LTLRandomFactory extends LTLFactory<Integer> {
      * @return              An arbitrary random LTLFormula object.
      */
     @Override
-    public Pair<LTLFormula, Set<Set<String>>> buildLTL(Integer complexity) {
+    public Result buildLTL(Integer complexity) {
         // Make sure the complexity does not surpass 10:
         complexity = complexity > 10 ? 10 : complexity;
         int numVariables = 1+10*complexity;
@@ -63,16 +63,16 @@ public class LTLRandomFactory extends LTLFactory<Integer> {
         operatorCount=0;
 
         Set<Set<String>> alphabet = Sets.powerSet(ImmutableSet.of("There is no alphabet."));
-        return new Pair<>(result, alphabet);
+        return new Result(result, alphabet, null);
     }
 
     // If the generated LTLFormula should not contain any G-subformulae set the gFree parameter to true
-    public Pair<LTLFormula, Set<Set<String>>> buildLTL(Integer complexity, boolean gFree) {
+    public Result buildLTL(Integer complexity, boolean gFree) {
         List<Supplier<LTLFormula>> savedList = nonTerminatingGeneratingFunctions;
         if (gFree) {
             nonTerminatingGeneratingFunctions = gFreeNonTerminatingGeneratingFunctions;
         }
-        Pair<LTLFormula, Set<Set<String>>> result = buildLTL(complexity);
+        Result result = buildLTL(complexity);
         if (gFree) {
             nonTerminatingGeneratingFunctions = savedList;
         }

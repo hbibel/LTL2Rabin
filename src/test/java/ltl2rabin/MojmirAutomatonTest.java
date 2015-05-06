@@ -1,6 +1,5 @@
 package ltl2rabin;
 
-import com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,11 +8,11 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 
 public class MojmirAutomatonTest {
-    MojmirAutomatonFactory automatonFactory;
+    MojmirAutomatonFactoryFromString automatonFactory;
 
     @Before
     public void setUp() {
-        automatonFactory = new MojmirAutomatonFactory();
+        automatonFactory = new MojmirAutomatonFactoryFromString();
     }
 
     @Test

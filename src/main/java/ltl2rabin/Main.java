@@ -1,5 +1,6 @@
 package ltl2rabin;
 
+import com.google.common.collect.ImmutableSet;
 import ltl2rabin.parser.LTLLexer;
 import ltl2rabin.parser.LTLParser;
 import net.sf.javabdd.*;
@@ -22,11 +23,29 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("This program runs, but does not do anything useful yet.");
 
-        ArrayList<LTLFormula> l1 = new ArrayList<>(Arrays.asList(new LTLVariable("a"), new LTLVariable("b"), new LTLVariable("c")));
-        LTLPropEquivalenceClass c3 = new LTLPropEquivalenceClass(new LTLAnd(l1)); // a & b & c
+        ImmutableSet.Builder<Foo> setBuilder = new ImmutableSet.Builder<>();
+        for (int i = 0; i < 10; i++) {
+            setBuilder.add(new Foo(i));
+        }
+        ImmutableSet<Foo> mySet = setBuilder.build();
+        mySet.iterator().forEachRemaining(f -> f.setA(99));
+        mySet.iterator().forEachRemaining(f -> System.out.println(f.getA()));
+    }
 
-        System.out.println("");
+    private static class Foo {
+        private int a;
 
+        public Foo(int a) {
+            this.a = a;
+        }
+
+        public int getA() {
+            return a;
+        }
+
+        public void setA(int a) {
+            this.a = a;
+        }
     }
 
     public static LTLListener stringToLTLFormula (String s) {

@@ -5,16 +5,14 @@ import ltl2rabin.parser.LTLParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class LTLListener extends LTLBaseListener {
     private LTLFormula ltlTree;
     private final LTLParser parser;
     // Keeping all variables in a HashMap makes sure no variable gets created more than once.
     private final HashMap<String, LTLListener.LTLVariablePair> variables = new HashMap<>();
+    private final Collection<LTLGOperator> gFormulas = new ArrayList<>();
 
     public LTLListener(LTLParser parser) {
         this.parser = parser;
@@ -28,21 +26,25 @@ public class LTLListener extends LTLBaseListener {
         return new HashSet<>(variables.keySet());
     }
 
-    /* This is not a very pretty solution. Initially I had this:
-    @Override
-    public void exitEveryRule(ParserRuleContext ctx) {
-        if (null == ctx.getParent()) {
-            // null == ctx.getParent() means that this node is the root node of the parse tree that antlr generated
-            // for us. Now we can create the LTL Tree.
-            ltlTree = createLTLFormula(ctx);
-
-        }
-        super.exitEveryRule(ctx);
+    public Collection<LTLGOperator> getgFormulas() {
+        return gFormulas;
     }
-     * but then I realized that the parent node doesn't get visited in all cases (for example, it is not visited when
-     * I parse "a U c"). So for now, the exitEveryRule method searches for the parent node the first time it is called,
-     * then sets the "done" flag and calls the createLTLFormula method.
-     */
+
+    /* This is not a very pretty solution. Initially I had this:
+        @Override
+        public void exitEveryRule(ParserRuleContext ctx) {
+            if (null == ctx.getParent()) {
+                // null == ctx.getParent() means that this node is the root node of the parse tree that antlr generated
+                // for us. Now we can create the LTL Tree.
+                ltlTree = createLTLFormula(ctx);
+
+            }
+            super.exitEveryRule(ctx);
+        }
+         * but then I realized that the parent node doesn't get visited in all cases (for example, it is not visited when
+         * I parse "a U c"). So for now, the exitEveryRule method searches for the parent node the first time it is called,
+         * then sets the "done" flag and calls the createLTLFormula method.
+         */
     private boolean done = false;
 
     @Override
@@ -74,7 +76,9 @@ public class LTLListener extends LTLBaseListener {
             return new LTLFOperator(createLTLFormula(ctx.getChild(1)));
         }
         else if (ctx instanceof  LTLParser.FormulagContext) {
-            return new LTLGOperator(createLTLFormula(ctx.getChild(1)));
+            LTLGOperator result = new LTLGOperator(createLTLFormula(ctx.getChild(1)));
+            gFormulas.add(result);
+            return result;
         }
         else if (ctx instanceof LTLParser.FormulaxContext) {
             return new LTLXOperator(createLTLFormula(ctx.getChild(1)));

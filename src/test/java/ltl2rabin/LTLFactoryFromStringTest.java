@@ -25,8 +25,8 @@ public class LTLFactoryFromStringTest {
     @Test
     public void testAgainstRandom() throws Exception {
         for (int i = 0; i < 5; i++) {
-            LTLFormula randomFormula = randomFactory.buildLTL(1+i).getFirst();
-            LTLFormula generatedFormula = factory.buildLTL(randomFormula.toString()).getFirst();
+            LTLFormula randomFormula = randomFactory.buildLTL(1+i).getLtlFormula();
+            LTLFormula generatedFormula = factory.buildLTL(randomFormula.toString()).getLtlFormula();
 
             assertEquals(randomFormula, generatedFormula);
         }
@@ -35,7 +35,7 @@ public class LTLFactoryFromStringTest {
     @Test
     public void testVariable() throws Exception {
         LTLVariable expectedTestResult1 = new LTLVariable("a");
-        assertEquals(expectedTestResult1, factory.buildLTL("a").getFirst());
+        assertEquals(expectedTestResult1, factory.buildLTL("a").getLtlFormula());
     }
 
     @Test
@@ -46,7 +46,7 @@ public class LTLFactoryFromStringTest {
         op2.add(ol);
         op2.add(or);
         LTLOr expectedTestResult2 = new LTLOr(op2);
-        assertEquals(expectedTestResult2, factory.buildLTL("a | b").getFirst());
+        assertEquals(expectedTestResult2, factory.buildLTL("a | b").getLtlFormula());
     }
 
     @Test
@@ -57,7 +57,7 @@ public class LTLFactoryFromStringTest {
         op3.add(ol3);
         op3.add(or3);
         LTLOr expectedTestResult3 = new LTLOr(op3);
-        assertEquals(expectedTestResult3, factory.buildLTL("(a | b)").getFirst());
+        assertEquals(expectedTestResult3, factory.buildLTL("(a | b)").getLtlFormula());
     }
 
     @Test
@@ -67,14 +67,14 @@ public class LTLFactoryFromStringTest {
         op4.add(new LTLVariable("b"));
         op4.add(new LTLVariable("c"));
         LTLOr expectedTestResult4 = new LTLOr(op4);
-        assertEquals(expectedTestResult4, factory.buildLTL("a | b | c").getFirst());
+        assertEquals(expectedTestResult4, factory.buildLTL("a | b | c").getLtlFormula());
     }
 
     @Test
         public void testUntilOr() throws Exception {
         LTLUOperator aub5 = new LTLUOperator(new LTLVariable("a"), new LTLVariable("b"));
         LTLOr expectedTestResult5 = new LTLOr(aub5, new LTLVariable("c"));
-        assertEquals(expectedTestResult5, factory.buildLTL("(a U b | c)").getFirst());
+        assertEquals(expectedTestResult5, factory.buildLTL("(a U b | c)").getLtlFormula());
     }
 
     @Test
@@ -91,6 +91,6 @@ public class LTLFactoryFromStringTest {
         LTLAnd aobucanaubuxc = new LTLAnd(aobuc, naubuxc);
         LTLGOperator gaobucanaubuxc = new LTLGOperator(aobucanaubuxc);
         LTLFOperator expectedTestResult6 = new LTLFOperator(gaobucanaubuxc);
-        assertEquals(expectedTestResult6, factory.buildLTL("F G (a | b U c) & !a U (b U (X c))").getFirst());
+        assertEquals(expectedTestResult6, factory.buildLTL("F G (a | b U c) & !a U (b U (X c))").getLtlFormula());
     }
 }

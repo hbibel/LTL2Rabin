@@ -4,17 +4,14 @@ import com.google.common.collect.ImmutableSet;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.function.BiFunction;
 
-public class MojmirAutomatonFactory extends AutomatonFactory<String, LTLPropEquivalenceClass, Set<String>> {
+public class MojmirAutomatonFactoryFromLTL extends AutomatonFactory<Pair<LTLFormula, Set<Set<String>>>, LTLPropEquivalenceClass, Set<String>> {
 
     @Override
-    public MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> createFrom(String ltlFormula) {
+    public MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> createFrom(Pair<LTLFormula, Set<Set<String>>> from) {
         // TODO: Use Builders for immutable collections
-        LTLFactoryFromString ltlFactory = new LTLFactoryFromString();
-        Pair<LTLFormula, Set<Set<String>>> parserResult = ltlFactory.buildLTL(ltlFormula);
-        ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(parserResult.getSecond());
-        LTLFormula formula = parserResult.getFirst();
+        LTLFormula formula = from.getFirst();
+        ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(from.getSecond());
 
         LTLPropEquivalenceClass initialLabel = new LTLPropEquivalenceClass(formula);
         MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> initialState =
