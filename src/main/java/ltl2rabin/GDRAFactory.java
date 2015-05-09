@@ -20,13 +20,14 @@ public class GDRAFactory extends RabinAutomatonFactory<String,
                 .addAll(parserResult.getgFormulas()).build();
         ImmutableSet<Set<LTLGOperator>> curlyGSet = (new ImmutableSet.Builder<Set<LTLGOperator>>())
                 .addAll(Sets.powerSet(gSet)).build();
-        Set<Set<String>> alphabet = parserResult.getAlphabet();
+        ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(parserResult.getAlphabet());
         LTLFormula phi = parserResult.getLtlFormula();
 
         ImmutableSet.Builder<RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>> slavesBuilder = new ImmutableSet.Builder<>();
-        curlyGSet.forEach(psi -> slavesBuilder.add(
-                (new RabinAutomatonFromMojmirFactory()).createFrom((new MojmirAutomatonFactoryFromLTL()).createFrom(new Pair<>(phi, alphabet)))
-        ));
+        MojmirAutomatonListFactory mojmirAutomatonListFactory = new MojmirAutomatonListFactory(curlyGSet, alphabet);
+        gSet.forEach(psi ->
+            mojmirAutomatonListFactory.createFrom(psi).forEach(ma -> slavesBuilder.add(new RabinAutomatonFromMojmirFactory().createFrom(ma)))
+        );
         ImmutableSet<RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>> slaves
                 = slavesBuilder.build();
 

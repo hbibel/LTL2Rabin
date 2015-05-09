@@ -15,16 +15,18 @@ public class MojmirAutomatonFactoryFromLTL extends AutomatonFactory<Pair<LTLForm
 
         LTLPropEquivalenceClass initialLabel = new LTLPropEquivalenceClass(formula);
         MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> initialState =
-                new MojmirAutomaton.State<>(initialLabel, initialLabel.isTautology());
-        Set<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> reachResult = reach(initialState, alphabet);
-        ImmutableSet<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> states = ImmutableSet.copyOf(reachResult);
+                new MojmirAutomaton.State<>(initialLabel);
+        Pair<Set<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, ImmutableSet<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>> reachResult = reach(initialState, alphabet);
+        ImmutableSet<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> states = ImmutableSet.copyOf(reachResult.getFirst());
 
-        return new MojmirAutomaton<>(states, initialState, alphabet);
+        return new MojmirAutomaton<>(states, initialState, reachResult.getSecond(), alphabet);
     }
 
-    private Set<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> reach(MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> initialState,
+    private Pair<Set<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>,
+                 ImmutableSet<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>> reach(MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> initialState,
                                                                                    Set<Set<String>> alphabet) {
         Set<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> states = new HashSet<>();
+        ImmutableSet.Builder<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> acceptingStatesBuilder = new ImmutableSet.Builder<>();
         states.add(initialState);
 
         Queue<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> statesToBeAdded = new ConcurrentLinkedQueue<>();
@@ -47,7 +49,14 @@ public class MojmirAutomatonFactoryFromLTL extends AutomatonFactory<Pair<LTLForm
                 // line never will be reached.
                 isSink = false;
 
-                MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> newState = new MojmirAutomaton.State<>(newLabel, newLabel.isTautology());
+                // state is accepting if
+                // - previous state was accepting or
+                // - state label is in curlyG or
+                // - state label is a tautology (propositionally equivalent to true)
+                MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> newState = new MojmirAutomaton.State<>(newLabel);
+                if (newLabel.isTautology()) {
+                    acceptingStatesBuilder.add(newState);
+                }
                 transitions.put(letter, newState);
                 if (!states.add(newState)) {
                     continue; // Remark: states is a set, so no duplicate states will be added, instead false is returned
@@ -60,6 +69,6 @@ public class MojmirAutomatonFactoryFromLTL extends AutomatonFactory<Pair<LTLForm
             temp.setTransitions(transitions);
         }
 
-        return states;
+        return new Pair<>(states, acceptingStatesBuilder.build());
     }
 }

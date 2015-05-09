@@ -16,7 +16,7 @@ public abstract class Automaton<T, U> {
     }
 
     public static abstract class State<R, S> {
-        public abstract State readLetter(S letter);
+        public abstract State<R, S> readLetter(S letter);
 
         @Override
         public abstract boolean equals(Object obj);

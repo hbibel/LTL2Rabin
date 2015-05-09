@@ -13,6 +13,7 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
     private final ImmutableSet<State<T, U>> states;
     private final State<T, U> initialState;
     private final ImmutableSet<U> alphabet;
+    private final ImmutableSet<State<T, U>> acceptingStates;
 
     public ImmutableSet<State<T, U>> getStates() {
         return states;
@@ -30,32 +31,32 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
         return initialState;
     }
 
-    public MojmirAutomaton(ImmutableSet<State<T, U>> states, State<T, U> initialState,
+    public MojmirAutomaton(ImmutableSet<State<T, U>> states, State<T, U> initialState, ImmutableSet<State<T, U>> acceptingStates,
                            ImmutableSet<U> alphabet) {
         this.states = states;
         this.initialState = initialState;
         this.alphabet = alphabet;
+        this.acceptingStates = acceptingStates;
+    }
+
+    public boolean isAcceptingState(State<T, U> s) {
+        return acceptingStates.contains(s);
     }
 
     public static class State<R, S> extends Automaton.State<R, S> {
         // TODO: Make this class immutable
         private final R label;
-        private final boolean accepting;
+        // private final boolean accepting; TODO: Remove
         private boolean isSink;
         private Map<S, State<R, S>> transitions;
 
-        public State(R label, boolean accepting) {
+        public State(R label) {
             isSink = false;
-            this.accepting = accepting;
             this.label = label;
         }
 
         public R getLabel() {
             return label;
-        }
-
-        public boolean isAccepting() {
-            return this.accepting;
         }
 
         public void setSink(boolean isSink) {

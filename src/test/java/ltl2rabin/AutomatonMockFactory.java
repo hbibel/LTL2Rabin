@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("unchecked") // TODO: Might want to check assignments
 public abstract class AutomatonMockFactory<T> {
+    // TODO: Remake entire class
     public abstract T mockMe(int numStates, Collection<StateTransition> transitions);
 
     public static class MAMockFactory extends AutomatonMockFactory<MojmirAutomaton<LTLPropEquivalenceClass, Set<String>>> {
@@ -30,9 +31,9 @@ public abstract class AutomatonMockFactory<T> {
             sinks.forEach(i -> {
                 when(states.get(i).isSink()).thenReturn(true);
             });
-            acceptingStates.forEach(i -> {
-                when(states.get(i).isAccepting()).thenReturn(true);
-            });
+            //acceptingStates.forEach(i -> {
+            //    when(states.get(i).isAccepting()).thenReturn(true);
+            //});
 
             for (StateTransition t : transitions) {
                 when(states.get(t.from).readLetter(t.letter)).thenReturn(states.get(t.to));

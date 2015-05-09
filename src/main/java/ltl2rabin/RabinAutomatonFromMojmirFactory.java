@@ -66,7 +66,7 @@ public class RabinAutomatonFromMojmirFactory extends RabinAutomatonFactory<Mojmi
             rState.getLabel().forEach(mState -> {
                 alphabet.forEach(letter -> {
                     MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> nextMState = mState.readLetter(letter);
-                    if (nextMState.isSink() && !nextMState.isAccepting()) {
+                    if (nextMState.isSink() && !from.isAcceptingState(nextMState)) {
                         fail.add(new Automaton.Transition<>(rState, letter, rState.readLetter(letter)));
                     }
                 });
@@ -91,11 +91,11 @@ public class RabinAutomatonFromMojmirFactory extends RabinAutomatonFactory<Mojmi
             for (Set<String> letter : alphabet) {
                 succeedI.addAll(immutableTransitions.stream()
                         .filter(transition -> transition.getFrom().getLabel().size() > finalRank)
-                        .filter(transition -> !transition.getFrom().getLabel().get(finalRank).isAccepting()
+                        .filter(transition -> !from.isAcceptingState(transition.getFrom().getLabel().get(finalRank))
                                 || transition.getFrom().getLabel().get(finalRank).equals(from.getInitialState()))
-                        .filter(transition -> transition.getFrom().getLabel().get(finalRank).readLetter(letter).isAccepting())
+                        .filter(transition -> from.isAcceptingState(transition.getFrom().getLabel().get(finalRank).readLetter(letter)))
                         .filter(transition -> transition.getLetter().equals(letter))
-                        .collect(Collectors.toList()));
+                                .collect(Collectors.toList()));
             }
             succeed.add(succeedI);
         }
