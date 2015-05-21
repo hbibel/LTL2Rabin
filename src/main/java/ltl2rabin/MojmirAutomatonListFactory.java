@@ -7,13 +7,13 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MojmirAutomatonListFactory {
-    private final ImmutableSet<Set<LTLGOperator>> curlyGSet;
+    private final ImmutableSet<Set<LTLFormula>> curlyGSet;
     private final ImmutableSet<Set<String>> alphabet;
 
-    public MojmirAutomatonListFactory(Set<Set<LTLGOperator>> curlyGSet, ImmutableSet<Set<String>> alphabet) {
+    public MojmirAutomatonListFactory(Set<Set<LTLFormula>> curlyGSet, ImmutableSet<Set<String>> alphabet) {
         this.alphabet = alphabet;
         if (curlyGSet instanceof ImmutableSet) {
-            this.curlyGSet = (ImmutableSet<Set<LTLGOperator>>) curlyGSet;
+            this.curlyGSet = (ImmutableSet<Set<LTLFormula>>) curlyGSet;
         }
         else {
             this.curlyGSet = ImmutableSet.copyOf(curlyGSet);
@@ -67,7 +67,7 @@ public class MojmirAutomatonListFactory {
         ImmutableList.Builder<MojmirAutomaton<LTLPropEquivalenceClass, Set<String>>> mojmirListBuilder = new ImmutableList.Builder<>();
         // Loop that generates acceptance sets
         curlyGSet.forEach(curlyG -> {
-            if ((initialState.getLabel().getRepresentative() instanceof LTLGOperator && curlyG.contains(initialState.getLabel().getRepresentative()))
+            if ((initialState.getLabel().getRepresentative() instanceof LTLGOperator && curlyG.contains(((LTLGOperator) (initialState.getLabel().getRepresentative())).getOperand()))
                     || initialState.getLabel().isTautology()) {
                 mojmirListBuilder.add(new MojmirAutomaton<>(states, initialState, states, alphabet));
             }

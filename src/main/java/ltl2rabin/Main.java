@@ -22,30 +22,6 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("This program runs, but does not do anything useful yet.");
-
-        ImmutableSet.Builder<Foo> setBuilder = new ImmutableSet.Builder<>();
-        for (int i = 0; i < 10; i++) {
-            setBuilder.add(new Foo(i));
-        }
-        ImmutableSet<Foo> mySet = setBuilder.build();
-        mySet.iterator().forEachRemaining(f -> f.setA(99));
-        mySet.iterator().forEachRemaining(f -> System.out.println(f.getA()));
-    }
-
-    private static class Foo {
-        private int a;
-
-        public Foo(int a) {
-            this.a = a;
-        }
-
-        public int getA() {
-            return a;
-        }
-
-        public void setA(int a) {
-            this.a = a;
-        }
     }
 
     public static LTLListener stringToLTLFormula (String s) {

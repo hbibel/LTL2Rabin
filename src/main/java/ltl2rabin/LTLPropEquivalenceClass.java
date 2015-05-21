@@ -32,6 +32,10 @@ public class LTLPropEquivalenceClass {
         return representative;
     }
 
+    public boolean implies(LTLPropEquivalenceClass other) {
+        return cachedBDD.imp(other.cachedBDD).isOne();
+    }
+
     private static BDD getOrCreateBDD(final LTLFormula formula) {
         BDD result = formulaBDDMap.get(formula);
         if (result != null) {

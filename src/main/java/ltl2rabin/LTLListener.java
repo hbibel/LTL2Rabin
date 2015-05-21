@@ -12,7 +12,7 @@ public class LTLListener extends LTLBaseListener {
     private final LTLParser parser;
     // Keeping all variables in a HashMap makes sure no variable gets created more than once.
     private final HashMap<String, LTLListener.LTLVariablePair> variables = new HashMap<>();
-    private final Collection<LTLGOperator> gFormulas = new ArrayList<>();
+    private final Collection<LTLFormula> gFormulas = new ArrayList<>();
 
     public LTLListener(LTLParser parser) {
         this.parser = parser;
@@ -26,7 +26,7 @@ public class LTLListener extends LTLBaseListener {
         return new HashSet<>(variables.keySet());
     }
 
-    public Collection<LTLGOperator> getgFormulas() {
+    public Collection<LTLFormula> getgFormulas() {
         return gFormulas;
     }
 
@@ -77,7 +77,7 @@ public class LTLListener extends LTLBaseListener {
         }
         else if (ctx instanceof  LTLParser.FormulagContext) {
             LTLGOperator result = new LTLGOperator(createLTLFormula(ctx.getChild(1)));
-            gFormulas.add(result);
+            gFormulas.add(result.getOperand());
             return result;
         }
         else if (ctx instanceof LTLParser.FormulaxContext) {

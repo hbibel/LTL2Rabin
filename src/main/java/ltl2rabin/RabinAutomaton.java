@@ -47,8 +47,13 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
         return result;
     }
 
+    public Set<Transition<RabinAutomaton.State<T, U>, U>> succeed(int i) {
+        return null; // TODO
+    }
+
     public static class State<R, S> extends Automaton.State<R, S> {
         private final R label;
+        private LTLFormula ltlLabel;
         private Map<S, State<R, S>> transitions = new HashMap<>();
 
         public void setTransition(S letter, State<R, S> to) {
@@ -69,6 +74,14 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
 
         public int transitionCount() {
             return transitions.size();
+        }
+
+        public LTLFormula getLtlLabel() {
+            return ltlLabel;
+        }
+
+        public void setLtlLabel(LTLFormula ltlLabel) {
+            this.ltlLabel = ltlLabel;
         }
 
         /**

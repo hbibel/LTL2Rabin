@@ -16,4 +16,12 @@ public class Pair<F, S> {
         this.first = first;
         this.second = second;
     }
+
+    public static <F, S> F getFirst(Pair<F, S> p) {
+        return p.getFirst();
+    }
+
+    public static <F, S> S getSecond(Pair<F, S> p) {
+        return p.getSecond();
+    }
 }
