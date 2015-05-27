@@ -9,9 +9,9 @@ public abstract class LTLFactory<T> {
     public static class Result {
         private LTLFormula ltlFormula;
         private Set<Set<String>> alphabet;
-        private Collection<LTLGOperator> gFormulas;
+        private Collection<LTLFormula> gFormulas;
 
-        public Result(LTLFormula ltlFormula, Set<Set<String>> alphabet, Collection<LTLGOperator> gFormulas) {
+        public Result(LTLFormula ltlFormula, Set<Set<String>> alphabet, Collection<LTLFormula> gFormulas) {
             this.ltlFormula = ltlFormula;
             this.alphabet = alphabet;
             this.gFormulas = gFormulas;
@@ -25,7 +25,7 @@ public abstract class LTLFactory<T> {
             return alphabet;
         }
 
-        public Collection<LTLGOperator> getgFormulas() {
+        public Collection<LTLFormula> getgFormulas() {
             return gFormulas;
         }
     }

@@ -18,6 +18,8 @@ import java.util.HashSet;
 
 // Note to self: When parsing several LTLs, don't forget to call LTLVariable.cachedBDDs.clear() in between to clean up
 // the variable space.
+
+//
 public class Main {
 
     public static void main(String[] args) {

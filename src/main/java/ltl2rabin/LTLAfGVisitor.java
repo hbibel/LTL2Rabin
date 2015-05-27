@@ -11,7 +11,7 @@ public class LTLAfGVisitor implements ILTLFormulaVisitor<LTLFormula> {
     public LTLAfGVisitor(Set<String> letter) {
         this.letter = letter;
     }
-// TODO: See LTLOr
+
     public LTLFormula visit(LTLAnd formula) {
         ArrayList<LTLFormula> newConjuncts = new ArrayList<>();
         Iterator<LTLFormula> iterator = formula.getIterator();

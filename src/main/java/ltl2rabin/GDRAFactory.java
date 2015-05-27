@@ -3,7 +3,6 @@ package ltl2rabin;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import javafx.scene.control.RadioMenuItem;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -63,15 +62,7 @@ public class GDRAFactory extends RabinAutomatonFactory<String,
 
         int maxRank = 0;
         ImmutableSet.Builder<RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>> slavesBuilder = new ImmutableSet.Builder<>();
-        MojmirAutomatonListFactory mojmirAutomatonListFactory = new MojmirAutomatonListFactory(curlyGSets, alphabet); // TODO: Remove this
 
-        for (LTLFormula psi : gSet) {
-            List<MojmirAutomaton<LTLPropEquivalenceClass, Set<String>>> mojmirAutomatonList = mojmirAutomatonListFactory.createFrom(psi);
-            for (MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma : mojmirAutomatonList) {
-                slavesBuilder.add(rabinAutomatonFromMojmirFactory.createFrom(ma));
-                maxRank = ma.getMaxRank() > maxRank ? ma.getMaxRank() : maxRank;
-            }
-        }
         ImmutableSet<RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>> slaves
                 = slavesBuilder.build();
 
@@ -80,11 +71,11 @@ public class GDRAFactory extends RabinAutomatonFactory<String,
         for (Set<LTLFormula> curlyG : curlyGSets) {
             Set<Pair<Set, Set>> accForCurlyG = new HashSet<>();
             Set<RabinAutomaton.State> notInF = new HashSet<>();
-            Pair<Set, Set> theMPart = new Pair<>(notInF, univ);
+            Pair<Set, Set> mPair = new Pair<>(notInF, univ);
             for (RabinAutomaton.State<LTLPropEquivalenceClass, Set<String>> tempState : states) {
                 List<LTLFormula> conjuncts = new ArrayList<>();
-                curlyG.forEach(conjuncts::add);
-                LTLAnd prefix = new LTLAnd(conjuncts);
+                curlyG.forEach(f -> conjuncts.add(new LTLGOperator(f)));
+                LTLAnd prefix = new LTLAnd(conjuncts); // e.g. G(psi1) && G(psi2) && G(psi3)
 
                 List<Set<Pair<LTLFormula, Integer>>> mappingsForPsis = new ArrayList<>();
                 for (LTLFormula psi : curlyG) {
@@ -96,6 +87,7 @@ public class GDRAFactory extends RabinAutomatonFactory<String,
                 }
                 Set<List<Pair<LTLFormula, Integer>>> possibleMappings = Sets.cartesianProduct(mappingsForPsis);
                 for (List<Pair<LTLFormula, Integer>> mapping : possibleMappings) {
+                    // M(pi, G)
                     List<LTLFormula> cons = new ArrayList<>();
                     for (Pair<LTLFormula, Integer> p : mapping) {
                         cons.add(pi(p.getFirst(), p.getSecond()));
@@ -103,9 +95,13 @@ public class GDRAFactory extends RabinAutomatonFactory<String,
                     if (!(new LTLPropEquivalenceClass(new LTLAnd(prefix, new LTLAnd(cons)))).implies(tempState.getLabel())) {
                         notInF.add(tempState);
                     }
+
+                    // Acc(pi, G, psi)
+                    // TODO
                 }
 
             }
+            accForCurlyG.add(mPair);
             acc.add(accForCurlyG);
         }
         // TODO
