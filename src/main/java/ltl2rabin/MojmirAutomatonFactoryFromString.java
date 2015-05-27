@@ -19,7 +19,7 @@ public class MojmirAutomatonFactoryFromString extends MojmirAutomatonFactory<Str
         }
 
         MojmirAutomatonFactoryFromLTL factoryFromLTL = new MojmirAutomatonFactoryFromLTL();
-        cachedResult = factoryFromLTL.createFrom(parserResult.getLtlFormula(), alphabet);
+        cachedResult = factoryFromLTL.createFrom(parserResult.getLtlFormula(), parserResult.getAlphabet());
         putIntoCache(new Pair<>(parserResult.getLtlFormula(), Collections.<LTLFormula>emptySet()), cachedResult);
         return cachedResult;
     }

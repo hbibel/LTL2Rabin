@@ -13,13 +13,10 @@ public class GDRAFactory extends RabinAutomatonFactory<String,
     private HashMap<LTLPropEquivalenceClass, RabinAutomaton.State<LTLPropEquivalenceClass, Set<String>>> existingStates;
     private MojmirAutomatonFactoryFromLTL mojmirAutomatonFactoryFromLTL = new MojmirAutomatonFactoryFromLTL();
     private RabinAutomatonFromMojmirFactory rabinAutomatonFromMojmirFactory = new RabinAutomatonFromMojmirFactory();
-    private Set<Set<String>> alphabet;
+    private ImmutableSet<Set<String>> alphabet;
 
-    public GDRAFactory(Set<Set<String>> alphabet) {
-        this.alphabet = alphabet;
-    }
-
-    public RabinAutomaton<LTLPropEquivalenceClass, Set<String>> createFrom(String from) {
+    // the alphabet parameter is irrelevant
+    public RabinAutomaton<LTLPropEquivalenceClass, Set<String>> createFrom(String from, ImmutableSet<Set<String>> dontCare) {
         LTLFactoryFromString ltlFactory = new LTLFactoryFromString();
         LTLFactory.Result parserResult = ltlFactory.buildLTL(from);
 
@@ -27,7 +24,7 @@ public class GDRAFactory extends RabinAutomatonFactory<String,
                 .addAll(parserResult.getgFormulas()).build();
         ImmutableSet<Set<LTLFormula>> curlyGSets = (new ImmutableSet.Builder<Set<LTLFormula>>())
                 .addAll(Sets.powerSet(gSet)).build();
-        ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(parserResult.getAlphabet());
+        this.alphabet = ImmutableSet.copyOf(parserResult.getAlphabet());
         LTLFormula phi = parserResult.getLtlFormula();
 
         ImmutableSet.Builder<RabinAutomaton.State<LTLPropEquivalenceClass, Set<String>>> statesBuilder = new ImmutableSet.Builder<>();
@@ -80,7 +77,7 @@ public class GDRAFactory extends RabinAutomatonFactory<String,
                 List<Set<Pair<LTLFormula, Integer>>> mappingsForPsis = new ArrayList<>();
                 for (LTLFormula psi : curlyG) {
                     Set<Pair<LTLFormula, Integer>> possibleRanks = new HashSet<>();
-                    for (int rank = 0; rank < mojmirAutomatonFactoryFromLTL.createFrom(new Pair<>(psi, alphabet)).getMaxRank(); rank++) {
+                    for (int rank = 0; rank < mojmirAutomatonFactoryFromLTL.createFrom(psi, alphabet).getMaxRank(); rank++) {
                         possibleRanks.add(new Pair<>(psi, rank));
                     }
                     mappingsForPsis.add(possibleRanks);
@@ -109,8 +106,8 @@ public class GDRAFactory extends RabinAutomatonFactory<String,
     }
 
     private LTLFormula pi(LTLFormula psi, int rank) {
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma = mojmirAutomatonFactoryFromLTL.createFrom(new Pair<>(psi, alphabet));
-        RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFromMojmirFactory.createFrom(ma);
+        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma = mojmirAutomatonFactoryFromLTL.createFrom(psi, alphabet);
+        RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFromMojmirFactory.createFrom(ma, alphabet);
         List<LTLFormula> conjuncts = new ArrayList<>();
         ra.succeed(rank).forEach(t -> conjuncts.add(t.getFrom().getLabel().get(rank).getLabel().getRepresentative()));
         return new LTLAnd(conjuncts);

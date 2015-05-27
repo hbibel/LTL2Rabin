@@ -14,14 +14,13 @@ import java.util.stream.Stream;
 public class RabinAutomatonFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomaton<LTLPropEquivalenceClass, Set<String>>,
         List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>,
         Set<String>> {
-    public RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> createFrom(MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> from) {
+    public RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> createFrom(MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> from, ImmutableSet<Set<String>> alphabet) {
         ListOrderedSet<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>> states = new ListOrderedSet<>();
         RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> initialState;
         ImmutableSet.Builder<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> transitionBuilder = new ImmutableSet.Builder<>();
         Set<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> fail = new ListOrderedSet<>();
         List<Set<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>> buy = new ArrayList<>();
         List<Set<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>> succeed = new ArrayList<>();
-        ImmutableSet<Set<String>> alphabet = from.getAlphabet();
 
         List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> initialMojmirStates = new ArrayList<>(Collections.singletonList(from.getInitialState()));
         initialState = new RabinAutomaton.State<>(initialMojmirStates);
