@@ -7,17 +7,21 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.*;
 
 public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
+    // TODO: Maybe Create subclass Slave that provides specific functions, such as acc(int i)
     private final ImmutableCollection<State<T, U>> states;
     private final State<T, U> initialState;
-    private final Pair<? extends ImmutableCollection<? extends Automaton.Transition>, ? extends ImmutableCollection<? extends Automaton.Transition>> rabinPair;
+    private final Object rabinCondition;
+    // private final Pair<? extends ImmutableCollection<? extends Automaton.Transition>, ? extends ImmutableCollection<? extends Automaton.Transition>> rabinPair;
     private final ImmutableSet<U> alphabet;
 
-    public RabinAutomaton(ImmutableCollection<State<T, U>> states, State<T, U> initialState,
-                          Pair<? extends ImmutableCollection<? extends Transition>, ? extends ImmutableCollection<? extends Automaton.Transition>> rabinPair,
+    public RabinAutomaton(ImmutableCollection<State<T, U>> states,
+                          State<T, U> initialState,
+                          Object rabinCondition,
+                          // Pair<? extends ImmutableCollection<? extends Transition>, ? extends ImmutableCollection<? extends Automaton.Transition>> rabinPair,
                           ImmutableSet<U> alphabet) {
         this.states = states;
         this.initialState = initialState;
-        this.rabinPair = rabinPair;
+        this.rabinCondition = rabinCondition;
         this.alphabet = alphabet;
     }
 
@@ -25,9 +29,13 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
         return initialState;
     }
 
-    public Pair<? extends ImmutableCollection<? extends Automaton.Transition>, ? extends ImmutableCollection<? extends Automaton.Transition>> getRabinPair() {
-        return rabinPair;
+    public Object getRabinCondition() {
+        return rabinCondition;
     }
+
+    /*public Pair<? extends ImmutableCollection<? extends Automaton.Transition>, ? extends ImmutableCollection<? extends Automaton.Transition>> getRabinPair() {
+        return rabinPair;
+    }*/
 
     public ImmutableCollection<State<T, U>> getStates() {
         return states;

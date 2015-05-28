@@ -19,7 +19,7 @@ import java.util.HashSet;
 // Note to self: When parsing several LTLs, don't forget to call LTLVariable.cachedBDDs.clear() in between to clean up
 // the variable space.
 
-//
+// TODO: Let all factories take alphabet in their constructor
 public class Main {
 
     public static void main(String[] args) {
