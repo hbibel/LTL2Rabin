@@ -9,7 +9,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class GDRAFactory {
-    private Map<LTLPropEquivalenceClass, RabinAutomaton.State<LTLPropEquivalenceClass, Set<String>>> existingStates = new HashMap<>();
+    private Map<Pair<LTLPropEquivalenceClass, List<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>>>,
+                RabinAutomaton.State<Pair<LTLPropEquivalenceClass, List<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>>>, Set<String>>> existingStates = new HashMap<>();
     private MojmirAutomatonFactoryFromLTL mojmirAutomatonFactoryFromLTL = new MojmirAutomatonFactoryFromLTL();
     private MojmirAutomatonFactoryFromLTLAndSet mojmirAutomatonFactoryFromLTLAndSet = new MojmirAutomatonFactoryFromLTLAndSet();
     private RabinAutomatonFromMojmirFactory rabinAutomatonFromMojmirFactory = new RabinAutomatonFromMojmirFactory();
@@ -72,7 +73,7 @@ public class GDRAFactory {
                 // for each subformula from gSet add the initial state of the corresponding RabinAutomaton
                 temp.getLabel().getSecond().forEach(slaveState -> newLabelSlaveStatesBuilder.add(slaveState.readLetter(letter)));
                 RabinAutomaton.State<Pair<LTLPropEquivalenceClass, List<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>>>, Set<String>> newState =
-                        new RabinAutomaton.State<>(new Pair<>(newLabelLTL, newLabelSlaveStatesBuilder.build()));
+                        addOrGet(new Pair<>(newLabelLTL, newLabelSlaveStatesBuilder.build()));
 
                 if (!statesBuilder.build().contains(newState)) {
                     statesToBeAdded.offer(newState);
@@ -85,7 +86,7 @@ public class GDRAFactory {
                     ImmutableSet<LTLFormula> curlyG = curlyGPi.getFirst();
                     Map<LTLFormula, Integer> pi = curlyGPi.getSecond();
 
-                    // M(pi, curlyG)
+                    // M_pi^curlyG
                     List<LTLFormula> conjuncts = new ArrayList<>();
                     curlyG.forEach(psi -> {
                         conjuncts.add(new LTLGOperator(psi));
@@ -106,16 +107,36 @@ public class GDRAFactory {
                         // the state "temp" is not in F and thus its outgoing transition is in M(pi, curlyG)
                         Pair<Set<LTLFormula>, Map<LTLFormula, Integer>> key = new Pair<>(curlyG, pi);
                         Set accPiCurlyG = piCurlyGToAccMap.get(key);
-                        accPiCurlyG.add(new Automaton.Transition<>(temp, letter, newState));
+                        accPiCurlyG.add(new Pair<>(ImmutableSet.of(new Automaton.Transition<>(temp, letter, newState)), univ));
                     }
 
+                    // Acc_pi(psi)
                     curlyG.forEach(psi -> {
                         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma = mojmirAutomatonFactoryFromLTLAndSet.createFrom(new Pair<>(psi, curlyG), alphabet);
                         RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFromMojmirFactory.createFrom(ma, alphabet);
-                        pi.forEach((ltlFormula, integer) -> {
+                        int piForPsi = pi.get(psi);
+                        Set<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> succeedPi = null; // TODO: ra.succeed(piForPsi)
+                        Set<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> fail = null; // TODO: ra.fail()
+                        Pair<Set, Set> accPiPsi = new Pair<>(new HashSet<>(), new HashSet<>());
+                        for(Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>> transition : succeedPi) {
+                            if (transition.getLetter().equals(letter)
+                                    && temp.getLabel().getSecond().contains(transition.getFrom())) {
+                                accPiPsi.getFirst().add(new Automaton.Transition<>(temp, letter, newState));
+                                break;
+                            }
+                        }
+                        for(Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>> transition : fail) {
+                            if (transition.getLetter().equals(letter)
+                                    && temp.getLabel().getSecond().contains(transition.getFrom())) {
+                                accPiPsi.getSecond().add(new Automaton.Transition<>(temp, letter, newState));
+                                break;
+                            }
+                        }
+                        if ((!accPiPsi.getFirst().isEmpty()) && (!accPiPsi.getSecond().isEmpty())) {
                             Pair<Set<LTLFormula>, Map<LTLFormula, Integer>> key = new Pair<>(curlyG, pi);
                             Set accPiCurlyG = piCurlyGToAccMap.get(key);
-                        });
+                            accPiCurlyG.add(accPiPsi);
+                        }
                     });
                 });
             }
@@ -123,28 +144,14 @@ public class GDRAFactory {
 
         ImmutableSet<RabinAutomaton.State<Pair<LTLPropEquivalenceClass, List<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>>>, Set<String>>> states = statesBuilder.build();
         Set<Set<Pair<Set, Set>>> acc = ImmutableSet.copyOf(piCurlyGToAccMap.values());
-        // TODO
-        return null;
+        return new RabinAutomaton<>(states, initialState, acc, alphabet);
     }
 
-    private LTLFormula pi(LTLFormula psi, int rank) {
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma = mojmirAutomatonFactoryFromLTL.createFrom(psi, alphabet);
-        RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFromMojmirFactory.createFrom(ma, alphabet);
-        List<LTLFormula> conjuncts = new ArrayList<>();
-        ra.succeed(rank).forEach(t -> conjuncts.add(t.getFrom().getLabel().get(rank).getLabel().getRepresentative()));
-        return new LTLAnd(conjuncts);
-    }
-
-//    private LTLPropEquivalenceClass eval(LTLPropEquivalenceClass formula, Set<LTLGOperator> curlyG) {
-
-  //  }
-
-    private RabinAutomaton.State<LTLPropEquivalenceClass, Set<String>> addOrGet(LTLPropEquivalenceClass label) {
-        RabinAutomaton.State<LTLPropEquivalenceClass, Set<String>> result = existingStates.get(label);
+    private RabinAutomaton.State<Pair<LTLPropEquivalenceClass, List<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>>>, Set<String>> addOrGet(Pair<LTLPropEquivalenceClass, List<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>>> label) {
+        RabinAutomaton.State<Pair<LTLPropEquivalenceClass, List<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>>>, Set<String>> result = existingStates.get(label);
         if (result == null) {
-            RabinAutomaton.State<LTLPropEquivalenceClass, Set<String>> newState = new RabinAutomaton.State<>(label);
-            existingStates.put(label, newState);
-            result = newState;
+            result = new RabinAutomaton.State<>(label);
+            existingStates.put(label, result);
         }
         return result;
     }
