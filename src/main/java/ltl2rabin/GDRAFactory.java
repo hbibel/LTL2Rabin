@@ -91,8 +91,23 @@ public class GDRAFactory {
                         conjuncts.add(new LTLGOperator(psi));
                         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma = mojmirAutomatonFactoryFromLTLAndSet.createFrom(new Pair<>(psi, curlyG), alphabet);
                         RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFromMojmirFactory.createFrom(ma, alphabet);
-                        conjuncts.add() // TODO: F(r_psi)
+                        ra.getStates().forEach(raState -> {
+                            // F(r_psi): For each raState, get the corresponding mojmir state with rank pi(psi) or higher
+                            int piForPsi = pi.get(psi);
+                            if (raState.getLabel().size() - 1 >= piForPsi) {
+                                // raState has LTL formulae with rank pi(psi) or higher.
+                                for (int i = piForPsi; i < raState.getLabel().size() - 1; i++) {
+                                    conjuncts.add(raState.getLabel().get(i).getLabel().getRepresentative());
+                                }
+                            }
+                        });
                     });
+                    if (!new LTLPropEquivalenceClass(new LTLAnd(conjuncts)).implies(newLabelLTL)) {
+                        // the state "temp" is not in F and thus its outgoing transition is in M(pi, curlyG)
+                        Pair<Set<LTLFormula>, Map<LTLFormula, Integer>> key = new Pair<>(curlyG, pi);
+                        Set accPiCurlyG = piCurlyGToAccMap.get(key);
+                        accPiCurlyG.add(new Automaton.Transition<>(temp, letter, newState));
+                    }
 
                     curlyG.forEach(psi -> {
                         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma = mojmirAutomatonFactoryFromLTLAndSet.createFrom(new Pair<>(psi, curlyG), alphabet);
