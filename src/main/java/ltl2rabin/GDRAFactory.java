@@ -147,7 +147,8 @@ public class GDRAFactory {
         }
 
         ImmutableSet<RabinAutomaton.State<Pair<LTLPropEquivalenceClass, List<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>>>, Set<String>>> states = statesBuilder.build();
-        Set<Set<Pair<Set, Set>>> acc = ImmutableSet.copyOf(piCurlyGToAccMap.values());
+        // Set<Set<Pair<Set, Set>>> acc = ImmutableSet.copyOf(piCurlyGToAccMap.values());
+        Set acc = ImmutableSet.copyOf(piCurlyGToAccMap.values());
         return new RabinAutomaton<>(states, initialState, acc, alphabet);
     }
 

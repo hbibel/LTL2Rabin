@@ -19,7 +19,6 @@ public class RabinAutomatonTest {
     LTLVariable variable_c;
     LTLFactoryFromString ltlFactoryFromString;
     AutomatonMockFactory.MAMockFactory automatonMockFactory = new AutomatonMockFactory.MAMockFactory();
-    RabinAutomatonFromMojmirFactory rabinAutomatonFactory = new RabinAutomatonFromMojmirFactory();
 
     private String mojmirStateStringFromLTL(LTLFormula f) {
         return "state(" + f.toString() + ")";
@@ -53,6 +52,7 @@ public class RabinAutomatonTest {
     @Test
     public void test1() {
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(1));
+        RabinAutomatonFromMojmirFactory rabinAutomatonFactory = new RabinAutomatonFromMojmirFactory(alphabet);
         Set<StateTransition> transitions = new HashSet<>();
         HashSet<String> letter = new HashSet<>();
         letter.add("a");
@@ -70,7 +70,7 @@ public class RabinAutomatonTest {
 
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = automatonMockFactory.mockMe(2, transitions, sinks, acceptingStates, alphabet);
 
-        RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFactory.createFrom(mockMA, alphabet);
+        RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(1, ra.getStates().size());
 
         List<Set<String>> word1 = AutomatonMockFactory.createWord("", "a");
@@ -82,6 +82,7 @@ public class RabinAutomatonTest {
     public void test2() {
         // Example from the paper, figure 3
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3));
+        RabinAutomatonFromMojmirFactory rabinAutomatonFactory = new RabinAutomatonFromMojmirFactory(alphabet);
         Set<StateTransition> transitions = new HashSet<>();
 
         for (Set<String> l : alphabet) {
@@ -111,7 +112,7 @@ public class RabinAutomatonTest {
 
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = automatonMockFactory.mockMe(4, transitions, sinks, acceptingStates, alphabet);
 
-        RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFactory.createFrom(mockMA, alphabet);
+        RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(2, ra.getStates().size());
 
         List<Set<String>> emptyWord = AutomatonMockFactory.createWord("");
@@ -133,6 +134,7 @@ public class RabinAutomatonTest {
     @Test
     public void test3() {
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(2));
+        RabinAutomatonFromMojmirFactory rabinAutomatonFactory = new RabinAutomatonFromMojmirFactory(alphabet);
         Set<StateTransition> transitions = new HashSet<>();
 
         for (Set<String> l : alphabet) {
@@ -161,7 +163,7 @@ public class RabinAutomatonTest {
 
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = automatonMockFactory.mockMe(5, transitions, sinks, acceptingStates, alphabet);
 
-        RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFactory.createFrom(mockMA, alphabet);
+        RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(3, ra.getStates().size());
 
         List<Set<String>> emptyWord = AutomatonMockFactory.createWord("");
