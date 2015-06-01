@@ -74,12 +74,12 @@ public abstract class AutomatonMockFactory<T> {
         }
     }*/
 
-    public static Set<Set<String>> generateAlphabet (int numLetters) {
+    public static ImmutableSet<Set<String>> generateAlphabet (int numLetters) {
         Set<String> result = new HashSet<>();
         for (int i = 0; i < numLetters; i++) {
             result.add(Character.toString((char) ('a' + i)));
         }
-        return Sets.powerSet(result);
+        return ImmutableSet.copyOf(Sets.powerSet(result));
     }
 
     public static class StateTransition {
