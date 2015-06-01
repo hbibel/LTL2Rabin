@@ -11,20 +11,24 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class GDRAFactory {
     private Map<Pair<LTLPropEquivalenceClass, List<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>>>,
                 RabinAutomaton.State<Pair<LTLPropEquivalenceClass, List<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>>>, Set<String>>> existingStates = new HashMap<>();
-    private MojmirAutomatonFactoryFromLTL mojmirAutomatonFactoryFromLTL = new MojmirAutomatonFactoryFromLTL();
-    private MojmirAutomatonFactoryFromLTLAndSet mojmirAutomatonFactoryFromLTLAndSet = new MojmirAutomatonFactoryFromLTLAndSet();
-    private RabinAutomatonFromMojmirFactory rabinAutomatonFromMojmirFactory = new RabinAutomatonFromMojmirFactory();
+    private MojmirAutomatonFactoryFromLTL mojmirAutomatonFactoryFromLTL;
+    private MojmirAutomatonFactoryFromLTLAndSet mojmirAutomatonFactoryFromLTLAndSet;
+    private RabinAutomatonFromMojmirFactory rabinAutomatonFromMojmirFactory;
     private LTLFactoryFromString ltlFactory = new LTLFactoryFromString();
     private ImmutableSet<Set<String>> alphabet;
 
-    // the dontCare parameter is irrelevant
-    public RabinAutomaton<Pair<LTLPropEquivalenceClass, List<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>>>, Set<String>> createFrom(String from, ImmutableSet<Set<String>> dontCare) {
+    public RabinAutomaton<Pair<LTLPropEquivalenceClass, List<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>>>, Set<String>> createFrom(String from) {
         LTLFactory.Result parserResult = ltlFactory.buildLTL(from);
+        this.alphabet = ImmutableSet.copyOf(parserResult.getAlphabet());
+        mojmirAutomatonFactoryFromLTL = new MojmirAutomatonFactoryFromLTL(alphabet);
+        mojmirAutomatonFactoryFromLTLAndSet = new MojmirAutomatonFactoryFromLTLAndSet(alphabet);
+        rabinAutomatonFromMojmirFactory = new RabinAutomatonFromMojmirFactory(alphabet);
+
+
         ImmutableSet<LTLFormula> gSet = (new ImmutableSet.Builder<LTLFormula>())
                 .addAll(parserResult.getgFormulas()).build();
         ImmutableSet<Set<LTLFormula>> curlyGSets = (new ImmutableSet.Builder<Set<LTLFormula>>())
                 .addAll(Sets.powerSet(gSet)).build();
-        this.alphabet = ImmutableSet.copyOf(parserResult.getAlphabet());
         LTLFormula phi = parserResult.getLtlFormula();
 
         Set<RabinAutomaton.Transition> univ = new HashSet<>(); // TODO: UNIV = all transitions?
@@ -46,7 +50,7 @@ public class GDRAFactory {
         // Initial state:
         ImmutableList.Builder<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>> initialLabelSlaveStatesBuilder = new ImmutableList.Builder<>();
         // for each subformula from gSet add the initial state of the corresponding RabinAutomaton
-        gSet.forEach(subFormula -> initialLabelSlaveStatesBuilder.add(rabinAutomatonFromMojmirFactory.createFrom(mojmirAutomatonFactoryFromLTL.createFrom(subFormula, alphabet), alphabet).getInitialState()));
+        gSet.forEach(subFormula -> initialLabelSlaveStatesBuilder.add(rabinAutomatonFromMojmirFactory.createFrom(mojmirAutomatonFactoryFromLTL.createFrom(subFormula)).getInitialState()));
         Pair<LTLPropEquivalenceClass, List<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>>> initialLabel
                 = new Pair<>(new LTLPropEquivalenceClass(phi), initialLabelSlaveStatesBuilder.build());
         RabinAutomaton.State<Pair<LTLPropEquivalenceClass, List<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>>>, Set<String>> initialState
@@ -90,8 +94,8 @@ public class GDRAFactory {
                     List<LTLFormula> conjuncts = new ArrayList<>();
                     curlyG.forEach(psi -> {
                         conjuncts.add(new LTLGOperator(psi));
-                        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma = mojmirAutomatonFactoryFromLTLAndSet.createFrom(new Pair<>(psi, curlyG), alphabet);
-                        RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFromMojmirFactory.createFrom(ma, alphabet);
+                        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma = mojmirAutomatonFactoryFromLTLAndSet.createFrom(new Pair<>(psi, curlyG));
+                        RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFromMojmirFactory.createFrom(ma);
                         ra.getStates().forEach(raState -> {
                             // F(r_psi): For each raState, get the corresponding mojmir state with rank pi(psi) or higher
                             int piForPsi = pi.get(psi);
@@ -112,8 +116,8 @@ public class GDRAFactory {
 
                     // Acc_pi(psi)
                     curlyG.forEach(psi -> {
-                        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma = mojmirAutomatonFactoryFromLTLAndSet.createFrom(new Pair<>(psi, curlyG), alphabet);
-                        RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFromMojmirFactory.createFrom(ma, alphabet);
+                        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma = mojmirAutomatonFactoryFromLTLAndSet.createFrom(new Pair<>(psi, curlyG));
+                        RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFromMojmirFactory.createFrom(ma);
                         int piForPsi = pi.get(psi);
                         Set<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> succeedPi = null; // TODO: ra.succeed(piForPsi)
                         Set<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> fail = null; // TODO: ra.fail()

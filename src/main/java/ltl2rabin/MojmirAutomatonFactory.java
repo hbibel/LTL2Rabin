@@ -8,8 +8,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, LTLPropEquivalenceClass, Set<String>> {
     private static HashMap<Pair<LTLFormula, Set<LTLFormula>>, MojmirAutomaton<LTLPropEquivalenceClass, Set<String>>> mojmirAutomata = new HashMap<>();
 
+    public MojmirAutomatonFactory(ImmutableSet<Set<String>> alphabet) {
+        super(alphabet);
+    }
+
     @Override
-    public abstract MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> createFrom(F from, ImmutableSet<Set<String>> alphabet);
+    public abstract MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> createFrom(F from);
 
     protected static void putIntoCache(Pair<LTLFormula, Set<LTLFormula>> key, MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma) {
         mojmirAutomata.put(key, ma);

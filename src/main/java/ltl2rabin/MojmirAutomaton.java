@@ -44,9 +44,7 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
     }
 
     public static class State<R, S> extends Automaton.State<R, S> {
-        // TODO: Make this class immutable
         private final R label;
-        // private final boolean accepting; TODO: Remove
         private boolean isSink;
         private Map<S, State<R, S>> transitions;
 

@@ -1,3 +1,4 @@
+
 package ltl2rabin;
 
 import com.google.common.collect.ImmutableSet;
@@ -11,14 +12,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class RabinAutomatonFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomaton<LTLPropEquivalenceClass, Set<String>>,
-        List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>,
-        Set<String>> {
-    public RabinAutomatonFromMojmirFactory(ImmutableSet<Set<String>> alphabet) {
+public class SlaveFromMojmirFactory  extends RabinAutomatonFactory<MojmirAutomaton<LTLPropEquivalenceClass, Set<String>>,
+            List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>,
+            Set<String>> {
+    public SlaveFromMojmirFactory(ImmutableSet<Set<String>> alphabet) {
         super(alphabet);
     }
 
-    public RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> createFrom(MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> from) {
+    public Slave createFrom(MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> from) {
         ListOrderedSet<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>> states = new ListOrderedSet<>();
         RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> initialState;
         ImmutableSet.Builder<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> transitionBuilder = new ImmutableSet.Builder<>();
@@ -98,7 +99,7 @@ public class RabinAutomatonFromMojmirFactory extends RabinAutomatonFactory<Mojmi
                                 || transition.getFrom().getLabel().get(finalRank).equals(from.getInitialState()))
                         .filter(transition -> from.isAcceptingState(transition.getFrom().getLabel().get(finalRank).readLetter(letter)))
                         .filter(transition -> transition.getLetter().equals(letter))
-                                .collect(Collectors.toList()));
+                        .collect(Collectors.toList()));
             }
             succeed.add(succeedI);
         }
@@ -114,7 +115,7 @@ public class RabinAutomatonFromMojmirFactory extends RabinAutomatonFactory<Mojmi
         Pair<ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>, ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>> rabinPair
                 = new Pair<>(avoidBuilder.build(), reachBuilder.build());
 
-        return new RabinAutomaton<>(immutableStates, initialState, rabinPair, getAlphabet());
+        return new Slave(immutableStates, initialState, rabinPair, getAlphabet());
     }
 
     private boolean buysOrGetBought(Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>> transition,

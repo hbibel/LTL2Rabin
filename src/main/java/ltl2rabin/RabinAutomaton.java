@@ -61,7 +61,6 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
 
     public static class State<R, S> extends Automaton.State<R, S> {
         private final R label;
-        private LTLFormula ltlLabel;
         private Map<S, State<R, S>> transitions = new HashMap<>();
 
         public void setTransition(S letter, State<R, S> to) {
@@ -80,18 +79,6 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
             return transitions.get(letter);
         }
 
-        public int transitionCount() {
-            return transitions.size();
-        }
-
-        public LTLFormula getLtlLabel() {
-            return ltlLabel;
-        }
-
-        public void setLtlLabel(LTLFormula ltlLabel) {
-            this.ltlLabel = ltlLabel;
-        }
-
         /**
          *
          * @param label the list representing the ranking of the states of the corresponding mojmir automaton.
@@ -100,7 +87,7 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
         public State(R label) {
             this.label = label;
         }
-
+/*
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
@@ -112,6 +99,20 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
         @Override
         public int hashCode() {
             return new HashCodeBuilder(911, 19).append(label).toHashCode();
+        }
+*/
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            State<?, ?> state = (State<?, ?>) o;
+            return Objects.equals(label, state.label);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(label);
         }
 
         @Override
