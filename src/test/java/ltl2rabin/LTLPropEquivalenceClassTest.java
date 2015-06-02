@@ -16,6 +16,8 @@ public class LTLPropEquivalenceClassTest {
     List<LTLVariable> variables;
     List<LTLPropEquivalenceClass> equivalenceClasses;
     int variableCount = 3; // should not surpass 26. Otherwise change variable generation in the setUp() method.
+    LTLFormula tt;
+    LTLFormula ff;
 
     @Before
     public void setUp () {
@@ -26,6 +28,8 @@ public class LTLPropEquivalenceClassTest {
             variables.add(new LTLVariable(Character.toString((char) ('a' + i))));
             equivalenceClasses.add(new LTLPropEquivalenceClass(variables.get(i)));
         }
+        tt = new LTLBoolean(true);
+        ff = new LTLBoolean(false);
     }
 
     @After
@@ -164,5 +168,29 @@ public class LTLPropEquivalenceClassTest {
         LTLPropEquivalenceClass c6 = new LTLPropEquivalenceClass(new LTLAnd(variables.get(1), bORc)); // b & (b | c)
         // b & (b | c) = b
         assertTrue(c6.equals(new LTLPropEquivalenceClass(variables.get(1))));
+    }
+
+    @Test
+    public void implicationTest() {
+        // a & b |= a
+        assertTrue(new LTLPropEquivalenceClass(new LTLAnd(variables.get(0), variables.get(1))).implies(equivalenceClasses.get(0)));
+        // a & b |= b
+        assertTrue(new LTLPropEquivalenceClass(new LTLAnd(variables.get(0), variables.get(1))).implies(equivalenceClasses.get(1)));
+
+        // a | b |/= a
+        assertFalse(new LTLPropEquivalenceClass(new LTLOr(variables.get(0), variables.get(1))).implies(equivalenceClasses.get(0)));
+        // a | b |/= b
+        assertFalse(new LTLPropEquivalenceClass(new LTLOr(variables.get(0), variables.get(1))).implies(equivalenceClasses.get(1)));
+
+        // a & b |= a | b
+        assertTrue(new LTLPropEquivalenceClass(new LTLAnd(variables.get(0), variables.get(1))).implies(
+                new LTLPropEquivalenceClass(new LTLOr(variables.get(0), variables.get(1)))));
+
+        // tt |/= a
+        assertFalse(new LTLPropEquivalenceClass(tt).implies(equivalenceClasses.get(0)));
+        // tt |= tt
+        assertTrue(new LTLPropEquivalenceClass(tt).implies(new LTLPropEquivalenceClass(tt)));
+        // tt |/= ff
+        assertFalse(new LTLPropEquivalenceClass(tt).implies(new LTLPropEquivalenceClass(ff)));
     }
 }

@@ -32,6 +32,7 @@ public class MAMockFactory {
             this.alphabet = alphabet;
             initialState = (MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>) mock(MojmirAutomaton.State.class);
             when(initialState.getLabel()).thenReturn(new LTLPropEquivalenceClass(initialLabel));
+            when(initialState.isSink()).thenReturn(false);
             states.add(initialState);
         }
 

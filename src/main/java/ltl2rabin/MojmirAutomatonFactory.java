@@ -1,5 +1,6 @@
 package ltl2rabin;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.*;
@@ -27,6 +28,18 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, LTLP
             ImmutableSet<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>> reach(MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> initialState,
                                                                                              Set<Set<String>> alphabet,
                                                                                              Set<LTLFormula> curlyG) {
+        LTLPropEquivalenceClass curlyGConjunction;
+        if (curlyG.isEmpty()) {
+            curlyGConjunction = new LTLPropEquivalenceClass(new LTLBoolean(true));
+        }
+        else {
+            List<LTLFormula> curlyGConjuncts = new ArrayList<>();
+            curlyG.forEach(ltlFormula -> {
+                curlyGConjuncts.add(new LTLGOperator(ltlFormula));
+            });
+            curlyGConjunction = new LTLPropEquivalenceClass(new LTLAnd(curlyGConjuncts));
+        }
+
         Set<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> states = new HashSet<>();
         ImmutableSet.Builder<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> acceptingStatesBuilder = new ImmutableSet.Builder<>();
         states.add(initialState);
@@ -51,11 +64,11 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, LTLP
                 // line never will be reached.
                 isSink = false;
 
-                // state is accepting if
-                // - state label is in curlyG or
-                // - state label is a tautology (propositionally equivalent to true)
+                // state is accepting if state label
+                // - is a tautology (propositionally equivalent to true)
+                // - is implied by curlyG
                 MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> newState = new MojmirAutomaton.State<>(newLabel);
-                if (newLabel.isTautology() || curlyG.contains(newLabel)) {
+                if (newLabel.isTautology() || curlyGConjunction.implies(newLabel)) {
                     acceptingStatesBuilder.add(newState);
                 }
                 transitions.put(letter, newState);

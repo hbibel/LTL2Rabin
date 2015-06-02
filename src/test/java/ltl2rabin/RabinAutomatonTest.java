@@ -1,5 +1,6 @@
 package ltl2rabin;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import ltl2rabin.AutomatonMockFactory.StateTransition;
 import org.junit.After;
@@ -17,6 +18,8 @@ public class RabinAutomatonTest {
     LTLVariable variable_a;
     LTLVariable variable_b;
     LTLVariable variable_c;
+    LTLFormula tt;
+    LTLFormula ff;
     LTLFactoryFromString ltlFactoryFromString;
     AutomatonMockFactory.MAMockFactory automatonMockFactory = new AutomatonMockFactory.MAMockFactory();
 
@@ -40,6 +43,8 @@ public class RabinAutomatonTest {
         variable_a = new LTLVariable("a");
         variable_b = new LTLVariable("b");
         variable_c = new LTLVariable("c");
+        tt = new LTLBoolean(true);
+        ff = new LTLBoolean(false);
 
         ltlFactoryFromString = new LTLFactoryFromString();
     }
@@ -67,8 +72,24 @@ public class RabinAutomatonTest {
         List<Integer> sinks = new ArrayList<>();
         sinks.add(1);
         List<Integer> acceptingStates = new ArrayList<>();
+//        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = automatonMockFactory.mockMe(2, transitions, sinks, acceptingStates, alphabet);
 
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = automatonMockFactory.mockMe(2, transitions, sinks, acceptingStates, alphabet);
+
+        MAMockFactory maMockFactory = new MAMockFactory();
+        LTLFormula initlabel = new LTLOr(ImmutableList.of(variable_a, variable_b, variable_c));
+        MAMockFactory.MAMock m = maMockFactory.createMAMock(alphabet, initlabel);
+        m.addState(tt, true);
+        m.whenReadingToken(initlabel, "a", tt);
+        m.whenReadingToken(initlabel, "b", tt);
+        m.whenReadingToken(initlabel, "c", tt);
+        m.setStateAccepting(tt);
+
+        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = m.toMA();
+
+        for (MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> state : mockMA.getStates()) {
+            System.out.println("State " + state.getLabel().getRepresentative() + " is Sink: " + state.isSink());
+        }
+
 
         RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(1, ra.getStates().size());
