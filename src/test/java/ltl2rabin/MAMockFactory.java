@@ -84,6 +84,12 @@ public class MAMockFactory {
             });
         }
 
+        public void whenReadingLetter(LTLFormula from, Set<String> letter, LTLFormula to) {
+            MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> fromState = states.stream().filter(state -> state.getLabel().equals(new LTLPropEquivalenceClass(from))).findAny().get();
+            MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> toState = states.stream().filter(state -> state.getLabel().equals(new LTLPropEquivalenceClass(to))).findAny().get();
+            when(fromState.readLetter(letter)).thenReturn(toState);
+        }
+
         public void setStateAccepting(LTLFormula label) {
             acceptingLabels.add(new LTLPropEquivalenceClass(label));
         }

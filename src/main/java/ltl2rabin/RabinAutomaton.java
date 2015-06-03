@@ -87,20 +87,6 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
         public State(R label) {
             this.label = label;
         }
-/*
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            State<?, ?> state = (State<?, ?>) o;
-            return Objects.equals(label, state.label);
-        }
-
-        @Override
-        public int hashCode() {
-            return new HashCodeBuilder(911, 19).append(label).toHashCode();
-        }
-*/
 
         @Override
         public boolean equals(Object o) {
