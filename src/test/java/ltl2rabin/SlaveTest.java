@@ -2,7 +2,6 @@ package ltl2rabin;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,7 +53,7 @@ public class SlaveTest {
     @Test
     public void test1() {
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(1));
-        RabinAutomatonFromMojmirFactory rabinAutomatonFactory = new RabinAutomatonFromMojmirFactory(alphabet);
+        SlaveFromMojmirFactory rabinAutomatonFactory = new SlaveFromMojmirFactory(alphabet);
 
         LTLFormula initlabel = new LTLOr(ImmutableList.of(aVariable, bVariable, cVariable));
         MAMockFactory.MAMock m = maMockFactory.createMAMock(alphabet, initlabel);
@@ -94,7 +93,7 @@ public class SlaveTest {
     public void test2() {
         // Example from the paper, figure 3
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3));
-        RabinAutomatonFromMojmirFactory rabinAutomatonFactory = new RabinAutomatonFromMojmirFactory(alphabet);
+        SlaveFromMojmirFactory rabinAutomatonFactory = new SlaveFromMojmirFactory(alphabet);
 
         LTLUOperator bUc = new LTLUOperator(bVariable, cVariable);
         LTLFormula initialLabel = new LTLAnd(aVariable, new LTLXOperator(bUc));

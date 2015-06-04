@@ -1,6 +1,6 @@
-
 package ltl2rabin;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.collections4.set.ListOrderedSet;
 
@@ -12,9 +12,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class SlaveFromMojmirFactory  extends RabinAutomatonFactory<MojmirAutomaton<LTLPropEquivalenceClass, Set<String>>,
-            List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>,
-            Set<String>> {
+public class SlaveFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomaton<LTLPropEquivalenceClass, Set<String>>,
+        List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>,
+        Set<String>> {
     public SlaveFromMojmirFactory(ImmutableSet<Set<String>> alphabet) {
         super(alphabet);
     }
@@ -25,7 +25,7 @@ public class SlaveFromMojmirFactory  extends RabinAutomatonFactory<MojmirAutomat
         ImmutableSet.Builder<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> transitionBuilder = new ImmutableSet.Builder<>();
         Set<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> fail = new ListOrderedSet<>();
         List<Set<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>> buy = new ArrayList<>();
-        List<Set<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>> succeed = new ArrayList<>();
+        List<ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>> succeed = new ArrayList<>();
 
         List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> initialMojmirStates = new ArrayList<>(Collections.singletonList(from.getInitialState()));
         initialState = new RabinAutomaton.State<>(initialMojmirStates);
@@ -90,7 +90,8 @@ public class SlaveFromMojmirFactory  extends RabinAutomatonFactory<MojmirAutomat
         }
 
         for (int rank = 0; rank < from.getMaxRank(); rank++) {
-            Set<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> succeedI = new ListOrderedSet<>();
+            // Set<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> succeedI = new ListOrderedSet<>();
+            ImmutableSet.Builder<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> succeedI = new ImmutableSet.Builder<>();
             final int finalRank = rank;
             for (Set<String> letter : getAlphabet()) {
                 succeedI.addAll(immutableTransitions.stream()
@@ -99,23 +100,23 @@ public class SlaveFromMojmirFactory  extends RabinAutomatonFactory<MojmirAutomat
                                 || transition.getFrom().getLabel().get(finalRank).equals(from.getInitialState()))
                         .filter(transition -> from.isAcceptingState(transition.getFrom().getLabel().get(finalRank).readLetter(letter)))
                         .filter(transition -> transition.getLetter().equals(letter))
-                        .collect(Collectors.toList()));
+                                .collect(Collectors.toList()));
             }
-            succeed.add(succeedI);
+            succeed.add(succeedI.build());
         }
 
-        ImmutableSet.Builder<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> avoidBuilder = new ImmutableSet.Builder<>();
-        ImmutableSet.Builder<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> reachBuilder = new ImmutableSet.Builder<>();
-        // TODO: Merge unnecessary fail buy and succeed loops into this one
+        ImmutableMap.Builder<Integer, ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>> failBuyIBuilder = new ImmutableMap.Builder<>();
+        ImmutableMap.Builder<Integer, ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>> succeedIBuilder = new ImmutableMap.Builder<>();
+
+
         for (int rank = 0; rank < from.getMaxRank(); rank++) {
-            buy.get(rank).addAll(fail);
-            avoidBuilder.addAll(buy.get(rank));
-            reachBuilder.addAll(succeed.get(rank));
+            failBuyIBuilder.put(rank, new ImmutableSet.Builder<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>().addAll(fail).addAll(buy.get(rank)).build());
+            succeedIBuilder.put(rank, succeed.get(rank));
         }
-        Pair<ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>, ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>> rabinPair
-                = new Pair<>(avoidBuilder.build(), reachBuilder.build());
+        Pair<ImmutableMap<Integer, ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>>, ImmutableMap<Integer, ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>>> failBuySucceed
+                = new Pair<>(failBuyIBuilder.build(), succeedIBuilder.build());
 
-        return new Slave(immutableStates, initialState, rabinPair, getAlphabet());
+        return new Slave(immutableStates, initialState, failBuySucceed, getAlphabet());
     }
 
     private boolean buysOrGetBought(Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>> transition,

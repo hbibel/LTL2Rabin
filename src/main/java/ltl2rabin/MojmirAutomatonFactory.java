@@ -34,7 +34,7 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, LTLP
         else {
             List<LTLFormula> curlyGConjuncts = new ArrayList<>();
             curlyG.forEach(ltlFormula -> {
-                curlyGConjuncts.add(new LTLGOperator(ltlFormula));
+                curlyGConjuncts.add(new LTLGOperator(ltlFormula)); // TODO: Salomon: "Kann es sein, dass du in Zeile 38 ein G zuviel hast?"
             });
             curlyGConjunction = new LTLPropEquivalenceClass(new LTLAnd(curlyGConjuncts));
         }
