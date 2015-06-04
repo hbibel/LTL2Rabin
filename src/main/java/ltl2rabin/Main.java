@@ -20,6 +20,8 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("This program runs, but does not do anything useful yet.");
+        GDRAFactory gdraFactory = new GDRAFactory();
+        gdraFactory.createFrom("(a U b) & (G c)");
     }
 
     public static LTLListener stringToLTLFormula (String s) {

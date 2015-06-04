@@ -14,7 +14,6 @@ public class MojmirAutomatonFactoryFromLTL extends MojmirAutomatonFactory<LTLFor
 
     @Override
     public MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> createFrom(LTLFormula from) {
-        // TODO: Use Builders for immutable collections
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> cachedResult = getFromCache(new Pair<>(from, Collections.<LTLFormula>emptySet()));
         if (null != cachedResult) {
             return cachedResult;

@@ -5,7 +5,6 @@ import org.apache.commons.collections4.set.ListOrderedSet;
 import java.util.*;
 
 public abstract class Automaton<T, U> {
-    private ListOrderedSet<State> states = new ListOrderedSet<>();
     private State initialState;
 
     // TODO: Consider creating a protected constructor which can be called from subclasses via "super"

@@ -14,6 +14,7 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
     private final State<T, U> initialState;
     private final ImmutableSet<U> alphabet;
     private final ImmutableSet<State<T, U>> acceptingStates;
+    private int maxRank = -1;
 
     public ImmutableSet<State<T, U>> getStates() {
         return states;
@@ -23,8 +24,18 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
         return alphabet;
     }
 
-    public int getMaxRank() {
-        return states.size() - 1;
+    public int getMaxRank() { // ranks start at 0
+        if (-1 == maxRank) {
+            int result = states.size() - 1;
+            for (State<T, U> state : states) {
+                if (state.isSink()) {
+                    result -= 1;
+                }
+            }
+            maxRank = result;
+            return result;
+        }
+        return maxRank;
     }
 
     public State<T, U> getInitialState() {

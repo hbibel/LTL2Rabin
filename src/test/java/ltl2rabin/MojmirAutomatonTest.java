@@ -49,6 +49,7 @@ public class MojmirAutomatonTest {
             }
         });
         assertEquals(new LTLPropEquivalenceClass(tt), mojmirAutomaton.getInitialState().readLetter(ImmutableSet.of("a")).getLabel());
+        assertEquals(0, mojmirAutomaton.getMaxRank());
     }
 
     @Test
@@ -74,6 +75,7 @@ public class MojmirAutomatonTest {
                         assertTrue(m.isAcceptingState((new MojmirAutomaton.State<>(new LTLPropEquivalenceClass(tt)))));
                     }
                 });
+        assertEquals(3, m.getMaxRank());
     }
 
     @Test
@@ -98,6 +100,7 @@ public class MojmirAutomatonTest {
                         assertTrue(mojmirAutomaton.isAcceptingState((new MojmirAutomaton.State<>(new LTLPropEquivalenceClass(phi1)))));
                     }
                 });
+        assertEquals(0, mojmirAutomaton.getMaxRank());
     }
 
     @Test

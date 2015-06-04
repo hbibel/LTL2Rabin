@@ -1,6 +1,5 @@
 package ltl2rabin;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.*;
@@ -40,15 +39,15 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, LTLP
             curlyGConjunction = new LTLPropEquivalenceClass(new LTLAnd(curlyGConjuncts));
         }
 
-        Set<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> states = new HashSet<>();
+        Map<LTLPropEquivalenceClass, MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> states = new HashMap<>();
         ImmutableSet.Builder<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> acceptingStatesBuilder = new ImmutableSet.Builder<>();
-        states.add(initialState);
+        states.put(initialState.getLabel(), initialState);
 
-        Queue<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> statesToBeAdded = new ConcurrentLinkedQueue<>();
-        statesToBeAdded.add(initialState);
+        Queue<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> statesToBeExpanded = new ConcurrentLinkedQueue<>();
+        statesToBeExpanded.add(initialState);
 
-        while (!statesToBeAdded.isEmpty()) {
-            MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> temp = statesToBeAdded.poll();
+        while (!statesToBeExpanded.isEmpty()) {
+            MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> temp = statesToBeExpanded.poll();
             Map<Set<String>, MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> transitions = new HashMap<>();
 
             boolean isSink = true;
@@ -64,18 +63,20 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, LTLP
                 // line never will be reached.
                 isSink = false;
 
+                MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> newState = states.get(newLabel);
+                if (null == newState) {
+                    newState = new MojmirAutomaton.State<>(newLabel);
+                    statesToBeExpanded.offer(newState);
+                    states.put(newLabel, newState);
+                }
+
                 // state is accepting if state label
                 // - is a tautology (propositionally equivalent to true)
                 // - is implied by curlyG
-                MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> newState = new MojmirAutomaton.State<>(newLabel);
                 if (newLabel.isTautology() || curlyGConjunction.implies(newLabel)) {
                     acceptingStatesBuilder.add(newState);
                 }
                 transitions.put(letter, newState);
-                if (!states.add(newState)) {
-                    continue; // Remark: states is a set, so no duplicate states will be added, instead false is returned
-                }
-                statesToBeAdded.offer(newState);
             }
             if (isSink && !(temp == initialState)) {
                 temp.setSink(true);
@@ -83,6 +84,6 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, LTLP
             temp.setTransitions(transitions);
         }
 
-        return new Pair<>(states, acceptingStatesBuilder.build());
+        return new Pair<>(ImmutableSet.copyOf(states.values()), acceptingStatesBuilder.build());
     }
 }
