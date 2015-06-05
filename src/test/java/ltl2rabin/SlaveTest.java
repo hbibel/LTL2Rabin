@@ -67,20 +67,26 @@ public class SlaveTest {
 
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = m.toMA();
 
-        RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFactory.createFrom(mockMA);
+        Slave ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(1, ra.getStates().size());
 
         // check for correct rabin pair
-        Pair<ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>, ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>> raAcc
-                = (Pair<ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>, ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>>) ra.getRabinCondition();
+        ImmutableSet.Builder<Slave.Transition> failBuyBuilder = new ImmutableSet.Builder<>();
+        ImmutableSet.Builder<Slave.Transition> succeedBuilder = new ImmutableSet.Builder<>();
+        for (int i = 0; i < mockMA.getMaxRank(); i++) {
+            failBuyBuilder.addAll(ra.failBuy(i));
+            succeedBuilder.addAll(ra.succeed(i));
+        }
+        ImmutableSet<Slave.Transition> failBuy = failBuyBuilder.build();
+        ImmutableSet<Slave.Transition> succeed = succeedBuilder.build();
         alphabet.forEach(letter -> {
             if (letter.isEmpty()) {
-                assertTrue(raAcc.getFirst().contains(new Automaton.Transition<>(ra.getInitialState(), letter, ra.getInitialState())));
-                assertFalse(raAcc.getSecond().contains(new Automaton.Transition<>(ra.getInitialState(), letter, ra.getInitialState())));
+                assertTrue(failBuy.contains(new Slave.Transition(ra.getInitialState(), letter, ra.getInitialState())));
+                assertFalse(succeed.contains(new Slave.Transition(ra.getInitialState(), letter, ra.getInitialState())));
             }
             else {
-                assertTrue(raAcc.getSecond().contains(new Automaton.Transition<>(ra.getInitialState(), letter, ra.getInitialState())));
-                assertFalse(raAcc.getFirst().contains(new Automaton.Transition<>(ra.getInitialState(), letter, ra.getInitialState())));
+                assertTrue(succeed.contains(new Slave.Transition(ra.getInitialState(), letter, ra.getInitialState())));
+                assertFalse(failBuy.contains(new Slave.Transition(ra.getInitialState(), letter, ra.getInitialState())));
             }
         });
 
@@ -111,7 +117,7 @@ public class SlaveTest {
         m.setStateAccepting(tt);
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = m.toMA();
 
-        RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> ra = rabinAutomatonFactory.createFrom(mockMA);
+        Slave ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(2, ra.getStates().size());
 
         List<Set<String>> emptyWord = AutomatonMockFactory.createWord("");
@@ -129,30 +135,38 @@ public class SlaveTest {
         List<Set<String>> wordACEtc = AutomatonMockFactory.createWord("ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac");
         assertNotEquals(ra.getInitialState(), ra.run(wordACEtc));
 
-        Pair<ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>, ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>> raAcc
-                = (Pair<ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>, ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>>>) ra.getRabinCondition();
-        RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> q0 = ra.getInitialState();
-        RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> q1 = q0.readLetter(ImmutableSet.of("a"));
+
+        // check for correct rabin pair
+        ImmutableSet.Builder<Slave.Transition> failBuyBuilder = new ImmutableSet.Builder<>();
+        ImmutableSet.Builder<Slave.Transition> succeedBuilder = new ImmutableSet.Builder<>();
+        for (int i = 0; i < mockMA.getMaxRank(); i++) {
+            failBuyBuilder.addAll(ra.failBuy(i));
+            succeedBuilder.addAll(ra.succeed(i));
+        }
+        ImmutableSet<Slave.Transition> failBuy = failBuyBuilder.build();
+        ImmutableSet<Slave.Transition> succeed = succeedBuilder.build();
+        Slave.State q0 = ra.getInitialState();
+        Slave.State q1 = q0.readLetter(ImmutableSet.of("a"));
         assertNotEquals(q0, q1);
-        Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>> t4ac = new Automaton.Transition<>(q1, ImmutableSet.of("a", "c"), q1);
-        Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>> t4abc = new Automaton.Transition<>(q1, ImmutableSet.of("a", "b", "c"), q1);
-        Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>> t7c = new Automaton.Transition<>(q1, ImmutableSet.of("c"), q0);
-        Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>> t7bc = new Automaton.Transition<>(q1, ImmutableSet.of("b", "c"), q0);
-        ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> succeed1 = ImmutableSet.of(t4ac, t4abc, t7c, t7bc);
-        assertEquals(succeed1, raAcc.getSecond());
-        ImmutableSet.Builder<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> failBuilder = new ImmutableSet.Builder<>();
+        Slave.Transition t4ac = new Slave.Transition(q1, ImmutableSet.of("a", "c"), q1);
+        Slave.Transition t4abc = new Slave.Transition(q1, ImmutableSet.of("a", "b", "c"), q1);
+        Slave.Transition t7c = new Slave.Transition(q1, ImmutableSet.of("c"), q0);
+        Slave.Transition t7bc = new Slave.Transition(q1, ImmutableSet.of("b", "c"), q0);
+        ImmutableSet<Slave.Transition> succeed1 = ImmutableSet.of(t4ac, t4abc, t7c, t7bc);
+        assertEquals(succeed1, succeed);
+        ImmutableSet.Builder<Slave.Transition> failBuilder = new ImmutableSet.Builder<>();
         alphabet.forEach(letter -> {
             if (!letter.contains("a")) {
-                failBuilder.add(new Automaton.Transition<>(q0, letter, q0)); // t1
+                failBuilder.add(new Slave.Transition(q0, letter, q0)); // t1
             }
             if (ImmutableSet.copyOf(letter).equals(ImmutableSet.of("a")) || ImmutableSet.copyOf(letter).equals(ImmutableSet.of("b"))) {
-                failBuilder.add(new Automaton.Transition<>(q1, letter, q1)); // t5, t6
+                failBuilder.add(new Slave.Transition(q1, letter, q1)); // t5, t6
             }
         });
-        failBuilder.add(t7bc).add(t7c).add(new Automaton.Transition<>(q1, Collections.emptySet(), q0)); // t7, t8
-        ImmutableSet.Builder<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> buyBuilder = new ImmutableSet.Builder<>();
-        buyBuilder.add(new Automaton.Transition<>(q1, ImmutableSet.of("a", "b"), q1));
-        ImmutableSet<Automaton.Transition<RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>>, Set<String>>> expected = failBuilder.addAll(buyBuilder.build()).build();
-        assertEquals(expected, raAcc.getFirst());
+        failBuilder.add(t7bc).add(t7c).add(new Slave.Transition(q1, Collections.emptySet(), q0)); // t7, t8
+        ImmutableSet.Builder<Slave.Transition> buyBuilder = new ImmutableSet.Builder<>();
+        buyBuilder.add(new Slave.Transition(q1, ImmutableSet.of("a", "b"), q1));
+        ImmutableSet<Slave.Transition> expected = failBuilder.addAll(buyBuilder.build()).build();
+        assertEquals(expected, failBuy);
     }
 }

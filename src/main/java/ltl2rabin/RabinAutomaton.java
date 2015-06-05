@@ -8,13 +8,13 @@ import java.util.*;
 
 public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
     // TODO: Maybe Create subclass Slave that provides specific functions, such as acc(int i)
-    private final ImmutableCollection<State<T, U>> states;
+    private final ImmutableCollection<? extends State<T, U>> states;
     private final State<T, U> initialState;
     private final Object rabinCondition;
     // private final Pair<? extends ImmutableCollection<? extends Automaton.Transition>, ? extends ImmutableCollection<? extends Automaton.Transition>> rabinPair;
     private final ImmutableSet<U> alphabet;
 
-    public RabinAutomaton(ImmutableCollection<State<T, U>> states,
+    public RabinAutomaton(ImmutableCollection<? extends State<T, U>> states,
                           State<T, U> initialState,
                           Object rabinCondition,
                           // Pair<? extends ImmutableCollection<? extends Transition>, ? extends ImmutableCollection<? extends Automaton.Transition>> rabinPair,
@@ -37,11 +37,11 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
         return rabinPair;
     }*/
 
-    public ImmutableCollection<State<T, U>> getStates() {
+    public ImmutableCollection<? extends State<T, U>> getStates() {
         return states;
     }
 
-    public ImmutableSet<U> getAlphabet() {
+    public ImmutableSet<? extends U> getAlphabet() {
         return alphabet;
     }
 
@@ -53,10 +53,6 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
             result = result.readLetter(nextLetter);
         }
         return result;
-    }
-
-    public Set<Transition<RabinAutomaton.State<T, U>, U>> succeed(int i) {
-        return null; // TODO
     }
 
     public static class State<R, S> extends Automaton.State<R, S> {
