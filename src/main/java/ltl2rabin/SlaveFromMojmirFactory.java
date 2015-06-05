@@ -2,6 +2,7 @@ package ltl2rabin;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import ltl2rabin.LTL.LTLPropEquivalenceClass;
 import org.apache.commons.collections4.set.ListOrderedSet;
 
 import java.util.ArrayList;

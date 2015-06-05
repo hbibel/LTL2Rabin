@@ -1,4 +1,4 @@
-package ltl2rabin;
+package ltl2rabin.LTL;
 
 import com.google.common.collect.Sets;
 import ltl2rabin.parser.LTLLexer;

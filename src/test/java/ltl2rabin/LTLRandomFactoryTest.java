@@ -1,5 +1,7 @@
 package ltl2rabin;
 
+import ltl2rabin.LTL.*;
+import ltl2rabin.LTL.Boolean;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,19 +22,19 @@ public class LTLRandomFactoryTest {
         System.out.println("i  | operatorCount | variableCount ");
         System.out.println("-----------------------------------");
         for (int i = 0; i < 11; i++) {
-            LTLFormula f = factory.buildLTL(i).getLtlFormula();
+            Formula f = factory.buildLTL(i).getLtlFormula();
             HashSet<String> distinctVariables = new HashSet<>();
             int operatorCount = 0;
-            Queue<LTLFormula> toBeAnalyzed = new LinkedList<>();
+            Queue<Formula> toBeAnalyzed = new LinkedList<>();
             toBeAnalyzed.add(f);
             while (!toBeAnalyzed.isEmpty()) {
-                LTLFormula temp = toBeAnalyzed.poll();
+                Formula temp = toBeAnalyzed.poll();
                 ++operatorCount;
-                if (temp instanceof LTLBoolean) {
+                if (temp instanceof Boolean) {
                     continue;
                 }
-                if (temp instanceof LTLVariable) {
-                    distinctVariables.add(((LTLVariable) temp).getValue());
+                if (temp instanceof Variable) {
+                    distinctVariables.add(((Variable) temp).getValue());
                     continue;
                 }
                 getChildren(temp).forEach(toBeAnalyzed::add);
@@ -48,46 +50,46 @@ public class LTLRandomFactoryTest {
 
     @Test
     public void testGFreeNess() throws Exception {
-        LTLFormula f = factory.buildLTL(10, true).getLtlFormula();
-        Queue<LTLFormula> toBeAnalyzed = new LinkedList<>();
+        Formula f = factory.buildLTL(10, true).getLtlFormula();
+        Queue<Formula> toBeAnalyzed = new LinkedList<>();
         toBeAnalyzed.add(f);
         while (!toBeAnalyzed.isEmpty()) {
-            LTLFormula temp = toBeAnalyzed.poll();
-            if (temp instanceof LTLBoolean || temp instanceof LTLVariable) continue;
-            assertFalse("f should not be instance of LTLGOperator", temp instanceof LTLGOperator);
+            Formula temp = toBeAnalyzed.poll();
+            if (temp instanceof Boolean || temp instanceof Variable) continue;
+            assertFalse("f should not be instance of G", temp instanceof G);
             getChildren(temp).forEach(toBeAnalyzed::add);
         }
     }
 
-    List<LTLFormula> getChildren(LTLFormula f) throws Exception {
-        List<LTLFormula> result = new ArrayList<>();
-        if(f instanceof LTLAnd) {
-            Iterator<LTLFormula> it = ((LTLAnd)f).getIterator();
+    List<Formula> getChildren(Formula f) throws Exception {
+        List<Formula> result = new ArrayList<>();
+        if(f instanceof And) {
+            Iterator<Formula> it = ((And)f).getIterator();
             while (it.hasNext()) {
                 result.add(it.next());
             }
         }
-        else if(f instanceof LTLFOperator) {
-            result.add(((LTLFOperator) f).getOperand());
+        else if(f instanceof F) {
+            result.add(((F) f).getOperand());
         }
-        else if(f instanceof LTLGOperator) {
-            result.add(((LTLGOperator) f).getOperand());
+        else if(f instanceof G) {
+            result.add(((G) f).getOperand());
         }
-        else if(f instanceof LTLOr) {
-            Iterator<LTLFormula> it = ((LTLOr) f).getIterator();
+        else if(f instanceof Or) {
+            Iterator<Formula> it = ((Or) f).getIterator();
             while (it.hasNext()) {
                 result.add(it.next());
             }
         }
-        else if (f instanceof LTLUOperator) {
-            result.add(((LTLUOperator) f).getLeft());
-            result.add(((LTLUOperator) f).getRight());
+        else if (f instanceof U) {
+            result.add(((U) f).getLeft());
+            result.add(((U) f).getRight());
         }
-        else if (f instanceof LTLXOperator) {
-            result.add(((LTLXOperator) f).getOperand());
+        else if (f instanceof X) {
+            result.add(((X) f).getOperand());
         }
         else {
-            throw new Exception("Error in test: getChildren() called on a LTLFormula without children!");
+            throw new Exception("Error in test: getChildren() called on a Formula without children!");
         }
         return result;
     }

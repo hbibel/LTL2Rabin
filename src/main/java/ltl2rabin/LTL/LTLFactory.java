@@ -1,4 +1,4 @@
-package ltl2rabin;
+package ltl2rabin.LTL;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -9,17 +9,17 @@ public abstract class LTLFactory<T> {
     public abstract Result buildLTL(T input);
 
     public static class Result {
-        private LTLFormula ltlFormula;
+        private Formula ltlFormula;
         private ImmutableSet<Set<String>> alphabet;
-        private Collection<LTLFormula> gFormulas;
+        private Collection<Formula> gFormulas;
 
-        public Result(LTLFormula ltlFormula, Set<Set<String>> alphabet, Collection<LTLFormula> gFormulas) {
+        public Result(Formula ltlFormula, Set<Set<String>> alphabet, Collection<Formula> gFormulas) {
             this.ltlFormula = ltlFormula;
             this.alphabet = ImmutableSet.copyOf(alphabet);
             this.gFormulas = gFormulas;
         }
 
-        public LTLFormula getLtlFormula() {
+        public Formula getLtlFormula() {
             return ltlFormula;
         }
 
@@ -27,7 +27,7 @@ public abstract class LTLFactory<T> {
             return alphabet;
         }
 
-        public Collection<LTLFormula> getgFormulas() {
+        public Collection<Formula> getgFormulas() {
             return gFormulas;
         }
     }

@@ -1,18 +1,20 @@
-package ltl2rabin;
+package ltl2rabin.LTL;
+
+import ltl2rabin.ILTLFormulaVisitor;
 
 import java.util.Objects;
 
 /**
  * This class represents the F (finally) operator in LTL.
  */
-public class LTLFOperator extends LTLFormula {
-    private final LTLFormula operand;
+public class F extends Formula {
+    private final Formula operand;
 
-    public LTLFOperator(LTLFormula operand) {
+    public F(Formula operand) {
         this.operand = operand;
     }
 
-    public LTLFormula getOperand() {
+    public Formula getOperand() {
         return operand;
     }
 
@@ -22,14 +24,14 @@ public class LTLFOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula accept(ILTLFormulaVisitor<LTLFormula> visitor) {
+    public Formula accept(ILTLFormulaVisitor<Formula> visitor) {
         return visitor.visit(this);
     }
 
     @Override
     public boolean equals(Object obj) {
         return (obj.getClass() == this.getClass())
-                && this.operand.equals(((LTLFOperator)obj).operand);
+                && this.operand.equals(((F)obj).operand);
     }
 
     @Override

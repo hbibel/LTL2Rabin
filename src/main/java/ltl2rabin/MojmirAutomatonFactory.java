@@ -1,12 +1,14 @@
 package ltl2rabin;
 
 import com.google.common.collect.ImmutableSet;
+import ltl2rabin.LTL.*;
+import ltl2rabin.LTL.Boolean;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, LTLPropEquivalenceClass, Set<String>> {
-    private static HashMap<Pair<LTLFormula, Set<LTLFormula>>, MojmirAutomaton<LTLPropEquivalenceClass, Set<String>>> mojmirAutomata = new HashMap<>();
+    private static HashMap<Pair<Formula, Set<Formula>>, MojmirAutomaton<LTLPropEquivalenceClass, Set<String>>> mojmirAutomata = new HashMap<>();
 
     public MojmirAutomatonFactory(ImmutableSet<Set<String>> alphabet) {
         super(alphabet);
@@ -15,28 +17,28 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, LTLP
     @Override
     public abstract MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> createFrom(F from);
 
-    protected static void putIntoCache(Pair<LTLFormula, Set<LTLFormula>> key, MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma) {
+    protected static void putIntoCache(Pair<Formula, Set<Formula>> key, MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma) {
         mojmirAutomata.put(key, ma);
     }
 
-    protected static MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> getFromCache(Pair<LTLFormula, Set<LTLFormula>> key) {
+    protected static MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> getFromCache(Pair<Formula, Set<Formula>> key) {
         return mojmirAutomata.get(key);
     }
 
     protected Pair<Set<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>,
             ImmutableSet<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>> reach(MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> initialState,
                                                                                              Set<Set<String>> alphabet,
-                                                                                             Set<LTLFormula> curlyG) {
+                                                                                             Set<Formula> curlyG) {
         LTLPropEquivalenceClass curlyGConjunction;
         if (curlyG.isEmpty()) {
-            curlyGConjunction = new LTLPropEquivalenceClass(new LTLBoolean(true));
+            curlyGConjunction = new LTLPropEquivalenceClass(new Boolean(true));
         }
         else {
-            List<LTLFormula> curlyGConjuncts = new ArrayList<>();
+            List<Formula> curlyGConjuncts = new ArrayList<>();
             curlyG.forEach(ltlFormula -> {
-                curlyGConjuncts.add(new LTLGOperator(ltlFormula)); // TODO: Salomon: "Kann es sein, dass du in Zeile 38 ein G zuviel hast?"
+                curlyGConjuncts.add(new G(ltlFormula)); // TODO: Salomon: "Kann es sein, dass du in Zeile 38 ein G zuviel hast?"
             });
-            curlyGConjunction = new LTLPropEquivalenceClass(new LTLAnd(curlyGConjuncts));
+            curlyGConjunction = new LTLPropEquivalenceClass(new And(curlyGConjuncts));
         }
 
         Map<LTLPropEquivalenceClass, MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> states = new HashMap<>();

@@ -1,14 +1,16 @@
-package ltl2rabin;
+package ltl2rabin.LTL;
+
+import ltl2rabin.ILTLFormulaVisitor;
 
 import java.util.Objects;
 
 /**
  * Represents a boolean value in an LTL formula (true or false)
  */
-public class LTLBoolean extends LTLFormula {
+public class Boolean extends Formula {
     private final boolean value;
 
-    public LTLBoolean(boolean value) {
+    public Boolean(boolean value) {
         this.value = value;
     }
 
@@ -22,14 +24,14 @@ public class LTLBoolean extends LTLFormula {
     }
 
     @Override
-    public LTLFormula accept(ILTLFormulaVisitor<LTLFormula> visitor) {
+    public Formula accept(ILTLFormulaVisitor<Formula> visitor) {
         return visitor.visit(this);
     }
 
     @Override
     public boolean equals(Object obj) {
         return (obj.getClass() == this.getClass())
-                && this.value == ((LTLBoolean)obj).value;
+                && this.value == ((Boolean)obj).value;
     }
 
     @Override

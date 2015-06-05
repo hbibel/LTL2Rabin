@@ -1,12 +1,15 @@
 package ltl2rabin;
 
+import ltl2rabin.LTL.*;
+import ltl2rabin.LTL.Boolean;
+
 public interface ILTLFormulaVisitor<T> {
-    T visit(LTLAnd formula);
-    T visit(LTLBoolean formula);
-    T visit(LTLFOperator formula);
-    T visit(LTLGOperator formula);
-    T visit(LTLOr formula);
-    T visit(LTLUOperator formula);
-    T visit(LTLVariable formula);
-    T visit(LTLXOperator formula);
+    T visit(And formula);
+    T visit(Boolean formula);
+    T visit(F formula);
+    T visit(G formula);
+    T visit(Or formula);
+    T visit(U formula);
+    T visit(Variable formula);
+    T visit(X formula);
 }

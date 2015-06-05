@@ -1,4 +1,4 @@
-package ltl2rabin;
+package ltl2rabin.LTL;
 
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
@@ -19,16 +19,16 @@ public class LTLPropEquivalenceClass {
     private static int bddVarCount = 0;
     private static final BDDFactory bddFactory = BDDFactory.init("java", 2, 2);
 
-    private LTLFormula representative;
+    private Formula representative;
     private BDD cachedBDD;
-    private static final Map<LTLFormula, BDD> formulaBDDMap = new HashMap<>();
+    private static final Map<Formula, BDD> formulaBDDMap = new HashMap<>();
 
-    public LTLPropEquivalenceClass(LTLFormula representative) {
+    public LTLPropEquivalenceClass(Formula representative) {
         this.representative = representative;
         this.cachedBDD = getOrCreateBDD(representative);
     }
 
-    public LTLFormula getRepresentative() {
+    public Formula getRepresentative() {
         return representative;
     }
 
@@ -36,37 +36,37 @@ public class LTLPropEquivalenceClass {
         return cachedBDD.imp(other.cachedBDD).isOne();
     }
 
-    private static BDD getOrCreateBDD(final LTLFormula formula) {
+    private static BDD getOrCreateBDD(final Formula formula) {
         BDD result = formulaBDDMap.get(formula);
         if (result != null) {
             return result;
         } else {
-            if (formula instanceof LTLAnd) {
-                Iterator<LTLFormula> it = ((LTLAnd) formula).getIterator();
-                LTLFormula tempFormula = it.next();
+            if (formula instanceof And) {
+                Iterator<Formula> it = ((And) formula).getIterator();
+                Formula tempFormula = it.next();
                 result = getOrCreateBDD(tempFormula);
 
                 while (it.hasNext()) {
                     tempFormula = it.next();
                     result = result.and(getOrCreateBDD(tempFormula));
                 }
-            } else if (formula instanceof LTLOr) {
-                Iterator<LTLFormula> it = ((LTLOr) formula).getIterator();
-                LTLFormula tempFormula = it.next();
+            } else if (formula instanceof Or) {
+                Iterator<Formula> it = ((Or) formula).getIterator();
+                Formula tempFormula = it.next();
                 result = getOrCreateBDD(tempFormula);
 
                 while (it.hasNext()) {
                     tempFormula = it.next();
                     result = result.or(getOrCreateBDD(tempFormula));
                 }
-            } else if (formula instanceof LTLBoolean) {
-                result = ((LTLBoolean) formula).getValue() ? bddFactory.one() : bddFactory.zero();
-            } else if (formula instanceof LTLVariable) {
-                // The LTLListener class makes sure any LTLVariable object is unique. Still, for any possible variable,
+            } else if (formula instanceof Boolean) {
+                result = ((Boolean) formula).getValue() ? bddFactory.one() : bddFactory.zero();
+            } else if (formula instanceof Variable) {
+                // The LTLListener class makes sure any Variable object is unique. Still, for any possible variable,
                 // there might be two versions: A negated one and a non-negated one. For our BDD, we have to make sure
                 // that those two are represented by the same BDDVariable.
-                LTLVariable notFormula = new LTLVariable(((LTLVariable) formula).getValue(),
-                        !((LTLVariable) formula).isNegated());
+                Variable notFormula = new Variable(((Variable) formula).getValue(),
+                        !((Variable) formula).isNegated());
                 BDD notFormulaBDD = formulaBDDMap.get(notFormula);
                 // If a negated version of our variable already exists, negate it and return it. Otherwise just proceed
                 // in creating a new variable (down below)
@@ -86,7 +86,7 @@ public class LTLPropEquivalenceClass {
         }
     }
 
-    boolean isTautology() {
+    public boolean isTautology() {
         return cachedBDD.isOne();
     }
 

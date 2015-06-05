@@ -1,29 +1,31 @@
-package ltl2rabin;
+package ltl2rabin.LTL;
+
+import ltl2rabin.ILTLFormulaVisitor;
 
 import java.util.Objects;
 
 /**
  * This class represents the U (until) operator in an LTL formula.
  */
-public class LTLUOperator extends LTLFormula {
-    private final LTLFormula left;
-    private final LTLFormula right;
+public class U extends Formula {
+    private final Formula left;
+    private final Formula right;
 
     /**
-     * The only valid constructor for LTLUOperator
-     * @param left The LTLFormula left of the U operator
-     * @param right The LTLFormula right of the U operator
+     * The only valid constructor for U
+     * @param left The Formula left of the U operator
+     * @param right The Formula right of the U operator
      */
-    public LTLUOperator(final LTLFormula left, final LTLFormula right) {
+    public U(final Formula left, final Formula right) {
         this.left = left;
         this.right = right;
     }
 
-    public LTLFormula getLeft() {
+    public Formula getLeft() {
         return left;
     }
 
-    public LTLFormula getRight() {
+    public Formula getRight() {
         return right;
     }
 
@@ -33,15 +35,15 @@ public class LTLUOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula accept(ILTLFormulaVisitor<LTLFormula> visitor) {
+    public Formula accept(ILTLFormulaVisitor<Formula> visitor) {
         return visitor.visit(this);
     }
 
     @Override
     public boolean equals(Object obj) {
         return (obj.getClass() == this.getClass())
-                && this.left.equals(((LTLUOperator)obj).left)
-                && this.right.equals(((LTLUOperator)obj).right) ;
+                && this.left.equals(((U)obj).left)
+                && this.right.equals(((U)obj).right) ;
     }
 
     @Override

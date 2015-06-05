@@ -5,6 +5,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import ltl2rabin.LTL.*;
+import ltl2rabin.LTL.Boolean;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -25,40 +27,40 @@ public class GDRAFactory {
         slaveFromMojmirFactory = new SlaveFromMojmirFactory(alphabet);
 
 
-        ImmutableSet<LTLFormula> gSet = (new ImmutableSet.Builder<LTLFormula>())
+        ImmutableSet<Formula> gSet = (new ImmutableSet.Builder<Formula>())
                 .addAll(parserResult.getgFormulas()).build();
-        ImmutableSet<Set<LTLFormula>> curlyGSets = (new ImmutableSet.Builder<Set<LTLFormula>>())
+        ImmutableSet<Set<Formula>> curlyGSets = (new ImmutableSet.Builder<Set<Formula>>())
                 .addAll(Sets.powerSet(gSet)).build();
-        LTLFormula phi = parserResult.getLtlFormula();
+        Formula phi = parserResult.getLtlFormula();
 
         Set<RabinAutomaton.Transition> univ = new HashSet<>(); // TODO: UNIV = all transitions?
         ImmutableSet.Builder<RabinAutomaton.State<Pair<LTLPropEquivalenceClass, List<Slave.State>>, Set<String>>> statesBuilder = new ImmutableSet.Builder<>();
 
         // All possible combinations of curlyG and pi:
-        ImmutableList.Builder<Pair<ImmutableSet<LTLFormula>, Map<LTLFormula, Integer>>> curlyGPiBuilder = new ImmutableList.Builder<>();
-        for (Set<LTLFormula> curlyG : curlyGSets) {
-            ImmutableList.Builder<Set<Pair<LTLFormula, Integer>>> psiAndPiPairs = new ImmutableList.Builder<>();
+        ImmutableList.Builder<Pair<ImmutableSet<Formula>, Map<Formula, Integer>>> curlyGPiBuilder = new ImmutableList.Builder<>();
+        for (Set<Formula> curlyG : curlyGSets) {
+            ImmutableList.Builder<Set<Pair<Formula, Integer>>> psiAndPiPairs = new ImmutableList.Builder<>();
             curlyG.forEach(psi -> {
-                ImmutableSet.Builder<Pair<LTLFormula, Integer>> pairBuilder = new ImmutableSet.Builder<>();
+                ImmutableSet.Builder<Pair<Formula, Integer>> pairBuilder = new ImmutableSet.Builder<>();
                 for (int i = 0; i < mojmirAutomatonFactoryFromLTL.createFrom(psi).getMaxRank(); i++) {
                     pairBuilder.add(new Pair<>(psi, i));
                 }
                 psiAndPiPairs.add(pairBuilder.build());
             });
-            Set<List<Pair<LTLFormula, Integer>>> possiblePairsForCurlyG = Sets.cartesianProduct(psiAndPiPairs.build());
+            Set<List<Pair<Formula, Integer>>> possiblePairsForCurlyG = Sets.cartesianProduct(psiAndPiPairs.build());
             possiblePairsForCurlyG.forEach(listOfPairs -> {
-                ImmutableMap.Builder<LTLFormula, Integer> mapBuilder = new ImmutableMap.Builder<>();
+                ImmutableMap.Builder<Formula, Integer> mapBuilder = new ImmutableMap.Builder<>();
                 listOfPairs.forEach(pair -> {
                     mapBuilder.put(pair.getFirst(), pair.getSecond());
                 });
                 curlyGPiBuilder.add(new Pair<>(ImmutableSet.copyOf(curlyG), mapBuilder.build()));
             });
         }
-        ImmutableList<Pair<ImmutableSet<LTLFormula>, Map<LTLFormula, Integer>>> curlyGPis = curlyGPiBuilder.build();
-        Map<Pair<Set<LTLFormula>, Map<LTLFormula, Integer>>, Set> piCurlyGToAccMap = new HashMap<>();
+        ImmutableList<Pair<ImmutableSet<Formula>, Map<Formula, Integer>>> curlyGPis = curlyGPiBuilder.build();
+        Map<Pair<Set<Formula>, Map<Formula, Integer>>, Set> piCurlyGToAccMap = new HashMap<>();
         curlyGPis.forEach(curlyGPi -> { // TODO: Integrate this loop into some other
-            Set<LTLFormula> curlyG = curlyGPi.getFirst();
-            Map<LTLFormula, Integer> pi = curlyGPi.getSecond();
+            Set<Formula> curlyG = curlyGPi.getFirst();
+            Map<Formula, Integer> pi = curlyGPi.getSecond();
             piCurlyGToAccMap.put(new Pair<>(curlyG, pi), new HashSet<>());
         });
 
@@ -84,9 +86,9 @@ public class GDRAFactory {
                 LTLAfGVisitor afVisitor = new LTLAfGVisitor(letter) {
                     // We want to use af here, not afG
                     @Override
-                    public LTLFormula visit(LTLGOperator formula) {
-                        LTLFormula afOperand = afG(formula.getOperand());
-                        return new LTLAnd(formula, afOperand);
+                    public Formula visit(G formula) {
+                        Formula afOperand = afG(formula.getOperand());
+                        return new And(formula, afOperand);
                     }
                 };
                 LTLPropEquivalenceClass newLabelLTL = new LTLPropEquivalenceClass(afVisitor.afG(temp.getLabel().getFirst().getRepresentative()));
@@ -104,13 +106,13 @@ public class GDRAFactory {
 
                 // this loop checks wether the transition is accepting or not
                 curlyGPis.forEach(curlyGPi -> {
-                    ImmutableSet<LTLFormula> curlyG = curlyGPi.getFirst();
-                    Map<LTLFormula, Integer> pi = curlyGPi.getSecond();
+                    ImmutableSet<Formula> curlyG = curlyGPi.getFirst();
+                    Map<Formula, Integer> pi = curlyGPi.getSecond();
 
                     // M_pi^curlyG
-                    List<LTLFormula> conjuncts = new ArrayList<>();
+                    List<Formula> conjuncts = new ArrayList<>();
                     curlyG.forEach(psi -> {
-                        conjuncts.add(new LTLGOperator(psi));
+                        conjuncts.add(new G(psi));
                         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma = mojmirAutomatonFactoryFromLTLAndSet.createFrom(new Pair<>(psi, curlyG));
                         Slave ra = slaveFromMojmirFactory.createFrom(ma);
                         ra.getStates().forEach(raState -> {
@@ -124,9 +126,9 @@ public class GDRAFactory {
                             }
                         });
                     });
-                    if (!new LTLPropEquivalenceClass(conjuncts.isEmpty() ? new LTLBoolean(true) : new LTLAnd(conjuncts)).implies(newLabelLTL)) {
+                    if (!new LTLPropEquivalenceClass(conjuncts.isEmpty() ? new Boolean(true) : new And(conjuncts)).implies(newLabelLTL)) {
                         // the state "temp" is not in F and thus its outgoing transition is in M(pi, curlyG)
-                        Pair<Set<LTLFormula>, Map<LTLFormula, Integer>> key = new Pair<>(curlyG, pi);
+                        Pair<Set<Formula>, Map<Formula, Integer>> key = new Pair<>(curlyG, pi);
                         Set accPiCurlyG = piCurlyGToAccMap.get(key);
                         accPiCurlyG.add(new Pair<>(ImmutableSet.of(new Automaton.Transition<>(temp, letter, newState)), univ));
                     }
@@ -154,7 +156,7 @@ public class GDRAFactory {
                             }
                         }
                         if ((!accPiPsi.getFirst().isEmpty()) && (!accPiPsi.getSecond().isEmpty())) {
-                            Pair<Set<LTLFormula>, Map<LTLFormula, Integer>> key = new Pair<>(curlyG, pi);
+                            Pair<Set<Formula>, Map<Formula, Integer>> key = new Pair<>(curlyG, pi);
                             Set accPiCurlyG = piCurlyGToAccMap.get(key);
                             accPiCurlyG.add(accPiPsi);
                         }

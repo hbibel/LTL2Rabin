@@ -2,17 +2,19 @@ package ltl2rabin;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import ltl2rabin.LTL.*;
+import ltl2rabin.LTL.Boolean;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.*;
 import java.util.function.Supplier;
 
 public class LTLRandomFactory extends LTLFactory<Integer> {
-    private List<Supplier<LTLFormula>> terminatingGeneratingFunctions = Arrays.asList(
+    private List<Supplier<Formula>> terminatingGeneratingFunctions = Arrays.asList(
             this::createRandomBoolean,
             this::chooseRandomVariable
     );
-    private List<Supplier<LTLFormula>> nonTerminatingGeneratingFunctions = Arrays.asList(
+    private List<Supplier<Formula>> nonTerminatingGeneratingFunctions = Arrays.asList(
             this::createRandomConjunction,
             this::createRandomF,
             this::createRandomG,
@@ -20,7 +22,7 @@ public class LTLRandomFactory extends LTLFactory<Integer> {
             this::createRandomU,
             this::createRandomX
     );
-    private List<Supplier<LTLFormula>> gFreeNonTerminatingGeneratingFunctions = Arrays.asList(
+    private List<Supplier<Formula>> gFreeNonTerminatingGeneratingFunctions = Arrays.asList(
             this::createRandomConjunction,
             this::createRandomF,
             this::createRandomDisjunction,
@@ -28,7 +30,7 @@ public class LTLRandomFactory extends LTLFactory<Integer> {
             this::createRandomX
     );
     private static final Random random = new Random();
-    private List<LTLVariable> variableSet = new ArrayList<>();
+    private List<Variable> variableSet = new ArrayList<>();
     private int maximumOperatorCount = 0;
     private int operatorCount = 0;
     // These strings represent Operators and should not be used as variable names:
@@ -41,7 +43,7 @@ public class LTLRandomFactory extends LTLFactory<Integer> {
      * @param complexity    Determines the desired complexity of the returned LTL formula. The value should be between
      *                      0 (terminal symbols) and 10 (very complex formulae with hundreds of distinct variables and
      *                      over 1000 (possibly over 2000) operators)
-     * @return              An arbitrary random LTLFormula object.
+     * @return              An arbitrary random Formula object.
      */
     @Override
     public Result buildLTL(Integer complexity) {
@@ -56,19 +58,19 @@ public class LTLRandomFactory extends LTLFactory<Integer> {
                 // Also, it's not a tragedy if two variables have the same name.
                 newVariableName = RandomStringUtils.randomAlphabetic(numVariables > 30 ? 2 : 1);
             }
-            variableSet.add(new LTLVariable(newVariableName));
+            variableSet.add(new Variable(newVariableName));
         }
         maximumOperatorCount = (int) Math.pow(2.0, 1.0*complexity);
-        LTLFormula result = createRandomFormula();
+        Formula result = createRandomFormula();
         operatorCount=0;
 
         Set<Set<String>> alphabet = Sets.powerSet(ImmutableSet.of("There is no alphabet."));
         return new Result(result, alphabet, null);
     }
 
-    // If the generated LTLFormula should not contain any G-subformulae set the gFree parameter to true
+    // If the generated Formula should not contain any G-subformulae set the gFree parameter to true
     public Result buildLTL(Integer complexity, boolean gFree) {
-        List<Supplier<LTLFormula>> savedList = nonTerminatingGeneratingFunctions;
+        List<Supplier<Formula>> savedList = nonTerminatingGeneratingFunctions;
         if (gFree) {
             nonTerminatingGeneratingFunctions = gFreeNonTerminatingGeneratingFunctions;
         }
@@ -79,7 +81,7 @@ public class LTLRandomFactory extends LTLFactory<Integer> {
         return result;
     }
 
-    private LTLFormula createRandomFormula() {
+    private Formula createRandomFormula() {
         // To get a positive random int, you have to specify any bound, otherwise negative results are possible
         int rnd = random.nextInt(1000);
         if (++operatorCount >= maximumOperatorCount) {
@@ -88,45 +90,45 @@ public class LTLRandomFactory extends LTLFactory<Integer> {
         return nonTerminatingGeneratingFunctions.get(rnd % nonTerminatingGeneratingFunctions.size()).get();
     }
 
-    private LTLAnd createRandomConjunction() {
+    private And createRandomConjunction() {
         int numberOfConjuncts = 2 + random.nextInt(4); // The number 4 is chosen arbitrarily.
-        List<LTLFormula> conjuncts = new ArrayList<>();
+        List<Formula> conjuncts = new ArrayList<>();
         for (int i = 0; i < numberOfConjuncts; i++) {
             conjuncts.add(createRandomFormula());
         }
-        return new LTLAnd(conjuncts);
+        return new And(conjuncts);
     }
 
-    private LTLBoolean createRandomBoolean() {
-        return new LTLBoolean(random.nextInt() % 2 == 0);
+    private Boolean createRandomBoolean() {
+        return new Boolean(random.nextInt() % 2 == 0);
     }
 
-    private LTLFOperator createRandomF() {
-        return new LTLFOperator(createRandomFormula());
+    private F createRandomF() {
+        return new F(createRandomFormula());
     }
 
-    private LTLGOperator createRandomG() {
-        return new LTLGOperator(createRandomFormula());
+    private G createRandomG() {
+        return new G(createRandomFormula());
     }
 
-    private LTLOr createRandomDisjunction() {
+    private Or createRandomDisjunction() {
         int numberOfDisjuncts = 2 + random.nextInt(4); // The number 4 is chosen arbitrarily.
-        List<LTLFormula> disjuncts = new ArrayList<>();
+        List<Formula> disjuncts = new ArrayList<>();
         for (int i = 0; i < numberOfDisjuncts; i++) {
             disjuncts.add(createRandomFormula());
         }
-        return new LTLOr(disjuncts);
+        return new Or(disjuncts);
     }
 
-    private LTLUOperator createRandomU() {
-        return new LTLUOperator(createRandomFormula(), createRandomFormula());
+    private U createRandomU() {
+        return new U(createRandomFormula(), createRandomFormula());
     }
 
-    private LTLVariable chooseRandomVariable() {
+    private Variable chooseRandomVariable() {
         return variableSet.get(random.nextInt(variableSet.size()));
     }
 
-    private LTLXOperator createRandomX() {
-        return new LTLXOperator(createRandomFormula());
+    private X createRandomX() {
+        return new X(createRandomFormula());
     }
 }

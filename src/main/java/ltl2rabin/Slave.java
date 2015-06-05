@@ -3,6 +3,7 @@ package ltl2rabin;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import ltl2rabin.LTL.LTLPropEquivalenceClass;
 
 import java.util.List;
 import java.util.Set;

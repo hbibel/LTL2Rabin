@@ -1,23 +1,25 @@
-package ltl2rabin;
+package ltl2rabin.LTL;
+
+import ltl2rabin.ILTLFormulaVisitor;
 
 import java.util.Objects;
 
 /**
  * Represents a variable (string) with an optional negation ('!') in an LTL Formula.
  */
-public class LTLVariable extends LTLFormula {
+public class Variable extends Formula {
     private final String value;
     private final boolean negated;
 
     /**
-     * Default constructor for LTLVariable
+     * Default constructor for Variable
      *
      * @param value The char literal
      * @param negated Indicates whether or not the char is preceded by a negation ('!'). Example usages:
-     *                a --> <code>LTLVariable('a', false)</code>
-     *                !a --> <code>LTLVariable('a', true)</code>
+     *                a --> <code>Variable('a', false)</code>
+     *                !a --> <code>Variable('a', true)</code>
      */
-    public LTLVariable(String value, boolean negated) {
+    public Variable(String value, boolean negated) {
         this.value = value;
         this.negated = negated;
     }
@@ -26,7 +28,7 @@ public class LTLVariable extends LTLFormula {
      * This constructor initializes <code>negated</code> to <code>false</code>
      * @param value The char literal
      */
-    public LTLVariable(String value) {
+    public Variable(String value) {
         this.value = value;
         negated = false;
     }
@@ -46,15 +48,15 @@ public class LTLVariable extends LTLFormula {
     }
 
     @Override
-    public LTLFormula accept(ILTLFormulaVisitor<LTLFormula> visitor) {
+    public Formula accept(ILTLFormulaVisitor<Formula> visitor) {
         return visitor.visit(this);
     }
 
     @Override
     public boolean equals(Object obj) {
         return (obj.getClass() == this.getClass())
-                && this.value.equals(((LTLVariable)obj).value)
-                && this.negated == ((LTLVariable)obj).negated;
+                && this.value.equals(((Variable)obj).value)
+                && this.negated == ((Variable)obj).negated;
     }
 
     @Override

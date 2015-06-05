@@ -1,18 +1,20 @@
-package ltl2rabin;
+package ltl2rabin.LTL;
+
+import ltl2rabin.ILTLFormulaVisitor;
 
 import java.util.Objects;
 
 /**
  * This class represents the X (next) operator in LTL.
  */
-public class LTLXOperator extends LTLFormula {
-    private final LTLFormula operand;
+public class X extends Formula {
+    private final Formula operand;
 
-    public LTLXOperator(LTLFormula operand) {
+    public X(Formula operand) {
         this.operand = operand;
     }
 
-    public LTLFormula getOperand() {
+    public Formula getOperand() {
         return operand;
     }
 
@@ -22,14 +24,14 @@ public class LTLXOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula accept(ILTLFormulaVisitor<LTLFormula> visitor) {
+    public Formula accept(ILTLFormulaVisitor<Formula> visitor) {
         return visitor.visit(this);
     }
 
     @Override
     public boolean equals(Object obj) {
         return (obj.getClass() == this.getClass())
-                && this.operand.equals(((LTLXOperator)obj).operand);
+                && this.operand.equals(((X)obj).operand);
     }
 
     @Override

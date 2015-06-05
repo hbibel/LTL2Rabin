@@ -1,4 +1,4 @@
-package ltl2rabin;
+package ltl2rabin.LTL;
 
 public class LTLFactoryFromString extends LTLFactoryWithAntlr<String> {
     @Override

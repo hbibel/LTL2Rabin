@@ -1,5 +1,6 @@
 package ltl2rabin;
 
+import ltl2rabin.LTL.*;
 import ltl2rabin.parser.LTLLexer;
 import ltl2rabin.parser.LTLParser;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -30,55 +31,55 @@ public class LTLListenerTest {
 
     @Test
     public void getLtlTree() throws Exception {
-        LTLVariable expectedTestResult1 = new LTLVariable("a");
-        LTLFormula testCase1 = testEnterFormulaHelp("a").getLtlTree();
+        Variable expectedTestResult1 = new Variable("a");
+        Formula testCase1 = testEnterFormulaHelp("a").getLtlTree();
         assertEquals(expectedTestResult1.toString(), testCase1.toString());
         // TODO: Test getTerminalSymbols
 
-        LTLVariable ol = new LTLVariable("a");
-        LTLVariable or = new LTLVariable("b");
-        ArrayList<LTLFormula> op2 = new ArrayList<>();
+        Variable ol = new Variable("a");
+        Variable or = new Variable("b");
+        ArrayList<Formula> op2 = new ArrayList<>();
         op2.add(ol);
         op2.add(or);
-        LTLOr expectedTestResult2 = new LTLOr(op2);
-        LTLFormula testCase2 = testEnterFormulaHelp("a | b").getLtlTree();
+        Or expectedTestResult2 = new Or(op2);
+        Formula testCase2 = testEnterFormulaHelp("a | b").getLtlTree();
         assertEquals(expectedTestResult2.toString(), testCase2.toString());
 
-        LTLVariable ol3 = new LTLVariable("a");
-        LTLVariable or3 = new LTLVariable("b");
-        ArrayList<LTLFormula> op3 = new ArrayList<>();
+        Variable ol3 = new Variable("a");
+        Variable or3 = new Variable("b");
+        ArrayList<Formula> op3 = new ArrayList<>();
         op3.add(ol3);
         op3.add(or3);
-        LTLOr expectedTestResult3 = new LTLOr(op3);
-        LTLFormula testCase3 = testEnterFormulaHelp("(a | b)").getLtlTree();
+        Or expectedTestResult3 = new Or(op3);
+        Formula testCase3 = testEnterFormulaHelp("(a | b)").getLtlTree();
         assertEquals(expectedTestResult3.toString(), testCase3.toString());
 
-        ArrayList<LTLFormula> op4 = new ArrayList<>();
-        op4.add(new LTLVariable("a"));
-        op4.add(new LTLVariable("b"));
-        op4.add(new LTLVariable("c"));
-        LTLOr expectedTestResult4 = new LTLOr(op4);
-        LTLFormula testCase4 = testEnterFormulaHelp("a | b | c").getLtlTree();
+        ArrayList<Formula> op4 = new ArrayList<>();
+        op4.add(new Variable("a"));
+        op4.add(new Variable("b"));
+        op4.add(new Variable("c"));
+        Or expectedTestResult4 = new Or(op4);
+        Formula testCase4 = testEnterFormulaHelp("a | b | c").getLtlTree();
         assertEquals(expectedTestResult4.toString(), testCase4.toString());
 
-        LTLUOperator aub5 = new LTLUOperator(new LTLVariable("a"), new LTLVariable("b"));
-        LTLOr expectedTestResult5 = new LTLOr(aub5, new LTLVariable("c"));
-        LTLFormula testCase5 = testEnterFormulaHelp("(a U b | c)").getLtlTree();
+        U aub5 = new U(new Variable("a"), new Variable("b"));
+        Or expectedTestResult5 = new Or(aub5, new Variable("c"));
+        Formula testCase5 = testEnterFormulaHelp("(a U b | c)").getLtlTree();
         assertEquals(expectedTestResult5.toString(), testCase5.toString());
 
-        LTLVariable c = new LTLVariable("c");
-        LTLXOperator xc = new LTLXOperator(c);
-        LTLVariable b = new LTLVariable("b");
-        LTLUOperator buxc = new LTLUOperator(b, xc);
-        LTLVariable na = new LTLVariable("a", true);
-        LTLUOperator naubuxc = new LTLUOperator(na, buxc);
-        LTLUOperator buc = new LTLUOperator(b, c);
-        LTLVariable a = new LTLVariable("a");
-        LTLOr aobuc = new LTLOr(a, buc);
-        LTLAnd aobucanaubuxc = new LTLAnd(aobuc, naubuxc);
-        LTLGOperator gaobucanaubuxc = new LTLGOperator(aobucanaubuxc);
-        LTLFOperator expectedTestResult999 = new LTLFOperator(gaobucanaubuxc);
-        LTLFormula testCase999 = testEnterFormulaHelp("F G (a | b U c) & !a U (b U (X c))").getLtlTree();
+        Variable c = new Variable("c");
+        X xc = new X(c);
+        Variable b = new Variable("b");
+        U buxc = new U(b, xc);
+        Variable na = new Variable("a", true);
+        U naubuxc = new U(na, buxc);
+        U buc = new U(b, c);
+        Variable a = new Variable("a");
+        Or aobuc = new Or(a, buc);
+        And aobucanaubuxc = new And(aobuc, naubuxc);
+        G gaobucanaubuxc = new G(aobucanaubuxc);
+        F expectedTestResult999 = new F(gaobucanaubuxc);
+        Formula testCase999 = testEnterFormulaHelp("F G (a | b U c) & !a U (b U (X c))").getLtlTree();
         assertEquals(expectedTestResult999.toString(), testCase999.toString());
     }
 }

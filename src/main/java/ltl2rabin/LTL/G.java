@@ -1,22 +1,24 @@
-package ltl2rabin;
+package ltl2rabin.LTL;
+
+import ltl2rabin.ILTLFormulaVisitor;
 
 import java.util.Objects;
 
 /**
  * This class represents the G (globally) operator in LTL.
  */
-public class LTLGOperator extends LTLFormula {
-    private final LTLFormula operand;
+public class G extends Formula {
+    private final Formula operand;
 
     /**
-     * The only valid constructor for LTLGOperator.
-     * @param operand The LTLFormula following the operator
+     * The only valid constructor for G.
+     * @param operand The Formula following the operator
      */
-    public LTLGOperator(LTLFormula operand) {
+    public G(Formula operand) {
         this.operand = operand;
     }
 
-    public LTLFormula getOperand() {
+    public Formula getOperand() {
         return operand;
     }
 
@@ -26,14 +28,14 @@ public class LTLGOperator extends LTLFormula {
     }
 
     @Override
-    public LTLFormula accept(ILTLFormulaVisitor<LTLFormula> visitor) {
+    public Formula accept(ILTLFormulaVisitor<Formula> visitor) {
         return visitor.visit(this);
     }
 
     @Override
     public boolean equals(Object obj) {
         return (obj.getClass() == this.getClass())
-                && this.operand.equals(((LTLGOperator)obj).operand);
+                && this.operand.equals(((G)obj).operand);
     }
 
     @Override

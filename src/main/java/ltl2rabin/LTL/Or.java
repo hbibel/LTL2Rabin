@@ -1,5 +1,6 @@
-package ltl2rabin;
+package ltl2rabin.LTL;
 
+import ltl2rabin.ILTLFormulaVisitor;
 import net.sf.javabdd.BDD;
 
 import java.util.ArrayList;
@@ -10,43 +11,43 @@ import java.util.Objects;
 /**
  * This class represents a logical disjunction (|) in an LTL formula.
  */
-public class LTLOr extends LTLFormula {
-    private final List<LTLFormula> disjuncts;
+public class Or extends Formula {
+    private final List<Formula> disjuncts;
     private BDD cachedBDD = null;
 
     /**
      *
      * @param disjuncts The LTL formulae that are connected by the disjunction
      */
-    public LTLOr(List<LTLFormula> disjuncts) {
+    public Or(List<Formula> disjuncts) {
         this.disjuncts = disjuncts;
     }
 
-    public LTLOr(final LTLFormula l, final LTLFormula r) {
+    public Or(final Formula l, final Formula r) {
         // In case you wonder why I created the mergeTwoArguments method: A constructor call (this(...)) must be the
         // first statement in a constructor.
         this(mergeTwoArguments(l, r));
     }
 
-    private static List<LTLFormula> mergeTwoArguments(final LTLFormula l, final LTLFormula r) {
-        List<LTLFormula> params = new ArrayList<>();
+    private static List<Formula> mergeTwoArguments(final Formula l, final Formula r) {
+        List<Formula> params = new ArrayList<>();
         params.add(l);
         params.add(r);
         return params;
     }
 
-    public Iterator<LTLFormula> getIterator() {
+    public Iterator<Formula> getIterator() {
         return disjuncts.iterator();
     }
 
-    public List<LTLFormula> getDisjuncts() {
+    public List<Formula> getDisjuncts() {
         return disjuncts;
     }
 
     @Override
     public String toString() {
         String result = "(";
-        for (LTLFormula f : disjuncts) {
+        for (Formula f : disjuncts) {
             result = result + "(" + f.toString() + ") | ";
         }
         // cut the last | and close the parentheses
@@ -54,7 +55,7 @@ public class LTLOr extends LTLFormula {
     }
 
     @Override
-    public LTLFormula accept(ILTLFormulaVisitor<LTLFormula> visitor) {
+    public Formula accept(ILTLFormulaVisitor<Formula> visitor) {
         return visitor.visit(this);
     }
 
@@ -69,7 +70,7 @@ public class LTLOr extends LTLFormula {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        LTLOr ltlOr = (LTLOr) o;
+        Or ltlOr = (Or) o;
 
         return disjuncts != null ? disjuncts.equals(ltlOr.disjuncts) : ltlOr.disjuncts == null;
     }

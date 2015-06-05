@@ -2,6 +2,8 @@ package ltl2rabin;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import ltl2rabin.LTL.*;
+import ltl2rabin.LTL.Boolean;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,22 +13,22 @@ import java.util.*;
 import static org.junit.Assert.*;
 
 public class SlaveTest {
-    LTLVariable aVariable;
-    LTLVariable bVariable;
-    LTLVariable cVariable;
-    LTLFormula tt;
-    LTLFormula ff;
+    Variable aVariable;
+    Variable bVariable;
+    Variable cVariable;
+    Formula tt;
+    Formula ff;
     LTLFactoryFromString ltlFactoryFromString;
     MAMockFactory maMockFactory;
 
-    private String mojmirStateStringFromLTL(LTLFormula f) {
+    private String mojmirStateStringFromLTL(Formula f) {
         return "state(" + f.toString() + ")";
     }
-    private String rabinStateStringFromList(List<LTLFormula> l) {
+    private String rabinStateStringFromList(List<Formula> l) {
         String result = "State{mojmirStates=[";
-        Iterator<LTLFormula> it = l.iterator();
+        Iterator<Formula> it = l.iterator();
         while (it.hasNext()) {
-            LTLFormula next = it.next();
+            Formula next = it.next();
             result += mojmirStateStringFromLTL(next);
             if (it.hasNext()) result += ", ";
         }
@@ -36,11 +38,11 @@ public class SlaveTest {
 
     @Before
     public void setUp() throws Exception {
-        aVariable = new LTLVariable("a");
-        bVariable = new LTLVariable("b");
-        cVariable = new LTLVariable("c");
-        tt = new LTLBoolean(true);
-        ff = new LTLBoolean(false);
+        aVariable = new Variable("a");
+        bVariable = new Variable("b");
+        cVariable = new Variable("c");
+        tt = new Boolean(true);
+        ff = new Boolean(false);
         maMockFactory = new MAMockFactory();
         ltlFactoryFromString = new LTLFactoryFromString();
     }
@@ -55,7 +57,7 @@ public class SlaveTest {
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(1));
         SlaveFromMojmirFactory rabinAutomatonFactory = new SlaveFromMojmirFactory(alphabet);
 
-        LTLFormula initlabel = new LTLOr(ImmutableList.of(aVariable, bVariable, cVariable));
+        Formula initlabel = new Or(ImmutableList.of(aVariable, bVariable, cVariable));
         MAMockFactory.MAMock m = maMockFactory.createMAMock(alphabet, initlabel);
         m.addState(tt, true);
         m.addState(ff, true);
@@ -101,8 +103,8 @@ public class SlaveTest {
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3));
         SlaveFromMojmirFactory rabinAutomatonFactory = new SlaveFromMojmirFactory(alphabet);
 
-        LTLUOperator bUc = new LTLUOperator(bVariable, cVariable);
-        LTLFormula initialLabel = new LTLAnd(aVariable, new LTLXOperator(bUc));
+        U bUc = new U(bVariable, cVariable);
+        Formula initialLabel = new And(aVariable, new X(bUc));
         MAMockFactory.MAMock m = maMockFactory.createMAMock(alphabet, initialLabel);
         m.addState(bUc, false);
         m.addState(ff, true);

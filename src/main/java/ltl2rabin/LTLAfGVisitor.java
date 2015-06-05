@@ -1,61 +1,64 @@
 package ltl2rabin;
 
+import ltl2rabin.LTL.*;
+import ltl2rabin.LTL.Boolean;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class LTLAfGVisitor implements ILTLFormulaVisitor<LTLFormula> {
+public class LTLAfGVisitor implements ILTLFormulaVisitor<Formula> {
     private final Set<String> letter;
 
     public LTLAfGVisitor(Set<String> letter) {
         this.letter = letter;
     }
 
-    public LTLFormula visit(LTLAnd formula) {
-        ArrayList<LTLFormula> newConjuncts = new ArrayList<>();
-        Iterator<LTLFormula> iterator = formula.getIterator();
+    public Formula visit(And formula) {
+        ArrayList<Formula> newConjuncts = new ArrayList<>();
+        Iterator<Formula> iterator = formula.getIterator();
         while (iterator.hasNext()) {
-            LTLFormula temp = iterator.next();
+            Formula temp = iterator.next();
             newConjuncts.add(afG(temp));
         }
-        return new LTLAnd(newConjuncts);
+        return new And(newConjuncts);
     }
 
-    public LTLFormula visit(LTLBoolean formula) {
-        return new LTLBoolean(formula.getValue());
+    public Formula visit(Boolean formula) {
+        return new Boolean(formula.getValue());
     }
 
-    public LTLFormula visit(LTLFOperator formula) {
-        ArrayList<LTLFormula> orParameter = new ArrayList<>();
+    public Formula visit(F formula) {
+        ArrayList<Formula> orParameter = new ArrayList<>();
         orParameter.add(formula);
         orParameter.add(afG(formula.getOperand()));
-        return new LTLOr(orParameter);
+        return new Or(orParameter);
     }
 
-    public LTLFormula visit(LTLGOperator formula) {
+    public Formula visit(G formula) {
         return formula;
     }
 
-    public LTLFormula visit(LTLOr formula) {
-        return new LTLOr(formula.getDisjuncts().stream().map(this::afG).collect(Collectors.toList()));
+    public Formula visit(Or formula) {
+        return new Or(formula.getDisjuncts().stream().map(this::afG).collect(Collectors.toList()));
     }
 
-    public LTLFormula visit(LTLUOperator formula) {
-        LTLFormula afGLeftSide = afG(formula.getLeft());
-        LTLFormula afGRightSide = afG(formula.getRight());
-        return new LTLOr(afGRightSide, new LTLAnd(afGLeftSide, formula));
+    public Formula visit(U formula) {
+        Formula afGLeftSide = afG(formula.getLeft());
+        Formula afGRightSide = afG(formula.getRight());
+        return new Or(afGRightSide, new And(afGLeftSide, formula));
     }
 
-    public LTLFormula visit(LTLVariable formula) {
-        return new LTLBoolean(formula.isNegated() != (letter.contains(formula.getValue())));
+    public Formula visit(Variable formula) {
+        return new Boolean(formula.isNegated() != (letter.contains(formula.getValue())));
     }
 
-    public LTLFormula visit(LTLXOperator formula) {
+    public Formula visit(X formula) {
         return formula.getOperand();
     }
 
-    public LTLFormula afG(IVisitableFormula<LTLFormula> formula) {
+    public Formula afG(IVisitableFormula<Formula> formula) {
         return formula.accept(this);
     }
 }

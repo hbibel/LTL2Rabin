@@ -2,6 +2,8 @@ package ltl2rabin;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import ltl2rabin.LTL.*;
+import ltl2rabin.LTL.Boolean;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,21 +17,21 @@ public class MojmirAutomatonTest {
     MojmirAutomatonFactoryFromString automatonFactory;
     MojmirAutomatonFactoryFromLTLAndSet automatonFactoryWithSet;
 
-    LTLFormula aVariable;
-    LTLFormula bVariable;
-    LTLFormula cVariable;
-    LTLFormula tt;
-    LTLFormula ff;
+    Formula aVariable;
+    Formula bVariable;
+    Formula cVariable;
+    Formula tt;
+    Formula ff;
 
     @Before
     public void setUp() {
         automatonFactory = new MojmirAutomatonFactoryFromString(ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3)));
         automatonFactoryWithSet = new MojmirAutomatonFactoryFromLTLAndSet(ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3)));
-        aVariable = new LTLVariable("a");
-        bVariable = new LTLVariable("b");
-        cVariable = new LTLVariable("c");
-        tt = new LTLBoolean(true);
-        ff = new LTLBoolean(false);
+        aVariable = new Variable("a");
+        bVariable = new Variable("b");
+        cVariable = new Variable("c");
+        tt = new Boolean(true);
+        ff = new Boolean(false);
     }
 
     @Test
@@ -57,14 +59,14 @@ public class MojmirAutomatonTest {
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> m = automatonFactory.createFrom("F ( ( a | b ) & ( a U ( b & ( X ( c ) ) ) ) & ( !c ) )");
 
         assertEquals(5, m.getStates().size());
-        LTLFormula aOrB = new LTLOr(aVariable, bVariable);
-        LTLFormula bAndXc = new LTLAnd(bVariable, new LTLXOperator(cVariable));
-        LTLFormula phi1 = new LTLUOperator(aVariable, bAndXc);
-        LTLFormula notC = new LTLVariable("c", true);
-        LTLFormula phi = new LTLFOperator(new LTLAnd(ImmutableList.of(aOrB, phi1, notC)));
+        Formula aOrB = new Or(aVariable, bVariable);
+        Formula bAndXc = new And(bVariable, new X(cVariable));
+        Formula phi1 = new U(aVariable, bAndXc);
+        Formula notC = new Variable("c", true);
+        Formula phi = new F(new And(ImmutableList.of(aOrB, phi1, notC)));
 
         // every state label exists:
-        ImmutableList.of(phi, new LTLOr(phi, phi1), new LTLOr(phi, cVariable), new LTLOr(phi, new LTLOr(cVariable, phi1)), tt)
+        ImmutableList.of(phi, new Or(phi, phi1), new Or(phi, cVariable), new Or(phi, new Or(cVariable, phi1)), tt)
                 .forEach(ltlFormula -> {
                     assertTrue(m.getStates().contains(new MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>(new LTLPropEquivalenceClass(ltlFormula))));
                     // only the state labeled 'tt' is accepting, the others are not
@@ -80,16 +82,16 @@ public class MojmirAutomatonTest {
 
     @Test
     public void curlyGTest() throws Exception {
-        LTLFormula phi = new LTLOr(
-                new LTLAnd(aVariable, new LTLGOperator(bVariable)),
-                new LTLGOperator(new LTLAnd(aVariable, bVariable))
+        Formula phi = new Or(
+                new And(aVariable, new G(bVariable)),
+                new G(new And(aVariable, bVariable))
         );
-        ImmutableSet<LTLFormula> curlyG = ImmutableSet.of(bVariable);
+        ImmutableSet<Formula> curlyG = ImmutableSet.of(bVariable);
         MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactoryWithSet.createFrom(new Pair<>(phi, curlyG));
-        LTLFormula phi1 = new LTLOr(new LTLGOperator(bVariable), new LTLGOperator(new LTLAnd(aVariable, bVariable)));
+        Formula phi1 = new Or(new G(bVariable), new G(new And(aVariable, bVariable)));
 
         assertEquals(3, mojmirAutomaton.getStates().size());
-        ImmutableList.of(phi, phi1, new LTLGOperator(new LTLAnd(aVariable, bVariable)))
+        ImmutableList.of(phi, phi1, new G(new And(aVariable, bVariable)))
                 .forEach(ltlFormula -> {
                     assertTrue(mojmirAutomaton.getStates().contains(new MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>(new LTLPropEquivalenceClass(ltlFormula))));
                     // only the state labeled with phi_1 is accepting, the others are not
