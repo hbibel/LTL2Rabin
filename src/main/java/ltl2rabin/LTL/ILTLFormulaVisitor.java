@@ -1,4 +1,4 @@
-package ltl2rabin;
+package ltl2rabin.LTL;
 
 import ltl2rabin.LTL.*;
 import ltl2rabin.LTL.Boolean;

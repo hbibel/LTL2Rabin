@@ -22,7 +22,7 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<LTLPropEqui
 
     @Override
     public Slave.State getInitialState() {
-        return (Slave.State) super.getInitialState();
+        return (State) super.getInitialState();
     }
 
     @Override

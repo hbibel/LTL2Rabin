@@ -1,6 +1,5 @@
 package ltl2rabin.LTL;
 
-import ltl2rabin.ILTLFormulaVisitor;
 import net.sf.javabdd.BDD;
 
 import java.util.ArrayList;

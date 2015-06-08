@@ -1,6 +1,7 @@
 package ltl2rabin;
 
 import ltl2rabin.LTL.Formula;
+import ltl2rabin.LTL.LTLAfGVisitor;
 import ltl2rabin.LTL.LTLPropEquivalenceClass;
 
 import java.util.Set;

@@ -1,7 +1,4 @@
-package ltl2rabin;
-
-import ltl2rabin.LTL.*;
-import ltl2rabin.LTL.Boolean;
+package ltl2rabin.LTL;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -1,7 +1,5 @@
 package ltl2rabin.LTL;
 
-import ltl2rabin.ILTLFormulaVisitor;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

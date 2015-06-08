@@ -1,7 +1,5 @@
 package ltl2rabin.LTL;
 
-import ltl2rabin.ILTLFormulaVisitor;
-
 import java.util.Objects;
 
 /**
