@@ -1,5 +1,9 @@
 grammar LTL;
 
+@header {
+   package ltl2rabin.parser;
+}
+
 formula
     : 'F' formula                   # formulaf
     | 'G' formula                   # formulag
