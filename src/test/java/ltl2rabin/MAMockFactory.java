@@ -21,7 +21,7 @@ public class MAMockFactory {
     // Working functions:
     // - getStates()
     // - getAlphabet()
-    // - getMaxRank()
+    // (-) getMaxRank()
     // - getInitialState()
     // - isAcceptingState(new State(new PropEquivalenceClass(Formula blah)))
     public static class MAMock {

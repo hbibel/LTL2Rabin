@@ -6,22 +6,18 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.*;
 
-public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
-    // TODO: Maybe Create subclass Slave that provides specific functions, such as acc(int i)
+public abstract class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
     private final ImmutableCollection<? extends State<T, U>> states;
     private final State<T, U> initialState;
-    private final Object rabinCondition;
     // private final Pair<? extends ImmutableCollection<? extends Automaton.Transition>, ? extends ImmutableCollection<? extends Automaton.Transition>> rabinPair;
     private final ImmutableSet<U> alphabet;
 
     public RabinAutomaton(ImmutableCollection<? extends State<T, U>> states,
                           State<T, U> initialState,
-                          Object rabinCondition,
                           // Pair<? extends ImmutableCollection<? extends Transition>, ? extends ImmutableCollection<? extends Automaton.Transition>> rabinPair,
                           ImmutableSet<U> alphabet) {
         this.states = states;
         this.initialState = initialState;
-        this.rabinCondition = rabinCondition;
         this.alphabet = alphabet;
     }
 
@@ -29,9 +25,6 @@ public class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
         return initialState;
     }
 
-    public Object getRabinCondition() {
-        return rabinCondition;
-    }
 
     /*public Pair<? extends ImmutableCollection<? extends Automaton.Transition>, ? extends ImmutableCollection<? extends Automaton.Transition>> getRabinPair() {
         return rabinPair;

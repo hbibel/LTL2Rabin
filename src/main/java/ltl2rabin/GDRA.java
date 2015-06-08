@@ -8,13 +8,18 @@ import java.util.List;
 import java.util.Set;
 
 public class GDRA extends RabinAutomaton<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> {
-
+    private final Set<Set<Pair<Set<Transition>, Set<Transition>>>> gdraCondition;
 
     public GDRA(ImmutableCollection<? extends RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>>> states,
                 RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> initialState,
                 Set<Set<Pair<Set<Transition>, Set<Transition>>>> rabinCondition,
                 ImmutableSet<Set<String>> alphabet) {
-        super(states, initialState, rabinCondition, alphabet);
+        super(states, initialState, alphabet);
+        this.gdraCondition = rabinCondition;
+    }
+
+    public Set<Set<Pair<Set<Transition>, Set<Transition>>>> getGdraCondition() {
+        return gdraCondition;
     }
 
     public static class State extends RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> {

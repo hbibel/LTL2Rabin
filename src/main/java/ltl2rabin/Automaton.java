@@ -7,8 +7,6 @@ import java.util.*;
 public abstract class Automaton<T, U> {
     private State initialState;
 
-    // TODO: Consider creating a protected constructor which can be called from subclasses via "super"
-
     public State getInitialState() {
         return initialState;
     }

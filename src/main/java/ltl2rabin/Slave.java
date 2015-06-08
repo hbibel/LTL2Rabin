@@ -11,12 +11,11 @@ import java.util.Set;
 public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>, Set<String>> {
     private final Pair<ImmutableMap<Integer, ImmutableSet<Transition>>, ImmutableMap<Integer, ImmutableSet<Transition>>> failMergeSucceed;
 
-// TODO: Maybe make RabinAutomaton abstract
     public Slave(ImmutableCollection<State> states,
                  State initialState,
                  Pair<ImmutableMap<Integer, ImmutableSet<Transition>>, ImmutableMap<Integer, ImmutableSet<Transition>>> rabinCondition,
                  ImmutableSet<Set<String>> alphabet) {
-        super(states, initialState, rabinCondition, alphabet);
+        super(states, initialState, alphabet);
         this.failMergeSucceed = rabinCondition;
     }
 

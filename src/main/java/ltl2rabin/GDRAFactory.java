@@ -34,6 +34,7 @@ public class GDRAFactory {
 
         Set<GDRA.Transition> univ = new HashSet<>(); // TODO: UNIV = all transitions?
         ImmutableSet.Builder<GDRA.State> statesBuilder = new ImmutableSet.Builder<>();
+        Map<Pair<Set<Formula>, Map<Formula, Integer>>, Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>>> piCurlyGToAccMap = new HashMap<>();
 
         // All possible combinations of curlyG and pi:
         ImmutableList.Builder<Pair<ImmutableSet<Formula>, Map<Formula, Integer>>> curlyGPiBuilder = new ImmutableList.Builder<>();
@@ -52,16 +53,13 @@ public class GDRAFactory {
                 listOfPairs.forEach(pair -> {
                     mapBuilder.put(pair.getFirst(), pair.getSecond());
                 });
-                curlyGPiBuilder.add(new Pair<>(ImmutableSet.copyOf(curlyG), mapBuilder.build()));
+                Pair<ImmutableSet<Formula>, Map<Formula, Integer>> curlyGPi = new Pair<>(ImmutableSet.copyOf(curlyG), mapBuilder.build());
+                Map<Formula, Integer> pi = curlyGPi.getSecond();
+                piCurlyGToAccMap.put(new Pair<>(curlyG, pi), new HashSet<>());
+                curlyGPiBuilder.add(curlyGPi);
             });
         }
         ImmutableList<Pair<ImmutableSet<Formula>, Map<Formula, Integer>>> curlyGPis = curlyGPiBuilder.build();
-        Map<Pair<Set<Formula>, Map<Formula, Integer>>, Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>>> piCurlyGToAccMap = new HashMap<>();
-        curlyGPis.forEach(curlyGPi -> { // TODO: Integrate this loop into some other
-            Set<Formula> curlyG = curlyGPi.getFirst();
-            Map<Formula, Integer> pi = curlyGPi.getSecond();
-            piCurlyGToAccMap.put(new Pair<>(curlyG, pi), new HashSet<>());
-        });
 
         // Initial state:
         ImmutableList.Builder<Slave.State> initialLabelSlaveStatesBuilder = new ImmutableList.Builder<>();
