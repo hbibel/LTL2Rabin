@@ -67,7 +67,7 @@ public class SlaveTest {
         m.whenReadingLetter(initlabel, Collections.emptySet(), ff);
         m.setStateAccepting(tt);
 
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = m.toMA();
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> mockMA = m.toMA();
 
         Slave ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(1, ra.getStates().size());
@@ -76,7 +76,7 @@ public class SlaveTest {
         ImmutableSet.Builder<Slave.Transition> failBuyBuilder = new ImmutableSet.Builder<>();
         ImmutableSet.Builder<Slave.Transition> succeedBuilder = new ImmutableSet.Builder<>();
         for (int i = 0; i < mockMA.getMaxRank(); i++) {
-            failBuyBuilder.addAll(ra.failBuy(i));
+            failBuyBuilder.addAll(ra.failMerge(i));
             succeedBuilder.addAll(ra.succeed(i));
         }
         ImmutableSet<Slave.Transition> failBuy = failBuyBuilder.build();
@@ -117,7 +117,7 @@ public class SlaveTest {
         m.whenReadingLetter(bUc, Collections.emptySet(), ff);
         m.whenReadingToken(bUc, "c", tt);
         m.setStateAccepting(tt);
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMA = m.toMA();
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> mockMA = m.toMA();
 
         Slave ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(2, ra.getStates().size());
@@ -142,7 +142,7 @@ public class SlaveTest {
         ImmutableSet.Builder<Slave.Transition> failBuyBuilder = new ImmutableSet.Builder<>();
         ImmutableSet.Builder<Slave.Transition> succeedBuilder = new ImmutableSet.Builder<>();
         for (int i = 0; i < mockMA.getMaxRank(); i++) {
-            failBuyBuilder.addAll(ra.failBuy(i));
+            failBuyBuilder.addAll(ra.failMerge(i));
             succeedBuilder.addAll(ra.succeed(i));
         }
         ImmutableSet<Slave.Transition> failBuy = failBuyBuilder.build();

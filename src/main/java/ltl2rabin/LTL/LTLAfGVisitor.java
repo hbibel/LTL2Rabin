@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class LTLAfGVisitor implements ILTLFormulaVisitor<Formula> {
+public class LTLAfGVisitor implements IVisitor<Formula> {
     private final Set<String> letter;
 
     public LTLAfGVisitor(Set<String> letter) {
@@ -55,7 +55,7 @@ public class LTLAfGVisitor implements ILTLFormulaVisitor<Formula> {
         return formula.getOperand();
     }
 
-    public Formula afG(IVisitableFormula<Formula> formula) {
+    public Formula afG(IVisitable<Formula> formula) {
         return formula.accept(this);
     }
 }

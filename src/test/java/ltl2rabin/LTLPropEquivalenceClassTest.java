@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 
 public class LTLPropEquivalenceClassTest {
     List<Variable> variables;
-    List<LTLPropEquivalenceClass> equivalenceClasses;
+    List<PropEquivalenceClass> equivalenceClasses;
     int variableCount = 3; // should not surpass 26. Otherwise change variable generation in the setUp() method.
     Formula tt;
     Formula ff;
@@ -28,7 +28,7 @@ public class LTLPropEquivalenceClassTest {
         // generate necessary variables
         for (int i = 0; i < variableCount; i++) {
             variables.add(new Variable(Character.toString((char) ('a' + i))));
-            equivalenceClasses.add(new LTLPropEquivalenceClass(variables.get(i)));
+            equivalenceClasses.add(new PropEquivalenceClass(variables.get(i)));
         }
         tt = new Boolean(true);
         ff = new Boolean(false);
@@ -45,9 +45,9 @@ public class LTLPropEquivalenceClassTest {
         Formula f1 = new Boolean(true);
         Formula f2 = new Boolean(false);
         Formula f3 = new Boolean(true);
-        LTLPropEquivalenceClass w1 = new LTLPropEquivalenceClass(f1);
-        LTLPropEquivalenceClass w2 = new LTLPropEquivalenceClass(f2);
-        LTLPropEquivalenceClass w3 = new LTLPropEquivalenceClass(f3);
+        PropEquivalenceClass w1 = new PropEquivalenceClass(f1);
+        PropEquivalenceClass w2 = new PropEquivalenceClass(f2);
+        PropEquivalenceClass w3 = new PropEquivalenceClass(f3);
 
         // true = true (different objects)
         assertTrue(w1.equals(w3));
@@ -59,8 +59,8 @@ public class LTLPropEquivalenceClassTest {
     public void variablePropositionalEquivalenceTest() {
         Variable a = new Variable("a");
         Variable notA = new Variable("a", true);
-        LTLPropEquivalenceClass w = new LTLPropEquivalenceClass(a);
-        LTLPropEquivalenceClass notW = new LTLPropEquivalenceClass(notA);
+        PropEquivalenceClass w = new PropEquivalenceClass(a);
+        PropEquivalenceClass notW = new PropEquivalenceClass(notA);
 
         // a = a (different objects)
         assertTrue(w.equals(equivalenceClasses.get(0)));
@@ -78,9 +78,9 @@ public class LTLPropEquivalenceClassTest {
                 X::new
         );
         gfxOperatorConstructors.forEach(constructor -> {
-            LTLPropEquivalenceClass wa = new LTLPropEquivalenceClass(constructor.apply(variables.get(0)));
-            LTLPropEquivalenceClass wa2 = new LTLPropEquivalenceClass(constructor.apply(variables.get(0)));
-            LTLPropEquivalenceClass wb = new LTLPropEquivalenceClass(constructor.apply(variables.get(1)));
+            PropEquivalenceClass wa = new PropEquivalenceClass(constructor.apply(variables.get(0)));
+            PropEquivalenceClass wa2 = new PropEquivalenceClass(constructor.apply(variables.get(0)));
+            PropEquivalenceClass wb = new PropEquivalenceClass(constructor.apply(variables.get(1)));
 
             // G a = G a (different objects)
             assertTrue(wa.equals(wa2));
@@ -93,9 +93,9 @@ public class LTLPropEquivalenceClassTest {
 
     @Test
     public void uOperatorPropositionalEquivalenceTest() {
-        LTLPropEquivalenceClass w1 = new LTLPropEquivalenceClass(new U(variables.get(0), variables.get(1)));
-        LTLPropEquivalenceClass w2 = new LTLPropEquivalenceClass(new U(variables.get(0), variables.get(1)));
-        LTLPropEquivalenceClass w3 = new LTLPropEquivalenceClass(new U(variables.get(1), variables.get(0)));
+        PropEquivalenceClass w1 = new PropEquivalenceClass(new U(variables.get(0), variables.get(1)));
+        PropEquivalenceClass w2 = new PropEquivalenceClass(new U(variables.get(0), variables.get(1)));
+        PropEquivalenceClass w3 = new PropEquivalenceClass(new U(variables.get(1), variables.get(0)));
 
         // a U b = a U b
         assertTrue(w1.equals(w2));
@@ -105,13 +105,13 @@ public class LTLPropEquivalenceClassTest {
 
     @Test
     public void andPropositionalEquivalenceTest() {
-        LTLPropEquivalenceClass c1 = new LTLPropEquivalenceClass(new And(variables.get(0), variables.get(1))); // a & b
-        LTLPropEquivalenceClass c2 = new LTLPropEquivalenceClass(new And(variables.get(1), variables.get(0))); // b & a
+        PropEquivalenceClass c1 = new PropEquivalenceClass(new And(variables.get(0), variables.get(1))); // a & b
+        PropEquivalenceClass c2 = new PropEquivalenceClass(new And(variables.get(1), variables.get(0))); // b & a
         ArrayList<Formula> l1 = new ArrayList<>(Arrays.asList(variables.get(0), variables.get(1), variables.get(2)));
-        LTLPropEquivalenceClass c3 = new LTLPropEquivalenceClass(new And(l1)); // a & b & c
-        LTLPropEquivalenceClass c4 = new LTLPropEquivalenceClass(new And(new And(variables.get(0), variables.get(1)), variables.get(2))); // (a & b) & c
-        LTLPropEquivalenceClass c5 = new LTLPropEquivalenceClass(new And(variables.get(0), new And(variables.get(1), variables.get(2)))); // a & (b & c)
-        LTLPropEquivalenceClass c6 = new LTLPropEquivalenceClass(new And(variables.get(0), variables.get(2))); // a & c
+        PropEquivalenceClass c3 = new PropEquivalenceClass(new And(l1)); // a & b & c
+        PropEquivalenceClass c4 = new PropEquivalenceClass(new And(new And(variables.get(0), variables.get(1)), variables.get(2))); // (a & b) & c
+        PropEquivalenceClass c5 = new PropEquivalenceClass(new And(variables.get(0), new And(variables.get(1), variables.get(2)))); // a & (b & c)
+        PropEquivalenceClass c6 = new PropEquivalenceClass(new And(variables.get(0), variables.get(2))); // a & c
 
         // a & b = b & a
         assertTrue(c1.equals(c2));
@@ -127,13 +127,13 @@ public class LTLPropEquivalenceClassTest {
 
     @Test
     public void orPropositionalEquivalenceTest() {
-        LTLPropEquivalenceClass c1 = new LTLPropEquivalenceClass(new Or(variables.get(0), variables.get(1))); // a | b
-        LTLPropEquivalenceClass c2 = new LTLPropEquivalenceClass(new Or(variables.get(1), variables.get(0))); // b | a
+        PropEquivalenceClass c1 = new PropEquivalenceClass(new Or(variables.get(0), variables.get(1))); // a | b
+        PropEquivalenceClass c2 = new PropEquivalenceClass(new Or(variables.get(1), variables.get(0))); // b | a
         ArrayList<Formula> l1 = new ArrayList<>(Arrays.asList(variables.get(0), variables.get(1), variables.get(2)));
-        LTLPropEquivalenceClass c3 = new LTLPropEquivalenceClass(new Or(l1)); // a | b | c
-        LTLPropEquivalenceClass c4 = new LTLPropEquivalenceClass(new Or(new Or(variables.get(0), variables.get(1)), variables.get(2))); // (a | b) | c
-        LTLPropEquivalenceClass c5 = new LTLPropEquivalenceClass(new Or(variables.get(0), new Or(variables.get(1), variables.get(2)))); // a | (b | c)
-        LTLPropEquivalenceClass c6 = new LTLPropEquivalenceClass(new Or(variables.get(0), variables.get(2))); // a | c
+        PropEquivalenceClass c3 = new PropEquivalenceClass(new Or(l1)); // a | b | c
+        PropEquivalenceClass c4 = new PropEquivalenceClass(new Or(new Or(variables.get(0), variables.get(1)), variables.get(2))); // (a | b) | c
+        PropEquivalenceClass c5 = new PropEquivalenceClass(new Or(variables.get(0), new Or(variables.get(1), variables.get(2)))); // a | (b | c)
+        PropEquivalenceClass c6 = new PropEquivalenceClass(new Or(variables.get(0), variables.get(2))); // a | c
 
         // a | b = b | a
         assertTrue(c1.equals(c2));
@@ -152,47 +152,47 @@ public class LTLPropEquivalenceClassTest {
         // Testing against some laws, taken from here: https://en.wikipedia.org/wiki/Boolean_algebra#Laws
 
         Formula bORc = new Or(variables.get(1), variables.get(2)); // b | c
-        LTLPropEquivalenceClass c1 = new LTLPropEquivalenceClass(new And(variables.get(0), bORc)); // a & (b | c)
+        PropEquivalenceClass c1 = new PropEquivalenceClass(new And(variables.get(0), bORc)); // a & (b | c)
         Formula aANDb = new And(variables.get(0), variables.get(1)); // a & b
         Formula aANDc = new And(variables.get(0), variables.get(2)); // a & c
-        LTLPropEquivalenceClass c2 = new LTLPropEquivalenceClass(new Or(aANDb, aANDc));
+        PropEquivalenceClass c2 = new PropEquivalenceClass(new Or(aANDb, aANDc));
         // a & (b | c) = (a & b) | (a & c)
         assertTrue(c1.equals(c2));
 
-        LTLPropEquivalenceClass c3 = new LTLPropEquivalenceClass(new Or(variables.get(0), new Boolean(false))); // a | false
-        LTLPropEquivalenceClass c4 = new LTLPropEquivalenceClass(variables.get(0)); // a
+        PropEquivalenceClass c3 = new PropEquivalenceClass(new Or(variables.get(0), new Boolean(false))); // a | false
+        PropEquivalenceClass c4 = new PropEquivalenceClass(variables.get(0)); // a
         // a | false = a
         assertTrue(c3.equals(c4));
         // a & true = a
-        LTLPropEquivalenceClass c5 = new LTLPropEquivalenceClass(new And(variables.get(0), new Boolean(true))); // a & true
+        PropEquivalenceClass c5 = new PropEquivalenceClass(new And(variables.get(0), new Boolean(true))); // a & true
         assertTrue(c4.equals(c5));
 
-        LTLPropEquivalenceClass c6 = new LTLPropEquivalenceClass(new And(variables.get(1), bORc)); // b & (b | c)
+        PropEquivalenceClass c6 = new PropEquivalenceClass(new And(variables.get(1), bORc)); // b & (b | c)
         // b & (b | c) = b
-        assertTrue(c6.equals(new LTLPropEquivalenceClass(variables.get(1))));
+        assertTrue(c6.equals(new PropEquivalenceClass(variables.get(1))));
     }
 
     @Test
     public void implicationTest() {
         // a & b |= a
-        assertTrue(new LTLPropEquivalenceClass(new And(variables.get(0), variables.get(1))).implies(equivalenceClasses.get(0)));
+        assertTrue(new PropEquivalenceClass(new And(variables.get(0), variables.get(1))).implies(equivalenceClasses.get(0)));
         // a & b |= b
-        assertTrue(new LTLPropEquivalenceClass(new And(variables.get(0), variables.get(1))).implies(equivalenceClasses.get(1)));
+        assertTrue(new PropEquivalenceClass(new And(variables.get(0), variables.get(1))).implies(equivalenceClasses.get(1)));
 
         // a | b |/= a
-        assertFalse(new LTLPropEquivalenceClass(new Or(variables.get(0), variables.get(1))).implies(equivalenceClasses.get(0)));
+        assertFalse(new PropEquivalenceClass(new Or(variables.get(0), variables.get(1))).implies(equivalenceClasses.get(0)));
         // a | b |/= b
-        assertFalse(new LTLPropEquivalenceClass(new Or(variables.get(0), variables.get(1))).implies(equivalenceClasses.get(1)));
+        assertFalse(new PropEquivalenceClass(new Or(variables.get(0), variables.get(1))).implies(equivalenceClasses.get(1)));
 
         // a & b |= a | b
-        assertTrue(new LTLPropEquivalenceClass(new And(variables.get(0), variables.get(1))).implies(
-                new LTLPropEquivalenceClass(new Or(variables.get(0), variables.get(1)))));
+        assertTrue(new PropEquivalenceClass(new And(variables.get(0), variables.get(1))).implies(
+                new PropEquivalenceClass(new Or(variables.get(0), variables.get(1)))));
 
         // tt |/= a
-        assertFalse(new LTLPropEquivalenceClass(tt).implies(equivalenceClasses.get(0)));
+        assertFalse(new PropEquivalenceClass(tt).implies(equivalenceClasses.get(0)));
         // tt |= tt
-        assertTrue(new LTLPropEquivalenceClass(tt).implies(new LTLPropEquivalenceClass(tt)));
+        assertTrue(new PropEquivalenceClass(tt).implies(new PropEquivalenceClass(tt)));
         // tt |/= ff
-        assertFalse(new LTLPropEquivalenceClass(tt).implies(new LTLPropEquivalenceClass(ff)));
+        assertFalse(new PropEquivalenceClass(tt).implies(new PropEquivalenceClass(ff)));
     }
 }

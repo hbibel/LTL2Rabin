@@ -3,13 +3,13 @@ package ltl2rabin;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import ltl2rabin.LTL.LTLPropEquivalenceClass;
+import ltl2rabin.LTL.PropEquivalenceClass;
 
 import java.util.List;
 import java.util.Set;
 
-public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> {
-    private final Pair<ImmutableMap<Integer, ImmutableSet<Transition>>, ImmutableMap<Integer, ImmutableSet<Transition>>> failBuySucceed;
+public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>, Set<String>> {
+    private final Pair<ImmutableMap<Integer, ImmutableSet<Transition>>, ImmutableMap<Integer, ImmutableSet<Transition>>> failMergeSucceed;
 
 // TODO: Maybe make RabinAutomaton abstract
     public Slave(ImmutableCollection<State> states,
@@ -17,7 +17,7 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<LTLPropEqui
                  Pair<ImmutableMap<Integer, ImmutableSet<Transition>>, ImmutableMap<Integer, ImmutableSet<Transition>>> rabinCondition,
                  ImmutableSet<Set<String>> alphabet) {
         super(states, initialState, rabinCondition, alphabet);
-        this.failBuySucceed = rabinCondition;
+        this.failMergeSucceed = rabinCondition;
     }
 
     @Override
@@ -30,20 +30,20 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<LTLPropEqui
         return (State) super.run(word);
     }
 
-    public ImmutableSet<Transition> failBuy (int i) {
-        return failBuySucceed.getFirst().get(i);
+    public ImmutableSet<Transition> failMerge(int i) {
+        return failMergeSucceed.getFirst().get(i);
     }
 
     public ImmutableSet<Transition> succeed (int i) {
-        return failBuySucceed.getSecond().get(i);
+        return failMergeSucceed.getSecond().get(i);
     }
 
-    public static class State extends RabinAutomaton.State<List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, Set<String>> {
+    public static class State extends RabinAutomaton.State<List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>, Set<String>> {
         /**
          * @param label the list representing the ranking of the states of the corresponding mojmir automaton.
          *              The elder states come first in the list.
          */
-        public State(List<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> label) {
+        public State(List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> label) {
             super(label);
         }
 

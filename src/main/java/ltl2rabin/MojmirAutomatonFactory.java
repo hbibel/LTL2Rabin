@@ -7,55 +7,55 @@ import ltl2rabin.LTL.Boolean;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, LTLPropEquivalenceClass, Set<String>> {
-    private static HashMap<Pair<Formula, Set<Formula>>, MojmirAutomaton<LTLPropEquivalenceClass, Set<String>>> mojmirAutomata = new HashMap<>();
+public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, PropEquivalenceClass, Set<String>> {
+    private static HashMap<Pair<Formula, Set<Formula>>, MojmirAutomaton<PropEquivalenceClass, Set<String>>> mojmirAutomata = new HashMap<>();
 
     public MojmirAutomatonFactory(ImmutableSet<Set<String>> alphabet) {
         super(alphabet);
     }
 
     @Override
-    public abstract MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> createFrom(F from);
+    public abstract MojmirAutomaton<PropEquivalenceClass, Set<String>> createFrom(F from);
 
-    protected static void putIntoCache(Pair<Formula, Set<Formula>> key, MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> ma) {
+    protected static void putIntoCache(Pair<Formula, Set<Formula>> key, MojmirAutomaton<PropEquivalenceClass, Set<String>> ma) {
         mojmirAutomata.put(key, ma);
     }
 
-    protected static MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> getFromCache(Pair<Formula, Set<Formula>> key) {
+    protected static MojmirAutomaton<PropEquivalenceClass, Set<String>> getFromCache(Pair<Formula, Set<Formula>> key) {
         return mojmirAutomata.get(key);
     }
 
-    protected Pair<Set<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>,
-            ImmutableSet<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>> reach(MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> initialState,
+    protected Pair<Set<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>,
+            ImmutableSet<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>> reach(MojmirAutomaton.State<PropEquivalenceClass, Set<String>> initialState,
                                                                                              Set<Set<String>> alphabet,
                                                                                              Set<Formula> curlyG) {
-        LTLPropEquivalenceClass curlyGConjunction;
+        PropEquivalenceClass curlyGConjunction;
         if (curlyG.isEmpty()) {
-            curlyGConjunction = new LTLPropEquivalenceClass(new Boolean(true));
+            curlyGConjunction = new PropEquivalenceClass(new Boolean(true));
         }
         else {
             List<Formula> curlyGConjuncts = new ArrayList<>();
             curlyG.forEach(ltlFormula -> {
                 curlyGConjuncts.add(new G(ltlFormula)); // TODO: Salomon: "Kann es sein, dass du in Zeile 38 ein G zuviel hast?"
             });
-            curlyGConjunction = new LTLPropEquivalenceClass(new And(curlyGConjuncts));
+            curlyGConjunction = new PropEquivalenceClass(new And(curlyGConjuncts));
         }
 
-        Map<LTLPropEquivalenceClass, MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> states = new HashMap<>();
-        ImmutableSet.Builder<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> acceptingStatesBuilder = new ImmutableSet.Builder<>();
+        Map<PropEquivalenceClass, MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> states = new HashMap<>();
+        ImmutableSet.Builder<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> acceptingStatesBuilder = new ImmutableSet.Builder<>();
         states.put(initialState.getLabel(), initialState);
 
-        Queue<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> statesToBeExpanded = new ConcurrentLinkedQueue<>();
+        Queue<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> statesToBeExpanded = new ConcurrentLinkedQueue<>();
         statesToBeExpanded.add(initialState);
 
         while (!statesToBeExpanded.isEmpty()) {
-            MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> temp = statesToBeExpanded.poll();
-            Map<Set<String>, MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> transitions = new HashMap<>();
+            MojmirAutomaton.State<PropEquivalenceClass, Set<String>> temp = statesToBeExpanded.poll();
+            Map<Set<String>, MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> transitions = new HashMap<>();
 
             boolean isSink = true;
             for (Set<String> letter : alphabet) {
                 LTLAfGVisitor visitor = new LTLAfGVisitor(letter);
-                LTLPropEquivalenceClass newLabel = new LTLPropEquivalenceClass(visitor.afG(temp.getLabel().getRepresentative()));
+                PropEquivalenceClass newLabel = new PropEquivalenceClass(visitor.afG(temp.getLabel().getRepresentative()));
 
                 if (newLabel.equals(temp.getLabel())) {
                     transitions.put(letter, temp);
@@ -65,7 +65,7 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, LTLP
                 // line never will be reached.
                 isSink = false;
 
-                MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> newState = states.get(newLabel);
+                MojmirAutomaton.State<PropEquivalenceClass, Set<String>> newState = states.get(newLabel);
                 if (null == newState) {
                     newState = new MojmirAutomaton.State<>(newLabel);
                     statesToBeExpanded.offer(newState);

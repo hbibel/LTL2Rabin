@@ -3,7 +3,7 @@ package ltl2rabin.LTL;
 import ltl2rabin.LTL.*;
 import ltl2rabin.LTL.Boolean;
 
-public interface ILTLFormulaVisitor<T> {
+public interface IVisitor<T> {
     T visit(And formula);
     T visit(Boolean formula);
     T visit(F formula);

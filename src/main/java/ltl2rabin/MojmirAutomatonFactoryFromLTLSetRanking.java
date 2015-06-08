@@ -9,14 +9,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public class MojmirAutomatonFactoryFromLTLAndSet extends MojmirAutomatonFactory<Pair<Formula, ImmutableSet<Formula>>> {
-    public MojmirAutomatonFactoryFromLTLAndSet(ImmutableSet<Set<String>> alphabet) {
+public class MojmirAutomatonFactoryFromLTLSetRanking extends MojmirAutomatonFactory<Pair<Formula, ImmutableSet<Formula>>> {
+    public MojmirAutomatonFactoryFromLTLSetRanking(ImmutableSet<Set<String>> alphabet) {
         super(alphabet);
     }
 
     @Override
-    public MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> createFrom(Pair<Formula, ImmutableSet<Formula>> from) {
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> cachedResult = getFromCache(new Pair<>(from.getFirst(), from.getSecond()));
+    public MojmirAutomaton<PropEquivalenceClass, Set<String>> createFrom(Pair<Formula, ImmutableSet<Formula>> from) {
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> cachedResult = getFromCache(new Pair<>(from.getFirst(), from.getSecond()));
         if (null != cachedResult) {
             return cachedResult;
         }
@@ -25,25 +25,25 @@ public class MojmirAutomatonFactoryFromLTLAndSet extends MojmirAutomatonFactory<
         cachedResult = getFromCache(new Pair<>(from.getFirst(), Collections.emptySet()));
         if (null != cachedResult) {
             ImmutableSet<Formula> curlyG = from.getSecond();
-            LTLPropEquivalenceClass curlyGConjunction;
+            PropEquivalenceClass curlyGConjunction;
             if (curlyG.isEmpty()) {
-                curlyGConjunction = new LTLPropEquivalenceClass(new Boolean(true));
+                curlyGConjunction = new PropEquivalenceClass(new Boolean(true));
             }
             else {
                 List<Formula> curlyGConjuncts = new ArrayList<>();
                 curlyG.forEach(ltlFormula -> {
                     curlyGConjuncts.add(new G(ltlFormula));
                 });
-                curlyGConjunction = new LTLPropEquivalenceClass(new And(curlyGConjuncts));
+                curlyGConjunction = new PropEquivalenceClass(new And(curlyGConjuncts));
             }
-            ImmutableSet.Builder<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> acceptingStatesBuilder = new ImmutableSet.Builder<>();
+            ImmutableSet.Builder<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> acceptingStatesBuilder = new ImmutableSet.Builder<>();
             cachedResult.getStates().forEach(state -> {
                 if (state.getLabel().isTautology() || curlyGConjunction.implies(state.getLabel())) {
                     acceptingStatesBuilder.add(state);
                 }
             });
 
-            MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> modifiedResult = new MojmirAutomaton<>(cachedResult.getStates(), cachedResult.getInitialState(), acceptingStatesBuilder.build(), cachedResult.getAlphabet());
+            MojmirAutomaton<PropEquivalenceClass, Set<String>> modifiedResult = new MojmirAutomaton<>(cachedResult.getStates(), cachedResult.getInitialState(), acceptingStatesBuilder.build(), cachedResult.getAlphabet());
             putIntoCache(new Pair<>(from.getFirst(), from.getSecond()), modifiedResult);
             return modifiedResult;
         }
@@ -51,11 +51,11 @@ public class MojmirAutomatonFactoryFromLTLAndSet extends MojmirAutomatonFactory<
         Formula formula = from.getFirst();
         ImmutableSet<Formula> curlyG = from.getSecond();
 
-        LTLPropEquivalenceClass initialLabel = new LTLPropEquivalenceClass(formula);
-        MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>> initialState =
+        PropEquivalenceClass initialLabel = new PropEquivalenceClass(formula);
+        MojmirAutomaton.State<PropEquivalenceClass, Set<String>> initialState =
                 new MojmirAutomaton.State<>(initialLabel);
-        Pair<Set<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>, ImmutableSet<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>>> reachResult = super.reach(initialState, getAlphabet(), curlyG);
-        ImmutableSet<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> states = ImmutableSet.copyOf(reachResult.getFirst());
+        Pair<Set<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>, ImmutableSet<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>> reachResult = super.reach(initialState, getAlphabet(), curlyG);
+        ImmutableSet<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> states = ImmutableSet.copyOf(reachResult.getFirst());
 
         cachedResult = new MojmirAutomaton<>(states, initialState, reachResult.getSecond(), getAlphabet());
         putIntoCache(new Pair<>(from.getFirst(), from.getSecond()), cachedResult);

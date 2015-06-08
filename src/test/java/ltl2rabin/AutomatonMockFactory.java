@@ -3,7 +3,7 @@ package ltl2rabin;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import ltl2rabin.LTL.LTLPropEquivalenceClass;
+import ltl2rabin.LTL.PropEquivalenceClass;
 
 import java.util.*;
 
@@ -15,16 +15,16 @@ public abstract class AutomatonMockFactory<T> {
     // TODO: Remake entire class
     public abstract T mockMe(int numStates, Collection<StateTransition> transitions);
 
-    public static class MAMockFactory extends AutomatonMockFactory<MojmirAutomaton<LTLPropEquivalenceClass, Set<String>>> {
+    public static class MAMockFactory extends AutomatonMockFactory<MojmirAutomaton<PropEquivalenceClass, Set<String>>> {
 
-        public MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mockMe(int numStates, Collection<StateTransition> transitions, Collection<Integer> sinks,
+        public MojmirAutomaton<PropEquivalenceClass, Set<String>> mockMe(int numStates, Collection<StateTransition> transitions, Collection<Integer> sinks,
                                       Collection<Integer> acceptingStates, Set<Set<String>> alphabet) {
-            MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> result = mock(MojmirAutomaton.class);
-            ImmutableList.Builder<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> stateBuilder = new ImmutableList.Builder<>();
+            MojmirAutomaton<PropEquivalenceClass, Set<String>> result = mock(MojmirAutomaton.class);
+            ImmutableList.Builder<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> stateBuilder = new ImmutableList.Builder<>();
             for (int i = 0; i < numStates; i++) {
                 stateBuilder.add(mock(MojmirAutomaton.State.class));
             }
-            ImmutableList<MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>> states = stateBuilder.build();
+            ImmutableList<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> states = stateBuilder.build();
 
             when(result.getInitialState()).thenReturn(states.get(0));
 
@@ -56,8 +56,8 @@ public abstract class AutomatonMockFactory<T> {
     public static class RAMockFactory extends AutomatonMockFactory<RabinAutomaton> {
         @Override
         public RabinAutomaton mockMe(int numStates, Collection<StateTransition> transitions) {
-            RabinAutomaton<LTLPropEquivalenceClass, Set<String>> result = mock(RabinAutomaton.class);
-            ArrayList<RabinAutomaton<LTLPropEquivalenceClass, Set<String>>.State> states = new ArrayList<>();
+            RabinAutomaton<PropEquivalenceClass, Set<String>> result = mock(RabinAutomaton.class);
+            ArrayList<RabinAutomaton<PropEquivalenceClass, Set<String>>.State> states = new ArrayList<>();
             for (int i = 0; i < numStates; i++) {
                 states.add(mock(RabinAutomaton.State.class));
             }
@@ -66,7 +66,7 @@ public abstract class AutomatonMockFactory<T> {
                 when(states.get(t.from).readLetter(t.letter)).thenReturn(states.get(t.to));
             }
 
-            ListOrderedSet<RabinAutomaton<LTLPropEquivalenceClass, Set<String>>.State> stateListOrderedSet = ListOrderedSet.listOrderedSet(states);
+            ListOrderedSet<RabinAutomaton<PropEquivalenceClass, Set<String>>.State> stateListOrderedSet = ListOrderedSet.listOrderedSet(states);
             when(result.getStates()).thenReturn(stateListOrderedSet);
             when(result.getInitialState()).thenReturn(states.get(0));
 

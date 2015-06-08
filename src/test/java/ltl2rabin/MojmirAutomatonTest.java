@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 
 public class MojmirAutomatonTest {
     MojmirAutomatonFactoryFromString automatonFactory;
-    MojmirAutomatonFactoryFromLTLAndSet automatonFactoryWithSet;
+    MojmirAutomatonFactoryFromLTLSetRanking automatonFactoryWithSet;
 
     Formula aVariable;
     Formula bVariable;
@@ -26,7 +26,7 @@ public class MojmirAutomatonTest {
     @Before
     public void setUp() {
         automatonFactory = new MojmirAutomatonFactoryFromString(ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3)));
-        automatonFactoryWithSet = new MojmirAutomatonFactoryFromLTLAndSet(ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3)));
+        automatonFactoryWithSet = new MojmirAutomatonFactoryFromLTLSetRanking(ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3)));
         aVariable = new Variable("a");
         bVariable = new Variable("b");
         cVariable = new Variable("c");
@@ -36,27 +36,27 @@ public class MojmirAutomatonTest {
 
     @Test
     public void basicTest() throws Exception {
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a");
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a");
 
-        assertEquals(new LTLPropEquivalenceClass(aVariable), mojmirAutomaton.getInitialState().getLabel());
+        assertEquals(new PropEquivalenceClass(aVariable), mojmirAutomaton.getInitialState().getLabel());
         // assertEquals(2, mojmirAutomaton.getMaxRank());
         assertEquals(3, mojmirAutomaton.getStates().size());
-        assertTrue(mojmirAutomaton.isAcceptingState(new MojmirAutomaton.State<>(new LTLPropEquivalenceClass(tt))));
-        assertFalse(mojmirAutomaton.isAcceptingState(new MojmirAutomaton.State<>(new LTLPropEquivalenceClass(ff))));
-        assertFalse(mojmirAutomaton.isAcceptingState(new MojmirAutomaton.State<>(new LTLPropEquivalenceClass(aVariable))));
+        assertTrue(mojmirAutomaton.isAcceptingState(new MojmirAutomaton.State<>(new PropEquivalenceClass(tt))));
+        assertFalse(mojmirAutomaton.isAcceptingState(new MojmirAutomaton.State<>(new PropEquivalenceClass(ff))));
+        assertFalse(mojmirAutomaton.isAcceptingState(new MojmirAutomaton.State<>(new PropEquivalenceClass(aVariable))));
         mojmirAutomaton.getStates().forEach(state -> {
-            LTLPropEquivalenceClass label = state.getLabel();
-            if (!label.equals(new LTLPropEquivalenceClass(tt))) {
+            PropEquivalenceClass label = state.getLabel();
+            if (!label.equals(new PropEquivalenceClass(tt))) {
                 assertFalse(mojmirAutomaton.isAcceptingState(state));
             }
         });
-        assertEquals(new LTLPropEquivalenceClass(tt), mojmirAutomaton.getInitialState().readLetter(ImmutableSet.of("a")).getLabel());
+        assertEquals(new PropEquivalenceClass(tt), mojmirAutomaton.getInitialState().readLetter(ImmutableSet.of("a")).getLabel());
         assertEquals(0, mojmirAutomaton.getMaxRank());
     }
 
     @Test
     public void allOperands() throws Exception {
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> m = automatonFactory.createFrom("F ( ( a | b ) & ( a U ( b & ( X ( c ) ) ) ) & ( !c ) )");
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> m = automatonFactory.createFrom("F ( ( a | b ) & ( a U ( b & ( X ( c ) ) ) ) & ( !c ) )");
 
         assertEquals(5, m.getStates().size());
         Formula aOrB = new Or(aVariable, bVariable);
@@ -68,13 +68,13 @@ public class MojmirAutomatonTest {
         // every state label exists:
         ImmutableList.of(phi, new Or(phi, phi1), new Or(phi, cVariable), new Or(phi, new Or(cVariable, phi1)), tt)
                 .forEach(ltlFormula -> {
-                    assertTrue(m.getStates().contains(new MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>(new LTLPropEquivalenceClass(ltlFormula))));
+                    assertTrue(m.getStates().contains(new MojmirAutomaton.State<PropEquivalenceClass, Set<String>>(new PropEquivalenceClass(ltlFormula))));
                     // only the state labeled 'tt' is accepting, the others are not
                     if (!ltlFormula.equals(tt)) {
-                        assertFalse(m.isAcceptingState(new MojmirAutomaton.State<>(new LTLPropEquivalenceClass(ltlFormula))));
+                        assertFalse(m.isAcceptingState(new MojmirAutomaton.State<>(new PropEquivalenceClass(ltlFormula))));
                     }
                     else {
-                        assertTrue(m.isAcceptingState((new MojmirAutomaton.State<>(new LTLPropEquivalenceClass(tt)))));
+                        assertTrue(m.isAcceptingState((new MojmirAutomaton.State<>(new PropEquivalenceClass(tt)))));
                     }
                 });
         assertEquals(3, m.getMaxRank());
@@ -87,19 +87,19 @@ public class MojmirAutomatonTest {
                 new G(new And(aVariable, bVariable))
         );
         ImmutableSet<Formula> curlyG = ImmutableSet.of(bVariable);
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactoryWithSet.createFrom(new Pair<>(phi, curlyG));
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactoryWithSet.createFrom(new Pair<>(phi, curlyG));
         Formula phi1 = new Or(new G(bVariable), new G(new And(aVariable, bVariable)));
 
         assertEquals(3, mojmirAutomaton.getStates().size());
         ImmutableList.of(phi, phi1, new G(new And(aVariable, bVariable)))
                 .forEach(ltlFormula -> {
-                    assertTrue(mojmirAutomaton.getStates().contains(new MojmirAutomaton.State<LTLPropEquivalenceClass, Set<String>>(new LTLPropEquivalenceClass(ltlFormula))));
+                    assertTrue(mojmirAutomaton.getStates().contains(new MojmirAutomaton.State<PropEquivalenceClass, Set<String>>(new PropEquivalenceClass(ltlFormula))));
                     // only the state labeled with phi_1 is accepting, the others are not
                     if (!ltlFormula.equals(phi1)) {
-                        assertFalse(mojmirAutomaton.isAcceptingState(new MojmirAutomaton.State<>(new LTLPropEquivalenceClass(ltlFormula))));
+                        assertFalse(mojmirAutomaton.isAcceptingState(new MojmirAutomaton.State<>(new PropEquivalenceClass(ltlFormula))));
                     }
                     else {
-                        assertTrue(mojmirAutomaton.isAcceptingState((new MojmirAutomaton.State<>(new LTLPropEquivalenceClass(phi1)))));
+                        assertTrue(mojmirAutomaton.isAcceptingState((new MojmirAutomaton.State<>(new PropEquivalenceClass(phi1)))));
                     }
                 });
         assertEquals(0, mojmirAutomaton.getMaxRank());
@@ -107,43 +107,43 @@ public class MojmirAutomatonTest {
 
     @Test
     public void testCase1() throws Exception {
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a | (b U c)");
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a | (b U c)");
         assertEquals(4, mojmirAutomaton.getStates().size());
     }
 
     @Test
     public void testCase2() throws Exception {
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a | b | c");
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a | b | c");
         assertEquals(3, mojmirAutomaton.getStates().size());
     }
 
     @Test
     public void testCase3() throws Exception {
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("X b");
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("X b");
         assertEquals(4, mojmirAutomaton.getStates().size());
     }
 
     @Test
     public void testCase4() throws Exception {
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("F b");
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("F b");
         assertEquals(2, mojmirAutomaton.getStates().size());
     }
 
     @Test
     public void testCase5() throws Exception {
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a & b & c");
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a & b & c");
         assertEquals(3, mojmirAutomaton.getStates().size());
     }
 
     @Test
     public void testCase6() throws Exception {
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a U b");
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a U b");
         assertEquals(3, mojmirAutomaton.getStates().size());
     }
 
     @Test
     public void testCase7() throws Exception {
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a");
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a");
         assertEquals(3, mojmirAutomaton.getStates().size());
     }
 

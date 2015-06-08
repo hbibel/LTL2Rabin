@@ -15,7 +15,7 @@ import java.util.Objects;
  *  - It eliminates formulas that are propositionally equivalent
  *  - It serves as a point where all variables and their BDD representations get stored
  */
-public class LTLPropEquivalenceClass {
+public class PropEquivalenceClass {
     private static int bddVarCount = 0;
     private static final BDDFactory bddFactory = BDDFactory.init("java", 2, 2);
 
@@ -23,7 +23,7 @@ public class LTLPropEquivalenceClass {
     private BDD cachedBDD;
     private static final Map<Formula, BDD> formulaBDDMap = new HashMap<>();
 
-    public LTLPropEquivalenceClass(Formula representative) {
+    public PropEquivalenceClass(Formula representative) {
         this.representative = representative;
         this.cachedBDD = getOrCreateBDD(representative);
     }
@@ -32,7 +32,7 @@ public class LTLPropEquivalenceClass {
         return representative;
     }
 
-    public boolean implies(LTLPropEquivalenceClass other) {
+    public boolean implies(PropEquivalenceClass other) {
         return cachedBDD.imp(other.cachedBDD).isOne();
     }
 
@@ -95,7 +95,7 @@ public class LTLPropEquivalenceClass {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        LTLPropEquivalenceClass that = (LTLPropEquivalenceClass) o;
+        PropEquivalenceClass that = (PropEquivalenceClass) o;
 
         return (that.representative.equals(this.representative)) || cachedBDD.equals(that.cachedBDD);
     }

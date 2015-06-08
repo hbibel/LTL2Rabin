@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import ltl2rabin.LTL.Formula;
 import ltl2rabin.LTL.LTLFactory;
 import ltl2rabin.LTL.LTLFactoryFromString;
-import ltl2rabin.LTL.LTLPropEquivalenceClass;
+import ltl2rabin.LTL.PropEquivalenceClass;
 
 import java.util.*;
 
@@ -15,11 +15,11 @@ public class MojmirAutomatonFactoryFromString extends MojmirAutomatonFactory<Str
     }
 
     @Override
-    public MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> createFrom(String from) {
+    public MojmirAutomaton<PropEquivalenceClass, Set<String>> createFrom(String from) {
         LTLFactoryFromString ltlFactory = new LTLFactoryFromString();
         LTLFactory.Result parserResult = ltlFactory.buildLTL(from);
 
-        MojmirAutomaton<LTLPropEquivalenceClass, Set<String>> cachedResult = getFromCache(new Pair<>(parserResult.getLtlFormula(), Collections.<Formula>emptySet()));
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> cachedResult = getFromCache(new Pair<>(parserResult.getLtlFormula(), Collections.<Formula>emptySet()));
         if (null != cachedResult) {
             return cachedResult;
         }

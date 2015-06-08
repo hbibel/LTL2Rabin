@@ -3,9 +3,8 @@ package ltl2rabin;
 import java.util.Objects;
 
 public class Pair<F, S> {
-    private F first;
-    private S second;
-    private int hashValue = Integer.MAX_VALUE;
+    private final F first;
+    private final S second;
 
     public F getFirst() {
         return first;
@@ -39,11 +38,6 @@ public class Pair<F, S> {
 
     @Override
     public int hashCode() {
-        if (Integer.MAX_VALUE == hashValue) {
-            int result = Objects.hash(first, second);
-            hashValue = result;
-            return result;
-        }
-        return hashValue;
+        return Objects.hash(first, second);
     }
 }

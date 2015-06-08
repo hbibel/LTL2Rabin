@@ -35,7 +35,7 @@ public class And extends Formula {
     }
 
     @Override
-    public Formula accept(ILTLFormulaVisitor<Formula> visitor) {
+    public Formula accept(IVisitor<Formula> visitor) {
         return visitor.visit(this);
     }
 
