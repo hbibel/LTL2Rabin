@@ -53,6 +53,36 @@ public class SlaveTest {
     }
 
     @Test
+    public void basicTest() {
+        ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(2));
+        SlaveFromMojmirFactory rabinAutomatonFactory = new SlaveFromMojmirFactory(alphabet);
+
+        Formula initLabel = new Variable("b");
+        MAMockFactory.MAMock m = maMockFactory.createMAMock(alphabet, initLabel);
+        m.addState(tt, true);
+        m.addState(ff, true);
+        m.whenReadingToken(initLabel, "b", tt);
+        m.whenReadingLetter(initLabel, Collections.emptySet(), ff);
+        m.whenReadingLetter(initLabel, ImmutableSet.of("a"), ff);
+        m.setStateAccepting(tt);
+
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> mockMA = m.toMA();
+
+        Slave ra = rabinAutomatonFactory.createFrom(mockMA);
+        assertEquals(1, ra.getStates().size());
+
+        // check for correct rabin pair
+        Slave.State q0 = ra.getInitialState();
+        ImmutableSet<Slave.Transition> fm = ra.failMerge(0);
+        assertEquals(ImmutableSet.of(new Slave.Transition(q0, ImmutableSet.of("a"), q0), new Slave.Transition(q0, Collections.emptySet(), q0)), ra.failMerge(0));
+        assertEquals(ImmutableSet.of(new Slave.Transition(q0, ImmutableSet.of("a", "b"), q0), new Slave.Transition(q0, ImmutableSet.of("b"), q0)), ra.succeed(0));
+
+        List<Set<String>> word1 = AutomatonMockFactory.createWord("", "a");
+        List<Set<String>> word2 = AutomatonMockFactory.createWord("a");
+        assertEquals(ra.run(word1), ra.run(word2));
+    }
+
+    @Test
     public void test1() {
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(1));
         SlaveFromMojmirFactory rabinAutomatonFactory = new SlaveFromMojmirFactory(alphabet);

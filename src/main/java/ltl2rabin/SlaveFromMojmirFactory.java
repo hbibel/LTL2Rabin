@@ -22,7 +22,7 @@ public class SlaveFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomato
         Slave.State initialState;
         Map<Integer, ImmutableSet.Builder<Slave.Transition>> failMergeMap = new HashMap<>();
         Map<Integer, ImmutableSet.Builder<Slave.Transition>> succeedMap = new HashMap<>();
-        for (int i = 0; i < from.getMaxRank(); i++) {
+        for (int i = 0; i <= from.getMaxRank(); i++) {
             failMergeMap.put(i, new ImmutableSet.Builder<>());
             succeedMap.put(i, new ImmutableSet.Builder<>());
         }
@@ -100,7 +100,7 @@ public class SlaveFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomato
     }
 
     private int mergeRank(Slave.Transition transition, MojmirAutomaton<PropEquivalenceClass, Set<String>> from) {
-        for (int rank = 0; rank < from.getMaxRank(); rank++) {
+        for (int rank = 0; rank <= from.getMaxRank(); rank++) {
             if (transition.getFrom().getLabel().size() < rank + 1) {
                 return -1;
             }
@@ -124,7 +124,7 @@ public class SlaveFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomato
     }
 
     private int succeedRank(Slave.Transition transition, MojmirAutomaton<PropEquivalenceClass, Set<String>> from) {
-        for (int rank = 0; rank < from.getMaxRank(); rank++) {
+        for (int rank = 0; rank <= from.getMaxRank(); rank++) {
             if (transition.getFrom().getLabel().size() < rank + 1) {
                 return -1;
             }

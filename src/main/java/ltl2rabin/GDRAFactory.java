@@ -42,7 +42,7 @@ public class GDRAFactory {
             ImmutableList.Builder<Set<Pair<Formula, Integer>>> psiAndPiPairs = new ImmutableList.Builder<>();
             curlyG.forEach(psi -> {
                 ImmutableSet.Builder<Pair<Formula, Integer>> pairBuilder = new ImmutableSet.Builder<>();
-                for (int i = 0; i < mojmirAutomatonFactoryFromLTL.createFrom(psi).getMaxRank(); i++) {
+                for (int i = 0; i <= mojmirAutomatonFactoryFromLTL.createFrom(psi).getMaxRank(); i++) {
                     pairBuilder.add(new Pair<>(psi, i));
                 }
                 psiAndPiPairs.add(pairBuilder.build());
@@ -90,7 +90,7 @@ public class GDRAFactory {
                 PropEquivalenceClass newLabelLTL = new PropEquivalenceClass(afVisitor.afG(temp.getLabel().getFirst().getRepresentative()));
                 ImmutableList.Builder<Slave.State> newLabelSlaveStatesBuilder = new ImmutableList.Builder<>();
                 // for each subformula from gSet add the initial state of the corresponding RabinAutomaton
-                temp.getLabel().getSecond().forEach(slaveState -> newLabelSlaveStatesBuilder.add((Slave.State) slaveState.readLetter(letter)));
+                temp.getLabel().getSecond().forEach(slaveState -> newLabelSlaveStatesBuilder.add(slaveState.readLetter(letter)));
                 GDRA.State newState = addOrGet(new Pair<>(newLabelLTL, newLabelSlaveStatesBuilder.build()));
 
                 if (!statesBuilder.build().contains(newState)) {
@@ -163,7 +163,7 @@ public class GDRAFactory {
                     Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accPiCurlyG = piCurlyGToAccMap.get(key);
                     alphabet.forEach(letter -> accPiCurlyG.add(new Pair<>(ImmutableSet.of(new GDRA.Transition(temp, letter, temp.readLetter(letter))), univ)));
                 }
-                });
+            });
         }
 
         ImmutableSet<GDRA.State> states = statesBuilder.build();

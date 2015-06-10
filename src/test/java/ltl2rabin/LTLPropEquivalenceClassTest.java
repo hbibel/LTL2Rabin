@@ -194,5 +194,8 @@ public class LTLPropEquivalenceClassTest {
         assertTrue(new PropEquivalenceClass(tt).implies(new PropEquivalenceClass(tt)));
         // tt |/= ff
         assertFalse(new PropEquivalenceClass(tt).implies(new PropEquivalenceClass(ff)));
+
+        // a |/= ff
+        assertFalse(new PropEquivalenceClass(variables.get(0)).implies(new PropEquivalenceClass(ff)));
     }
 }
