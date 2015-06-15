@@ -56,10 +56,10 @@ public class Or extends Formula {
         Iterator<Formula> disjunctsIterator = disjuncts.iterator();
         while (disjunctsIterator.hasNext()) {
             Formula operand = disjunctsIterator.next();
-            if (operand instanceof And || operand instanceof Variable || operand instanceof Boolean || operand instanceof Or) {
+            if (operand instanceof And || operand instanceof Variable || operand instanceof Boolean) {
                 builder.append(operand.toString());
             }
-            else if (operand instanceof U) {
+            else if (operand instanceof U || operand instanceof Or) {
                 builder.append("(").append(operand.toString()).append(")");
             }
             else {
@@ -84,7 +84,7 @@ public class Or extends Formula {
                     builder.append("(").append(operatorOfOperand).append(operandOfOperand.toString()).append(")");
                 }
                 else {
-                    builder.append(operatorOfOperand).append("(").append(operandOfOperand.toString()).append(")");
+                    builder.append("(").append(operatorOfOperand).append("(").append(operandOfOperand.toString()).append("))");
                 }
             }
 

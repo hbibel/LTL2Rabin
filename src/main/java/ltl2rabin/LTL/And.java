@@ -52,10 +52,10 @@ public class And extends Formula {
         Iterator<Formula> conjunctsIterator = conjuncts.iterator();
         while (conjunctsIterator.hasNext()) {
             Formula operand = conjunctsIterator.next();
-            if (operand instanceof And || operand instanceof Variable || operand instanceof Boolean) {
+            if (operand instanceof Variable || operand instanceof Boolean) {
                 builder.append(operand.toString());
             }
-            else if (operand instanceof U || operand instanceof Or) {
+            else if (operand instanceof And || operand instanceof U || operand instanceof Or) {
                 builder.append("(").append(operand.toString()).append(")");
             }
             else {
@@ -80,7 +80,7 @@ public class And extends Formula {
                     builder.append("(").append(operatorOfOperand).append(operandOfOperand.toString()).append(")");
                 }
                 else {
-                    builder.append(operatorOfOperand).append("(").append(operandOfOperand.toString()).append(")");
+                    builder.append("(").append(operatorOfOperand).append("(").append(operandOfOperand.toString()).append("))");
                 }
             }
 

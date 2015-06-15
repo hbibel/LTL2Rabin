@@ -33,6 +33,14 @@ public class LTLFactoryFromStringTest {
     }
 
     @Test
+    public void sdf() throws Exception {
+        F f1 = new F (new Variable("a"));
+        F f2 = new F (f1);
+        And a = new And(f1, f2);
+        assertEquals(a, factory.buildLTL("(F a) & (F F a)").getLtlFormula());
+    }
+
+    @Test
     public void testVariable() throws Exception {
         Variable expectedTestResult1 = new Variable("a");
         assertEquals(expectedTestResult1, factory.buildLTL("a").getLtlFormula());
