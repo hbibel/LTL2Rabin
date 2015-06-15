@@ -45,12 +45,54 @@ public class Or extends Formula {
 
     @Override
     public String toString() {
-        String result = "(";
-        for (Formula f : disjuncts) {
-            result = result + "(" + f.toString() + ") | ";
+        if (0 == disjuncts.size()) {
+            return "ff";
         }
-        // cut the last | and close the parentheses
-        return result.substring(0, result.length()-3) + ")";
+        else if (1 == disjuncts.size()) {
+            return disjuncts.get(0).toString();
+        }
+
+        StringBuilder builder = new StringBuilder();
+        Iterator<Formula> disjunctsIterator = disjuncts.iterator();
+        while (disjunctsIterator.hasNext()) {
+            Formula operand = disjunctsIterator.next();
+            if (operand instanceof And || operand instanceof Variable || operand instanceof Boolean || operand instanceof Or) {
+                builder.append(operand.toString());
+            }
+            else if (operand instanceof U) {
+                builder.append("(").append(operand.toString()).append(")");
+            }
+            else {
+                // prefix operator
+                Formula operandOfOperand;
+                String operatorOfOperand;
+                if (operand instanceof G) {
+                    operandOfOperand = ((G) operand).getOperand();
+                    operatorOfOperand = "G ";
+                }
+                else if (operand instanceof F) {
+                    operandOfOperand = ((F) operand).getOperand();
+                    operatorOfOperand = "F ";
+                }
+                else {
+                    operandOfOperand = ((X) operand).getOperand();
+                    operatorOfOperand = "X ";
+                }
+
+                if (operandOfOperand instanceof Variable || operandOfOperand instanceof Boolean
+                        || operandOfOperand instanceof G || operandOfOperand instanceof F || operandOfOperand instanceof X) {
+                    builder.append("(").append(operatorOfOperand).append(operandOfOperand.toString()).append(")");
+                }
+                else {
+                    builder.append(operatorOfOperand).append("(").append(operandOfOperand.toString()).append(")");
+                }
+            }
+
+            if (disjunctsIterator.hasNext()) {
+                builder.append(" | ");
+            }
+        }
+        return builder.toString();
     }
 
     @Override

@@ -29,7 +29,21 @@ public class U extends Formula {
 
     @Override
     public String toString() {
-        return "( (" + left.toString() + ") U (" + right.toString() + ") )";
+        StringBuilder builder = new StringBuilder();
+        if (left instanceof Variable || left instanceof Boolean) {
+            builder.append(left.toString());
+        }
+        else {
+            builder.append("(").append(left.toString()).append(")");
+        }
+        builder.append(" U ");
+        if (right instanceof Variable || right instanceof Boolean) {
+            builder.append(right.toString());
+        }
+        else {
+            builder.append("(").append(left.toString()).append(")");
+        }
+        return builder.toString();
     }
 
     @Override

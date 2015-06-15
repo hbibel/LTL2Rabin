@@ -18,7 +18,13 @@ public class X extends Formula {
 
     @Override
     public String toString() {
-        return "X (" + operand.toString() + ")";
+        if (operand instanceof G || operand instanceof F || operand instanceof X
+                || operand instanceof Variable || operand instanceof Boolean) {
+            return "X " + operand.toString();
+        }
+        else {
+            return "X (" + operand.toString() + ")";
+        }
     }
 
     @Override

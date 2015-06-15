@@ -22,7 +22,13 @@ public class G extends Formula {
 
     @Override
     public String toString() {
-        return "G (" + operand.toString() + ")";
+        if (operand instanceof G || operand instanceof F || operand instanceof X
+                || operand instanceof Variable || operand instanceof Boolean) {
+            return "G " + operand.toString();
+        }
+        else {
+            return "G (" + operand.toString() + ")";
+        }
     }
 
     @Override

@@ -41,11 +41,54 @@ public class And extends Formula {
 
     @Override
     public String toString() {
-        String result = "(";
-        for (Formula f : conjuncts) {
-            result = result + "(" + f.toString() + ") & ";
+        if (0 == conjuncts.size()) {
+            return "tt";
         }
-        return result.substring(0, result.length()-3) + ")";
+        else if (1 == conjuncts.size()) {
+            return conjuncts.get(0).toString();
+        }
+
+        StringBuilder builder = new StringBuilder();
+        Iterator<Formula> conjunctsIterator = conjuncts.iterator();
+        while (conjunctsIterator.hasNext()) {
+            Formula operand = conjunctsIterator.next();
+            if (operand instanceof And || operand instanceof Variable || operand instanceof Boolean) {
+                builder.append(operand.toString());
+            }
+            else if (operand instanceof U || operand instanceof Or) {
+                builder.append("(").append(operand.toString()).append(")");
+            }
+            else {
+                // prefix operator
+                Formula operandOfOperand;
+                String operatorOfOperand;
+                if (operand instanceof G) {
+                    operandOfOperand = ((G) operand).getOperand();
+                    operatorOfOperand = "G ";
+                }
+                else if (operand instanceof F) {
+                    operandOfOperand = ((F) operand).getOperand();
+                    operatorOfOperand = "F ";
+                }
+                else {
+                    operandOfOperand = ((X) operand).getOperand();
+                    operatorOfOperand = "X ";
+                }
+
+                if (operandOfOperand instanceof Variable || operandOfOperand instanceof Boolean
+                        || operandOfOperand instanceof G || operandOfOperand instanceof F || operandOfOperand instanceof X) {
+                    builder.append("(").append(operatorOfOperand).append(operandOfOperand.toString()).append(")");
+                }
+                else {
+                    builder.append(operatorOfOperand).append("(").append(operandOfOperand.toString()).append(")");
+                }
+            }
+
+            if (conjunctsIterator.hasNext()) {
+                builder.append(" & ");
+            }
+        }
+        return builder.toString();
     }
 
     @Override
