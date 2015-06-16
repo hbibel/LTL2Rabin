@@ -1,5 +1,6 @@
 package ltl2rabin;
 
+import ltl2rabin.LTL.LTLFactoryFromString;
 import ltl2rabin.LTL.LTLListener;
 import ltl2rabin.parser.LTLLexer;
 import ltl2rabin.parser.LTLParser;

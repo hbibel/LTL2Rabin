@@ -20,12 +20,7 @@ public class SlaveFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomato
     public Slave createFrom(MojmirAutomaton<PropEquivalenceClass, Set<String>> from) {
         ListOrderedSet<Slave.State> states = new ListOrderedSet<>();
         Slave.State initialState;
-        Map<Integer, ImmutableSet.Builder<Slave.Transition>> failMergeMap = new HashMap<>();
-        Map<Integer, ImmutableSet.Builder<Slave.Transition>> succeedMap = new HashMap<>();
-        for (int i = 0; i <= from.getMaxRank(); i++) {
-            failMergeMap.put(i, new ImmutableSet.Builder<>());
-            succeedMap.put(i, new ImmutableSet.Builder<>());
-        }
+        int maxRank = 0;
 
         List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> initialMojmirStates = new ArrayList<>(Collections.singletonList(from.getInitialState()));
         initialState = new Slave.State(initialMojmirStates);
@@ -56,38 +51,16 @@ public class SlaveFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomato
                         states.add(newState);
                     }
                     tempState.setTransition(letter, newState);
-                    final Slave.Transition tempTransition = new Slave.Transition(tempState, letter, newState);
-
-                    // Check if the transition is in fail, merge and/or succed:
-                    final int mergeRank = mergeRank(tempTransition, from);
-                    final int succedRank = succeedRank(tempTransition, from);
-                    if (mergeRank > -1) {
-                        failMergeMap.get(mergeRank).add(tempTransition);
-                    }
-                    if (succedRank > -1) {
-                        succeedMap.get(succedRank).add(tempTransition);
-                    }
-                    if (isInFail(tempTransition, from)) {
-                        failMergeMap.values().forEach(transitionSetBuilder -> transitionSetBuilder.add(tempTransition));
-                    }
 
                     queue.add(newState);
                 }
+                maxRank = tempState.getLabel().size() > maxRank ? tempState.getLabel().size() : maxRank;
             }
         }
         ImmutableSet<Slave.State> immutableStates = ImmutableSet.copyOf(states);
 
-        ImmutableMap.Builder<Integer, ImmutableSet<Slave.Transition>> finalFailMergeBuilder = new ImmutableMap.Builder<>();
-        failMergeMap.keySet().forEach(key -> finalFailMergeBuilder.put(key, failMergeMap.get(key).build()));
-
-        ImmutableMap.Builder<Integer, ImmutableSet<Slave.Transition>> finalSucceedBuilder = new ImmutableMap.Builder<>();
-        succeedMap.keySet().forEach(key -> finalSucceedBuilder.put(key, succeedMap.get(key).build()));
-
-        Pair<ImmutableMap<Integer, ImmutableSet<Slave.Transition>>, ImmutableMap<Integer, ImmutableSet<Slave.Transition>>> failMergeSucceed
-                = new Pair<>(finalFailMergeBuilder.build(), finalSucceedBuilder.build());
-
-        return new Slave(immutableStates, initialState, failMergeSucceed, getAlphabet());
-    }
+        return new Slave(immutableStates, initialState, getAlphabet(), maxRank);
+    }/* // TODO: Remove
 
     private boolean isInFail(Slave.Transition transition, MojmirAutomaton<PropEquivalenceClass, Set<String>> from) {
         List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> tempMojmirStates = transition.getFrom().getLabel();
@@ -136,5 +109,5 @@ public class SlaveFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomato
             }
         }
         return -1;
-    }
+    }*/
 }

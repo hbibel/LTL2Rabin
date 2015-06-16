@@ -23,18 +23,4 @@ public class GDRATest {
         GDRA gdra = new GDRAFactory().createFrom("a & (G b)");
         assertEquals(3, gdra.getStates().size());
     }
-
-    private Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> flatten (Set<Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>>> acc) {
-        Set<GDRA.Transition> avoid = new HashSet<>();
-        Set<GDRA.Transition> reach = new HashSet<>();
-
-        acc.forEach(setOfPairs -> {
-            setOfPairs.forEach(pairOfSets -> {
-                avoid.addAll(pairOfSets.getFirst());
-                reach.addAll(pairOfSets.getSecond());
-            });
-        });
-
-        return new Pair<>(avoid, reach);
-    }
 }

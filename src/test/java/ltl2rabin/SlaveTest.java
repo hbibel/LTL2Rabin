@@ -73,9 +73,9 @@ public class SlaveTest {
 
         // check for correct rabin pair
         Slave.State q0 = ra.getInitialState();
-        ImmutableSet<Slave.Transition> fm = ra.failMerge(0);
-        assertEquals(ImmutableSet.of(new Slave.Transition(q0, ImmutableSet.of("a"), q0), new Slave.Transition(q0, Collections.emptySet(), q0)), ra.failMerge(0));
-        assertEquals(ImmutableSet.of(new Slave.Transition(q0, ImmutableSet.of("a", "b"), q0), new Slave.Transition(q0, ImmutableSet.of("b"), q0)), ra.succeed(0));
+        ImmutableSet<Slave.Transition> fm = ra.failMerge(0, Collections.emptySet());
+        assertEquals(ImmutableSet.of(new Slave.Transition(q0, ImmutableSet.of("a"), q0), new Slave.Transition(q0, Collections.emptySet(), q0)), ra.failMerge(0, Collections.emptySet()));
+        assertEquals(ImmutableSet.of(new Slave.Transition(q0, ImmutableSet.of("a", "b"), q0), new Slave.Transition(q0, ImmutableSet.of("b"), q0)), ra.succeed(0, Collections.emptySet()));
 
         List<Set<String>> word1 = AutomatonMockFactory.createWord("", "a");
         List<Set<String>> word2 = AutomatonMockFactory.createWord("a");
@@ -106,8 +106,8 @@ public class SlaveTest {
         ImmutableSet.Builder<Slave.Transition> failBuyBuilder = new ImmutableSet.Builder<>();
         ImmutableSet.Builder<Slave.Transition> succeedBuilder = new ImmutableSet.Builder<>();
         for (int i = 0; i < mockMA.getMaxRank(); i++) {
-            failBuyBuilder.addAll(ra.failMerge(i));
-            succeedBuilder.addAll(ra.succeed(i));
+            failBuyBuilder.addAll(ra.failMerge(i, Collections.emptySet()));
+            succeedBuilder.addAll(ra.succeed(i, Collections.emptySet()));
         }
         ImmutableSet<Slave.Transition> failBuy = failBuyBuilder.build();
         ImmutableSet<Slave.Transition> succeed = succeedBuilder.build();
@@ -172,8 +172,8 @@ public class SlaveTest {
         ImmutableSet.Builder<Slave.Transition> failBuyBuilder = new ImmutableSet.Builder<>();
         ImmutableSet.Builder<Slave.Transition> succeedBuilder = new ImmutableSet.Builder<>();
         for (int i = 0; i < mockMA.getMaxRank(); i++) {
-            failBuyBuilder.addAll(ra.failMerge(i));
-            succeedBuilder.addAll(ra.succeed(i));
+            failBuyBuilder.addAll(ra.failMerge(i, Collections.emptySet()));
+            succeedBuilder.addAll(ra.succeed(i, Collections.emptySet()));
         }
         ImmutableSet<Slave.Transition> failBuy = failBuyBuilder.build();
         ImmutableSet<Slave.Transition> succeed = succeedBuilder.build();

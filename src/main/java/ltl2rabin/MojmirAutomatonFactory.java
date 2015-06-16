@@ -8,7 +8,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, PropEquivalenceClass, Set<String>> {
-    private static HashMap<Pair<Formula, Set<Formula>>, MojmirAutomaton<PropEquivalenceClass, Set<String>>> mojmirAutomata = new HashMap<>();
+    private static HashMap<Formula, MojmirAutomaton<PropEquivalenceClass, Set<String>>> mojmirAutomata = new HashMap<>();
 
     public MojmirAutomatonFactory(ImmutableSet<Set<String>> alphabet) {
         super(alphabet);
@@ -17,12 +17,12 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, Prop
     @Override
     public abstract MojmirAutomaton<PropEquivalenceClass, Set<String>> createFrom(F from);
 
-    protected static void putIntoCache(Pair<Formula, Set<Formula>> key, MojmirAutomaton<PropEquivalenceClass, Set<String>> ma) {
-        mojmirAutomata.put(key, ma);
+    protected static void putIntoCache(Formula psi, MojmirAutomaton<PropEquivalenceClass, Set<String>> ma) {
+        mojmirAutomata.put(psi, ma);
     }
 
-    protected static MojmirAutomaton<PropEquivalenceClass, Set<String>> getFromCache(Pair<Formula, Set<Formula>> key) {
-        return mojmirAutomata.get(key);
+    protected static MojmirAutomaton<PropEquivalenceClass, Set<String>> getFromCache(Formula psi) {
+        return mojmirAutomata.get(psi);
     }
 
     protected Pair<Set<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>,
@@ -36,7 +36,7 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, Prop
         else {
             List<Formula> curlyGConjuncts = new ArrayList<>();
             curlyG.forEach(ltlFormula -> {
-                curlyGConjuncts.add(new G(ltlFormula)); // TODO: Salomon: "Kann es sein, dass du in Zeile 38 ein G zuviel hast?"
+                curlyGConjuncts.add(new G(ltlFormula));
             });
             curlyGConjunction = new PropEquivalenceClass(new And(curlyGConjuncts));
         }

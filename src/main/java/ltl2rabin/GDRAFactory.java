@@ -14,17 +14,12 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class GDRAFactory {
     private Map<Pair<PropEquivalenceClass, List<Slave.State>>,
                 GDRA.State> existingStates = new HashMap<>();
-    private MojmirAutomatonFactoryFromLTL mojmirAutomatonFactoryFromLTL;
-    private MojmirAutomatonFactoryFromLTLSetRanking mojmirAutomatonFactoryFromLTLAndSet;
-    private SlaveFromMojmirFactory slaveFromMojmirFactory;
     private LTLFactoryFromString ltlFactory = new LTLFactoryFromString();
 
     public GDRA createFrom(String from) {
         LTLFactory.Result parserResult = ltlFactory.buildLTL(from);
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(parserResult.getAlphabet());
-        mojmirAutomatonFactoryFromLTL = new MojmirAutomatonFactoryFromLTL(alphabet);
-        mojmirAutomatonFactoryFromLTLAndSet = new MojmirAutomatonFactoryFromLTLSetRanking(alphabet);
-        slaveFromMojmirFactory = new SlaveFromMojmirFactory(alphabet);
+        SlaveFactory slaveFactory = new SlaveFactory(alphabet);
 
         ImmutableSet<Formula> gSet = (new ImmutableSet.Builder<Formula>())
                 .addAll(parserResult.getgFormulas()).build();
@@ -32,7 +27,7 @@ public class GDRAFactory {
                 .addAll(Sets.powerSet(gSet)).build();
         Formula phi = parserResult.getLtlFormula();
 
-        Set<GDRA.Transition> univ = new HashSet<>(); // TODO: UNIV = all transitions?
+        Set<GDRA.Transition> univ = new HashSet<>(); // UNIV = Universe, all transitions in the automaton.
         ImmutableSet.Builder<GDRA.State> statesBuilder = new ImmutableSet.Builder<>();
         Map<Pair<Set<Formula>, Map<Formula, Integer>>, Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>>> piCurlyGToAccMap = new HashMap<>();
 
@@ -42,7 +37,7 @@ public class GDRAFactory {
             ImmutableList.Builder<Set<Pair<Formula, Integer>>> psiAndPiPairs = new ImmutableList.Builder<>();
             curlyG.forEach(psi -> {
                 ImmutableSet.Builder<Pair<Formula, Integer>> pairBuilder = new ImmutableSet.Builder<>();
-                for (int i = 0; i <= mojmirAutomatonFactoryFromLTL.createFrom(psi).getMaxRank(); i++) {
+                for (int i = 0; i <= slaveFactory.createFrom(psi).getMaxRank(); i++) {
                     pairBuilder.add(new Pair<>(psi, i));
                 }
                 psiAndPiPairs.add(pairBuilder.build());
@@ -61,11 +56,11 @@ public class GDRAFactory {
         }
         ImmutableList<Pair<ImmutableSet<Formula>, Map<Formula, Integer>>> curlyGPis = curlyGPiBuilder.build();
 
-        // Initial state:
+        // Create the initial state:
         ImmutableList.Builder<Slave.State> initialLabelSlaveStatesBuilder = new ImmutableList.Builder<>();
-        // for each subformula from gSet add the initial state of the corresponding RabinAutomaton
+        // for each subformula from gSet add the initial state of the corresponding Slave
         gSet.forEach(subFormula -> {
-            initialLabelSlaveStatesBuilder.add(slaveFromMojmirFactory.createFrom(mojmirAutomatonFactoryFromLTL.createFrom(subFormula)).getInitialState());
+            initialLabelSlaveStatesBuilder.add(slaveFactory.createFrom(subFormula).getInitialState());
         });
         Pair<PropEquivalenceClass, List<Slave.State>> initialLabel
                 = new Pair<>(new PropEquivalenceClass(phi), initialLabelSlaveStatesBuilder.build());
@@ -78,7 +73,7 @@ public class GDRAFactory {
         while (!statesToBeAdded.isEmpty()) {
             GDRA.State temp = statesToBeAdded.poll();
 
-            for (Set<String> letter : alphabet) {
+            for (Set<String> letter : alphabet) { // TODO: This might be possible to be turned into a parallel forEach loop
                 LTLAfGVisitor afVisitor = new LTLAfGVisitor(letter) {
                     // We want to use af here, not afG
                     @Override
@@ -89,10 +84,10 @@ public class GDRAFactory {
                 };
                 PropEquivalenceClass newLabelLTL = new PropEquivalenceClass(afVisitor.afG(temp.getLabel().getFirst().getRepresentative()));
                 ImmutableList.Builder<Slave.State> newLabelSlaveStatesBuilder = new ImmutableList.Builder<>();
-                // for each subformula from gSet add the initial state of the corresponding RabinAutomaton
                 temp.getLabel().getSecond().forEach(slaveState -> newLabelSlaveStatesBuilder.add(slaveState.readLetter(letter)));
                 GDRA.State newState = addOrGet(new Pair<>(newLabelLTL, newLabelSlaveStatesBuilder.build()));
 
+                // if the states set already contains the newState then it already has been visited and expanded
                 if (!statesBuilder.build().contains(newState)) {
                     statesToBeAdded.offer(newState);
                     statesBuilder.add(newState);
@@ -100,29 +95,29 @@ public class GDRAFactory {
                 temp.setTransition(letter, newState);
 
                 final GDRA.Transition tempTransition = new GDRA.Transition(temp, letter, newState);
-                // this loop checks wether the transition is accepting or not
-                curlyGPis.forEach(curlyGPi -> {
+                univ.add(tempTransition);
+
+                // This loop checks whether the transition is in Acc_pi^curlyG(psi) or not
+                curlyGPis.forEach(curlyGPi -> { // TODO: Might want to make this parallel
                     ImmutableSet<Formula> curlyG = curlyGPi.getFirst();
                     Map<Formula, Integer> pi = curlyGPi.getSecond();
 
-                    // Acc_pi(psi)
                     curlyG.forEach(psi -> {
-                        MojmirAutomaton<PropEquivalenceClass, Set<String>> ma = mojmirAutomatonFactoryFromLTLAndSet.createFrom(new Pair<>(psi, curlyG));
-                        Slave ra = slaveFromMojmirFactory.createFrom(ma);
                         int piForPsi = pi.get(psi);
-                        Set<Slave.Transition> succeedPi = ra.succeed(piForPsi);
-                        Set<Slave.Transition> avoidPi = ra.failMerge(piForPsi);
+                        Slave ra = slaveFactory.createFrom(psi);
+                        Set<Slave.Transition> succeedPi = ra.succeed(piForPsi, curlyG);
+                        Set<Slave.Transition> failMergePi = ra.failMerge(piForPsi, curlyG);
                         Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> accPiCurlyGPsi = new Pair<>(new HashSet<>(), new HashSet<>());
-                        for(Slave.Transition transition : succeedPi) {
-                            if (transition.getLetter().equals(letter)
-                                    && temp.getLabel().getSecond().contains(transition.getFrom())) {
+                        for(Slave.Transition slaveReachTransition : succeedPi) {
+                            if (slaveReachTransition.getLetter().equals(letter) &&
+                                    tempTransition.getTo().getLabel().getSecond().contains(slaveReachTransition.getTo())) {
                                 accPiCurlyGPsi.getFirst().add(tempTransition);
                                 break;
                             }
                         }
-                        for(Slave.Transition transition : avoidPi) {
-                            if (transition.getLetter().equals(letter)
-                                    && temp.getLabel().getSecond().contains(transition.getFrom())) {
+                        for(Slave.Transition slaveAvoidTransition : failMergePi) {
+                            if (slaveAvoidTransition.getLetter().equals(letter)
+                                    && temp.getLabel().getSecond().contains(slaveAvoidTransition.getFrom())) {
                                 accPiCurlyGPsi.getSecond().add(tempTransition);
                                 break;
                             }
@@ -134,6 +129,7 @@ public class GDRAFactory {
                         }
                     });
                 });
+
             }
 
             // Now that temp has all transitions, we can check whether they all are in M_pi^curlyG or not:
@@ -144,11 +140,10 @@ public class GDRAFactory {
                 List<Formula> conjuncts = new ArrayList<>();
                 curlyG.forEach(psi -> {
                     conjuncts.add(new G(psi));
-                    MojmirAutomaton<PropEquivalenceClass, Set<String>> ma = mojmirAutomatonFactoryFromLTLAndSet.createFrom(new Pair<>(psi, curlyG));
-                    Slave ra = slaveFromMojmirFactory.createFrom(ma);
+                    int piForPsi = pi.get(psi);
+                    Slave ra = slaveFactory.createFrom(psi);
                     ra.getStates().forEach(raState -> {
                         // F(r_psi): For each raState, get the corresponding mojmir state with rank pi(psi) or higher
-                        int piForPsi = pi.get(psi);
                         if (raState.getLabel().size() - 1 >= piForPsi) {
                             // raState has LTL formulae with rank pi(psi) or higher.
                             for (int i = piForPsi; i < raState.getLabel().size() - 1; i++) {

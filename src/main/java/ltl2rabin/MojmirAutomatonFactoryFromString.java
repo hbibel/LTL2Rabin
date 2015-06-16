@@ -19,14 +19,14 @@ public class MojmirAutomatonFactoryFromString extends MojmirAutomatonFactory<Str
         LTLFactoryFromString ltlFactory = new LTLFactoryFromString();
         LTLFactory.Result parserResult = ltlFactory.buildLTL(from);
 
-        MojmirAutomaton<PropEquivalenceClass, Set<String>> cachedResult = getFromCache(new Pair<>(parserResult.getLtlFormula(), Collections.<Formula>emptySet()));
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> cachedResult = getFromCache(parserResult.getLtlFormula());
         if (null != cachedResult) {
             return cachedResult;
         }
 
         MojmirAutomatonFactoryFromLTL factoryFromLTL = new MojmirAutomatonFactoryFromLTL(super.getAlphabet());
         cachedResult = factoryFromLTL.createFrom(parserResult.getLtlFormula());
-        putIntoCache(new Pair<>(parserResult.getLtlFormula(), Collections.<Formula>emptySet()), cachedResult);
+        putIntoCache(parserResult.getLtlFormula(), cachedResult);
         return cachedResult;
     }
 }

@@ -16,13 +16,13 @@ public class MojmirAutomatonFactoryFromLTLSetRanking extends MojmirAutomatonFact
 
     @Override
     public MojmirAutomaton<PropEquivalenceClass, Set<String>> createFrom(Pair<Formula, ImmutableSet<Formula>> from) {
-        MojmirAutomaton<PropEquivalenceClass, Set<String>> cachedResult = getFromCache(new Pair<>(from.getFirst(), from.getSecond()));
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> cachedResult = getFromCache(from.getFirst());
         if (null != cachedResult) {
             return cachedResult;
         }
 
         // get cached result with same transition system but other acceptance condition:
-        cachedResult = getFromCache(new Pair<>(from.getFirst(), Collections.emptySet()));
+        cachedResult = getFromCache(from.getFirst());
         if (null != cachedResult) {
             ImmutableSet<Formula> curlyG = from.getSecond();
             PropEquivalenceClass curlyGConjunction;
@@ -44,7 +44,7 @@ public class MojmirAutomatonFactoryFromLTLSetRanking extends MojmirAutomatonFact
             });
 
             MojmirAutomaton<PropEquivalenceClass, Set<String>> modifiedResult = new MojmirAutomaton<>(cachedResult.getStates(), cachedResult.getInitialState(), acceptingStatesBuilder.build(), cachedResult.getAlphabet());
-            putIntoCache(new Pair<>(from.getFirst(), from.getSecond()), modifiedResult);
+            putIntoCache(from.getFirst(), modifiedResult);
             return modifiedResult;
         }
 
@@ -58,7 +58,7 @@ public class MojmirAutomatonFactoryFromLTLSetRanking extends MojmirAutomatonFact
         ImmutableSet<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> states = ImmutableSet.copyOf(reachResult.getFirst());
 
         cachedResult = new MojmirAutomaton<>(states, initialState, reachResult.getSecond(), getAlphabet());
-        putIntoCache(new Pair<>(from.getFirst(), from.getSecond()), cachedResult);
+        putIntoCache(from.getFirst(), cachedResult);
         return cachedResult;
     }
 }

@@ -14,7 +14,7 @@ public class MojmirAutomatonFactoryFromLTL extends MojmirAutomatonFactory<Formul
 
     @Override
     public MojmirAutomaton<PropEquivalenceClass, Set<String>> createFrom(Formula from) {
-        MojmirAutomaton<PropEquivalenceClass, Set<String>> cachedResult = getFromCache(new Pair<>(from, Collections.<Formula>emptySet()));
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> cachedResult = getFromCache(from);
         if (null != cachedResult) {
             return cachedResult;
         }
@@ -26,7 +26,7 @@ public class MojmirAutomatonFactoryFromLTL extends MojmirAutomatonFactory<Formul
         ImmutableSet<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> states = ImmutableSet.copyOf(reachResult.getFirst());
 
         cachedResult = new MojmirAutomaton<>(states, initialState, reachResult.getSecond(), super.getAlphabet());
-        putIntoCache(new Pair<>(from, Collections.<Formula>emptySet()), cachedResult);
+        putIntoCache(from, cachedResult);
         return cachedResult;
     }
 }
