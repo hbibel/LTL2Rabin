@@ -3,10 +3,7 @@ package ltl2rabin.LTL;
 import net.sf.javabdd.BDD;
 import net.sf.javabdd.BDDFactory;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * An object of this class represents an equivalence class of LTL formulas.

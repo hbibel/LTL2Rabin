@@ -131,8 +131,11 @@ public class GDRAFactory {
                 });
 
             }
+        }
+        ImmutableSet<GDRA.State> states = statesBuilder.build();
 
-            // Now that temp has all transitions, we can check whether they all are in M_pi^curlyG or not:
+        // Now that all states and transitions have been generated, we can construct M_pi^curlyG:
+        states.parallelStream().forEach(state -> {
             curlyGPis.forEach(curlyGPi -> {
                 ImmutableSet<Formula> curlyG = curlyGPi.getFirst();
                 Map<Formula, Integer> pi = curlyGPi.getSecond();
@@ -142,26 +145,17 @@ public class GDRAFactory {
                     conjuncts.add(new G(psi));
                     int piForPsi = pi.get(psi);
                     Slave ra = slaveFactory.createFrom(psi);
-                    ra.getStates().forEach(raState -> {
-                        // F(r_psi): For each raState, get the corresponding mojmir state with rank pi(psi) or higher
-                        if (raState.getLabel().size() - 1 >= piForPsi) {
-                            // raState has LTL formulae with rank pi(psi) or higher.
-                            for (int i = piForPsi; i < raState.getLabel().size() - 1; i++) {
-                                conjuncts.add(raState.getLabel().get(i).getLabel().getRepresentative());
-                            }
-                        }
-                    });
+                    conjuncts.addAll(ra.succeedingStates(curlyG, piForPsi, alphabet));
                 });
-                if (!new PropEquivalenceClass(conjuncts.isEmpty() ? new Boolean(true) : new And(conjuncts)).implies(temp.getLabel().getFirst())) {
+                if (!new PropEquivalenceClass(conjuncts.isEmpty() ? new Boolean(true) : new And(conjuncts)).implies(state.getLabel().getFirst())) {
                     // the state "temp" is not in F and thus its outgoing transitions are in M(pi, curlyG)
                     Pair<Set<Formula>, Map<Formula, Integer>> key = new Pair<>(curlyG, pi);
                     Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accPiCurlyG = piCurlyGToAccMap.get(key);
-                    alphabet.forEach(letter -> accPiCurlyG.add(new Pair<>(ImmutableSet.of(new GDRA.Transition(temp, letter, temp.readLetter(letter))), univ)));
+                    alphabet.forEach(letter -> accPiCurlyG.add(new Pair<>(ImmutableSet.of(new GDRA.Transition(state, letter, state.readLetter(letter))), univ)));
                 }
             });
-        }
+        });
 
-        ImmutableSet<GDRA.State> states = statesBuilder.build();
         Set<Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>>> acc = ImmutableSet.copyOf(piCurlyGToAccMap.values());
         return new GDRA(states, initialState, acc, alphabet);
     }
