@@ -51,7 +51,6 @@ public class MojmirAutomatonTest {
             }
         });
         assertEquals(new PropEquivalenceClass(tt), mojmirAutomaton.getInitialState().readLetter(ImmutableSet.of("a")).getLabel());
-        assertEquals(0, mojmirAutomaton.getMaxRank());
     }
 
     @Test
@@ -77,7 +76,6 @@ public class MojmirAutomatonTest {
                         assertTrue(m.isAcceptingState((new MojmirAutomaton.State<>(new PropEquivalenceClass(tt)))));
                     }
                 });
-        assertEquals(3, m.getMaxRank());
     }
 
     @Test
@@ -102,7 +100,6 @@ public class MojmirAutomatonTest {
                         assertTrue(mojmirAutomaton.isAcceptingState((new MojmirAutomaton.State<>(new PropEquivalenceClass(phi1)))));
                     }
                 });
-        assertEquals(0, mojmirAutomaton.getMaxRank());
     }
 
     @Test

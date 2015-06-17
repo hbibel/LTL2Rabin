@@ -70,6 +70,7 @@ public class SlaveTest {
 
         Slave ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(1, ra.getStates().size());
+        assertEquals(0, ra.getMaxRank());
 
         // check for correct rabin pair
         Slave.State q0 = ra.getInitialState();
@@ -101,11 +102,12 @@ public class SlaveTest {
 
         Slave ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(1, ra.getStates().size());
+        assertEquals(0, ra.getMaxRank());
 
         // check for correct rabin pair
         ImmutableSet.Builder<Slave.Transition> failBuyBuilder = new ImmutableSet.Builder<>();
         ImmutableSet.Builder<Slave.Transition> succeedBuilder = new ImmutableSet.Builder<>();
-        for (int i = 0; i < mockMA.getMaxRank(); i++) {
+        for (int i = 0; i <= ra.getMaxRank() ; i++) {
             failBuyBuilder.addAll(ra.failMerge(i, Collections.emptySet()));
             succeedBuilder.addAll(ra.succeed(i, Collections.emptySet()));
         }
@@ -151,6 +153,7 @@ public class SlaveTest {
 
         Slave ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(2, ra.getStates().size());
+        assertEquals(1, ra.getMaxRank());
 
         List<Set<String>> emptyWord = AutomatonMockFactory.createWord("");
         assertEquals(ra.getInitialState(), ra.run(emptyWord));
@@ -171,7 +174,7 @@ public class SlaveTest {
         // check for correct rabin pair
         ImmutableSet.Builder<Slave.Transition> failBuyBuilder = new ImmutableSet.Builder<>();
         ImmutableSet.Builder<Slave.Transition> succeedBuilder = new ImmutableSet.Builder<>();
-        for (int i = 0; i < mockMA.getMaxRank(); i++) {
+        for (int i = 0; i <= ra.getMaxRank(); i++) {
             failBuyBuilder.addAll(ra.failMerge(i, Collections.emptySet()));
             succeedBuilder.addAll(ra.succeed(i, Collections.emptySet()));
         }

@@ -42,7 +42,6 @@ public class MAMockFactory {
             MojmirAutomaton<PropEquivalenceClass, Set<String>> result = (MojmirAutomaton<PropEquivalenceClass, Set<String>>) mock(MojmirAutomaton.class);
             when(result.getStates()).thenReturn(ImmutableSet.copyOf(states));
             when(result.getAlphabet()).thenReturn(alphabet);
-            when(result.getMaxRank()).thenReturn(states.size() - 1); // TODO: - #(sinks)
             when(result.getInitialState()).thenReturn(initialState);
             when(result.isAcceptingState(anyObject())).thenAnswer(new Answer<Boolean>() {
                 @Override

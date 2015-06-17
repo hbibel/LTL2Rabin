@@ -53,11 +53,11 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
         } else {
             gConjunction = new PropEquivalenceClass(new And(ImmutableList.copyOf(curlyG)));
         }
-        slaveStates.parallelStream().forEach(slaveState -> {
-            getAlphabet().parallelStream().forEach(letter -> {
+        slaveStates.stream().forEach(slaveState -> {
+            getAlphabet().stream().forEach(letter -> {
                 // fail: Add transitions that move tokens from all Mojmir states in slaveState in a non-accepting sink
                 final State toState = slaveState.readLetter(letter);
-                slaveState.getLabel().parallelStream().forEach(ms -> {
+                slaveState.getLabel().stream().forEach(ms -> {
                     final MojmirAutomaton.State<PropEquivalenceClass, Set<String>> msToState = ms.readLetter(letter);
                     if (msToState.isSink() && !gConjunction.implies(msToState.getLabel())) {
                         resultBuilder.add(new Transition(slaveState, letter, toState));
@@ -72,7 +72,7 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
                         resultBuilder.add(new Transition(slaveState, letter, toState));
                     }
                     else {
-                        List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> otherTokens = slaveState.getLabel().parallelStream()
+                        List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> otherTokens = slaveState.getLabel().stream()
                                 .filter(ms -> !ms.equals(mFromState)) // tokens that don't come from q ...
                                 .map(ms -> ms.readLetter(letter))
                                 .filter(ms -> ms.equals(mToState)) // ... also move to q'
@@ -102,9 +102,9 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
         } else {
             gConjunction = new PropEquivalenceClass(new And(ImmutableList.copyOf(curlyG)));
         }
-        slaveStates.parallelStream()
+        slaveStates.stream()
                 .forEach(state -> {
-                    getAlphabet().parallelStream().forEach(letter -> {
+                    getAlphabet().stream().forEach(letter -> {
                         if (state.getLabel().size() > rank && gConjunction.implies(state.getLabel().get(rank).readLetter(letter).getLabel())) {
                             resultBuilder.add(new Transition(state, letter, state.readLetter(letter)));
                         }
@@ -123,15 +123,15 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
         }
 
         MojmirAutomaton<PropEquivalenceClass, Set<String>> ma = new MojmirAutomatonFactoryFromLTL(alphabet).createFrom(getInitialState().getLabel().get(0).getLabel().getRepresentative());
-        ma.getStates().parallelStream().forEach(maState -> {
+        ma.getStates().stream().forEach(maState -> {
             if (gConjunction.implies(maState.getLabel())) {
                 conjunctsBuilder.add(maState.getLabel().getRepresentative());
             }
         });
-        slaveStates.parallelStream().forEach(state -> {
+        slaveStates.stream().forEach(state -> {
             // get all mojmir states that either have rank >= pi or are accepting
             conjunctsBuilder.addAll(
-                state.getLabel().parallelStream().filter(mState -> mState.isAcceptingState(curlyG))
+                state.getLabel().stream().filter(mState -> mState.isAcceptingState(curlyG))
                                                  .map(mState -> eval(mState.getLabel().getRepresentative(), curlyG))
                                                  .collect(Collectors.toList()));
             if (state.getLabel().size() > pi) {
@@ -155,13 +155,13 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
             }
         }
         else if (f instanceof And) {
-            return new And(((And) f).getConjuncts().parallelStream().map(conjunct -> eval(conjunct, curlyG)).collect(Collectors.toList()));
+            return new And(((And) f).getConjuncts().stream().map(conjunct -> eval(conjunct, curlyG)).collect(Collectors.toList()));
         }
         else if (f instanceof F) {
             return new F(eval(((F) f).getOperand(), curlyG));
         }
         else if (f instanceof Or) {
-            return new Or(((Or) f).getDisjuncts().parallelStream().map(disjunct -> eval(disjunct, curlyG)).collect(Collectors.toList()));
+            return new Or(((Or) f).getDisjuncts().stream().map(disjunct -> eval(disjunct, curlyG)).collect(Collectors.toList()));
         }
         else if (f instanceof U) {
             return new U(eval(((U) f).getLeft(), curlyG), eval(((U) f).getRight(), curlyG));

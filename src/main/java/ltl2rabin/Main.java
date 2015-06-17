@@ -19,6 +19,15 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("This program runs, but does not do anything useful yet.");
+        // System.out.println("This program runs, but does not do anything useful yet.");
+        long startTime = System.currentTimeMillis();
+        GDRAFactory factory = new GDRAFactory();
+        //GDRA gdra = factory.createFrom("(a U b) & ((F G a) | (G F b)) & ((F G c) | (G F d)) | (a U c) & ((F G d) | (G F a)) & ((F G b) | (G F c))");
+        GDRA gdra = factory.createFrom("(r U s) & ((F G a) | (G F b)) & ((F G c) | (G F d)) ");
+
+        long stopTime = System.currentTimeMillis();
+        long elapsedTime = stopTime - startTime;
+        System.out.println(gdra.getStates().size() + " states in " + elapsedTime + "ms " +
+                "(=" + elapsedTime / 1000 / 60 + "m " + (elapsedTime % 60000) / 1000 + "s " + (elapsedTime % 1000) +"ms)");
     }
 }

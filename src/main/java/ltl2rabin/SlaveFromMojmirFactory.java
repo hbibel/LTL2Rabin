@@ -54,7 +54,7 @@ public class SlaveFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomato
 
                     queue.add(newState);
                 }
-                maxRank = tempState.getLabel().size() > maxRank ? tempState.getLabel().size() : maxRank;
+                maxRank = tempState.getLabel().size() - 1 > maxRank ? tempState.getLabel().size() - 1 : maxRank;
             }
         }
         ImmutableSet<Slave.State> immutableStates = ImmutableSet.copyOf(states);

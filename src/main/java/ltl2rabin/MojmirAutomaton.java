@@ -27,7 +27,7 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
         return alphabet;
     }
 
-    public int getMaxRank() { // ranks start at 0
+    /*public int getMaxRank() { // ranks start at 0
         if (-1 == maxRank) {
             int result = states.size() - 1;
             for (State<T, U> state : states) {
@@ -39,7 +39,7 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
             return result;
         }
         return maxRank;
-    }
+    }*/
 
     public State<T, U> getInitialState() {
         return initialState;
