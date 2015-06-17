@@ -12,13 +12,18 @@ public class And extends Formula {
     private final List<Formula> conjuncts;
 
     /**
-     * The only valid constructor for And
-     * @param conjuncts The LTL formulae that are connected by the conjunction
+     * @param conjuncts The LTL formulae that are connected by the conjunction. For example, the conjunction
+     *                  a & (X b) has the conjuncts a and (X b)
      */
     public And(List<Formula> conjuncts) {
         this.conjuncts = conjuncts;
     }
 
+    /**
+     * This constructor is for an conjunction with two conjuncts.
+     * @param l The left conjunct. For example, for a & b, a is the left conjunct.
+     * @param r The left conjunct. For example, for a & b, b is the right conjunct.
+     */
     public And(Formula l, Formula r) {
         List<Formula> params = new ArrayList<>();
         params.add(l);
@@ -30,6 +35,11 @@ public class And extends Formula {
         return conjuncts;
     }
 
+    /**
+     * Use this method to iterate over the conjuncts.
+     *
+     * @return The iterator over all conjuncts
+     */
     public Iterator<Formula> getIterator() {
         return conjuncts.iterator();
     }
@@ -42,7 +52,7 @@ public class And extends Formula {
     @Override
     public String toString() {
         if (0 == conjuncts.size()) {
-            return "tt";
+            return "tt"; // an empty conjunction is, by definition, true
         }
         else if (1 == conjuncts.size()) {
             return conjuncts.get(0).toString();
@@ -53,14 +63,17 @@ public class And extends Formula {
         while (conjunctsIterator.hasNext()) {
             Formula operand = conjunctsIterator.next();
             if (operand instanceof Variable || operand instanceof Boolean) {
-                builder.append(operand.toString());
+                builder.append(operand.toString()); // ... & a & ..., no parentheses needed
             }
             else if (operand instanceof And || operand instanceof U || operand instanceof Or) {
+                // (a & b) & c is structurally different from a & b & c, this is important for parsing. Logically,
+                // nested conjunctions don't have to be put in parentheses.
+                // And has higher priority than U and Or, so those have to be put in parentheses.
                 builder.append("(").append(operand.toString()).append(")");
             }
             else {
-                // prefix operator
-                Formula operandOfOperand;
+                // operand is an prefix operator
+                Formula operandOfOperand; // The last prefix operator binds strongest.
                 String operatorOfOperand;
                 if (operand instanceof G) {
                     operandOfOperand = ((G) operand).getOperand();
