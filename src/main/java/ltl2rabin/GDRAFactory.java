@@ -10,7 +10,7 @@ import ltl2rabin.LTL.Boolean;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
+// TODO: Rename Pi into acceptingRanks or sth like that
 public class GDRAFactory {
     private Map<Pair<PropEquivalenceClass, List<Slave.State>>,
                 GDRA.State> existingStates = new HashMap<>();
@@ -140,34 +140,36 @@ public class GDRAFactory {
         ImmutableSet<GDRA.State> states = statesBuilder.build();
 
         // Now that all states and transitions have been generated, we can construct M_pi^curlyG:
-        states.stream().forEach(state -> {
-            curlyGPis.forEach(curlyGPi -> {
-                Set<Formula> curlyG = curlyGPi.getFirst();
-                Map<Formula, Integer> pi = curlyGPi.getSecond();
+        curlyGPis.forEach(curlyGPi -> {
+            Set<Formula> curlyG = curlyGPi.getFirst();
+            Map<Formula, Integer> pi = curlyGPi.getSecond();
+            Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> mPiG = new Pair<>(new HashSet<>(), univ);
 
+            states.forEach(state -> {
                 List<Formula> conjuncts = new ArrayList<>();
-                curlyG.forEach(psi -> {
-                    conjuncts.add(new G(psi));
-                    int piForPsi = pi.get(psi);
-                    Slave ra = slaveFactory.createFrom(psi);
-                    conjuncts.addAll(ra.succeedingStates(curlyG, piForPsi, alphabet));
+                state.getLabel().getSecond().forEach(slaveState -> {
+                    Formula psi = slaveState.getPsi();
+                    if (curlyG.contains(psi)) {
+                        int piForPsi = pi.get(psi);
+                        conjuncts.add(psi);
+                        conjuncts.addAll(slaveState.succeedingFormulas(piForPsi));
+                    }
                 });
                 if (!new PropEquivalenceClass(conjuncts.isEmpty() ? new Boolean(true) : new And(conjuncts)).implies(state.getLabel().getFirst())) {
-                    // the state "temp" is not in F and thus its outgoing transitions are in M(pi, curlyG)
-                    Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> mPiGAvoid = new Pair<>(new HashSet<>(), univ);
-                    alphabet.forEach(letter -> mPiGAvoid.getFirst().add(new GDRA.Transition(state, letter, state.readLetter(letter))));
-                    Pair<Set<Formula>, Map<Formula, Integer>> key = new Pair<>(curlyG, pi);
-                    Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accPiCurlyG = piCurlyGToAccMap.get(key);
-                    accPiCurlyG.add(mPiGAvoid);
+                    // the state "state" is not in F and thus its outgoing transitions are in M(pi, curlyG)
+                    alphabet.forEach(letter -> mPiG.getFirst().add(new GDRA.Transition(state, letter, state.readLetter(letter))));
                 }
             });
+            Pair<Set<Formula>, Map<Formula, Integer>> key = new Pair<>(curlyG, pi);
+            Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accPiCurlyG = piCurlyGToAccMap.get(key);
+            accPiCurlyG.add(mPiG);
         });
 
-        Set<Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>>> acc = new HashSet<>();
+        ImmutableSet.Builder<Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>>> acc = new ImmutableSet.Builder<>();
         curlyGPis.forEach(key -> {
             acc.add(piCurlyGToAccMap.get(key));
         });
-        return new GDRA(states, initialState, acc, alphabet);
+        return new GDRA(states, initialState, acc.build(), alphabet);
     }
 
     private GDRA.State addOrGet(Pair<PropEquivalenceClass, List<Slave.State>> label) {

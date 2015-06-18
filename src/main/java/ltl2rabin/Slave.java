@@ -113,76 +113,63 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
         return resultBuilder.build();
     }
 
-    public List<Formula> succeedingStates(Set<Formula> curlyG, int pi, ImmutableSet<Set<String>> alphabet) { // TODO: Find a better name
-        ImmutableList.Builder<Formula> conjunctsBuilder = new ImmutableList.Builder<>();
-        PropEquivalenceClass gConjunction;
-        if (curlyG.isEmpty()) {
-            gConjunction = new PropEquivalenceClass(new Boolean(true));
-        } else {
-            gConjunction = new PropEquivalenceClass(new And(ImmutableList.copyOf(curlyG)));
-        }
-
-        MojmirAutomaton<PropEquivalenceClass, Set<String>> ma = new MojmirAutomatonFactoryFromLTL(alphabet).createFrom(getInitialState().getLabel().get(0).getLabel().getRepresentative());
-        ma.getStates().stream().forEach(maState -> {
-            if (gConjunction.implies(maState.getLabel())) {
-                conjunctsBuilder.add(maState.getLabel().getRepresentative());
-            }
-        });
-        slaveStates.stream().forEach(state -> {
-            // get all mojmir states that either have rank >= pi or are accepting
-            conjunctsBuilder.addAll(
-                state.getLabel().stream().filter(mState -> mState.isAcceptingState(curlyG))
-                                                 .map(mState -> eval(mState.getLabel().getRepresentative(), curlyG))
-                                                 .collect(Collectors.toList()));
-            if (state.getLabel().size() > pi) {
-                conjunctsBuilder.addAll(state.getLabel().subList(pi, state.getLabel().size())
-                        .stream()
-                        .map(mState -> eval(mState.getLabel().getRepresentative(), curlyG))
-                        .collect(Collectors.toList()));
-            }
-        });
-        return conjunctsBuilder.build();
-    }
-
-    private Formula eval(Formula f, Set<Formula> curlyG) {
-        if (f instanceof G) {
-            Formula operand = ((G) f).getOperand();
-            if (curlyG.contains(operand)) {
-                return new G(eval(operand, curlyG));
-            }
-            else {
-                return new Boolean(false);
-            }
-        }
-        else if (f instanceof And) {
-            return new And(((And) f).getConjuncts().stream().map(conjunct -> eval(conjunct, curlyG)).collect(Collectors.toList()));
-        }
-        else if (f instanceof F) {
-            return new F(eval(((F) f).getOperand(), curlyG));
-        }
-        else if (f instanceof Or) {
-            return new Or(((Or) f).getDisjuncts().stream().map(disjunct -> eval(disjunct, curlyG)).collect(Collectors.toList()));
-        }
-        else if (f instanceof U) {
-            return new U(eval(((U) f).getLeft(), curlyG), eval(((U) f).getRight(), curlyG));
-        }
-        else if (f instanceof X) {
-            return new X(eval(((X) f).getOperand(), curlyG));
-        }
-        return f; // Booleans and Variables don't change at all
-    }
-
     public static class State extends RabinAutomaton.State<List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>, Set<String>> {
+        private final Formula psi;
+
         /**
-         * @param label the list representing the ranking of the states of the corresponding mojmir automaton.
-         *              The elder states come first in the list.
+         * @param label The list representing the ranking of the states of the corresponding mojmir automaton.
+         *              The elder states come first in the list. The lowest rank is 0.
+         *        psi   The LTL Formula that is used to generate the automaton the state belongs to. This is the
+         *              connection between the state and the automaton.
          */
-        public State(List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> label) {
+        public State(List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> label, Formula psi) {
             super(label);
+            this.psi = psi;
         }
 
+        public Formula getPsi() {
+            return psi;
+        }
 
+        public List<Formula> succeedingFormulas(int rank) {
+            if (rank >= getLabel().size()) {
+                return Collections.emptyList();
 
+            }
+            ImmutableList.Builder<Formula> conjunctsBuilder = new ImmutableList.Builder<>();
+            for (int i = rank; i < getLabel().size(); i++) {
+                conjunctsBuilder.add(getLabel().get(i).getLabel().getRepresentative());
+            }
+            return conjunctsBuilder.build();
+        }
+
+        private Formula eval(Formula f, Set<Formula> curlyG) {
+            if (f instanceof G) {
+                Formula operand = ((G) f).getOperand();
+                if (curlyG.contains(operand)) {
+                    return new G(eval(operand, curlyG));
+                }
+                else {
+                    return new Boolean(false);
+                }
+            }
+            else if (f instanceof And) {
+                return new And(((And) f).getConjuncts().stream().map(conjunct -> eval(conjunct, curlyG)).collect(Collectors.toList()));
+            }
+            else if (f instanceof F) {
+                return new F(eval(((F) f).getOperand(), curlyG));
+            }
+            else if (f instanceof Or) {
+                return new Or(((Or) f).getDisjuncts().stream().map(disjunct -> eval(disjunct, curlyG)).collect(Collectors.toList()));
+            }
+            else if (f instanceof U) {
+                return new U(eval(((U) f).getLeft(), curlyG), eval(((U) f).getRight(), curlyG));
+            }
+            else if (f instanceof X) {
+                return new X(eval(((X) f).getOperand(), curlyG));
+            }
+            return f; // Booleans and Variables don't change at all
+        }
         @Override
         public State readLetter(Set<String> letter) {
             return (State) super.readLetter(letter);

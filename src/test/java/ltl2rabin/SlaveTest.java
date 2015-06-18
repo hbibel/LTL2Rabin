@@ -59,12 +59,11 @@ public class SlaveTest {
 
         Formula initLabel = new Variable("b");
         MAMockFactory.MAMock m = maMockFactory.createMAMock(alphabet, initLabel);
-        m.addState(tt, true);
+        m.addState(tt, true, ImmutableSet.of(Collections.emptySet()));
         m.addState(ff, true);
         m.whenReadingToken(initLabel, "b", tt);
         m.whenReadingLetter(initLabel, Collections.emptySet(), ff);
         m.whenReadingLetter(initLabel, ImmutableSet.of("a"), ff);
-        m.setStateAccepting(tt);
 
         MojmirAutomaton<PropEquivalenceClass, Set<String>> mockMA = m.toMA();
 
@@ -90,13 +89,12 @@ public class SlaveTest {
 
         Formula initlabel = new Or(ImmutableList.of(aVariable, bVariable, cVariable));
         MAMockFactory.MAMock m = maMockFactory.createMAMock(alphabet, initlabel);
-        m.addState(tt, true);
+        m.addState(tt, true, ImmutableSet.of(Collections.emptySet()));
         m.addState(ff, true);
         m.whenReadingToken(initlabel, "a", tt);
         m.whenReadingToken(initlabel, "b", tt);
         m.whenReadingToken(initlabel, "c", tt);
         m.whenReadingLetter(initlabel, Collections.emptySet(), ff);
-        m.setStateAccepting(tt);
 
         MojmirAutomaton<PropEquivalenceClass, Set<String>> mockMA = m.toMA();
 
@@ -131,7 +129,7 @@ public class SlaveTest {
 
     @Test
     public void test2() {
-        // Example from the paper, figure 3
+        // Example 4.12 from the paper: a | (b U c)
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3));
         SlaveFromMojmirFactory rabinAutomatonFactory = new SlaveFromMojmirFactory(alphabet);
 
@@ -140,7 +138,7 @@ public class SlaveTest {
         MAMockFactory.MAMock m = maMockFactory.createMAMock(alphabet, initialLabel);
         m.addState(bUc, false);
         m.addState(ff, true);
-        m.addState(tt, true);
+        m.addState(tt, true, ImmutableSet.of(Collections.emptySet())); // tt accepts
         m.whenReadingToken(initialLabel, "a", bUc);
         m.whenNotReadingToken(initialLabel, "a", ff);
         m.whenReadingLetter(bUc, ImmutableSet.of("b"), bUc);
@@ -148,7 +146,6 @@ public class SlaveTest {
         m.whenReadingLetter(bUc, ImmutableSet.of("a"), ff);
         m.whenReadingLetter(bUc, Collections.emptySet(), ff);
         m.whenReadingToken(bUc, "c", tt);
-        m.setStateAccepting(tt);
         MojmirAutomaton<PropEquivalenceClass, Set<String>> mockMA = m.toMA();
 
         Slave ra = rabinAutomatonFactory.createFrom(mockMA);
@@ -169,7 +166,6 @@ public class SlaveTest {
 
         List<Set<String>> wordACEtc = AutomatonMockFactory.createWord("ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac", "ac");
         assertNotEquals(ra.getInitialState(), ra.run(wordACEtc));
-
 
         // check for correct rabin pair
         ImmutableSet.Builder<Slave.Transition> failBuyBuilder = new ImmutableSet.Builder<>();
@@ -203,5 +199,13 @@ public class SlaveTest {
         buyBuilder.add(new Slave.Transition(q1, ImmutableSet.of("a", "b"), q1));
         ImmutableSet<Slave.Transition> expected = failBuilder.addAll(buyBuilder.build()).build();
         assertEquals(expected, failBuy);
+
+        Set<Formula> expectedSucceedingFormulasQ1_1 = ImmutableSet.of(initialLabel);
+        assertEquals(expectedSucceedingFormulasQ1_1, ImmutableSet.copyOf(q1.succeedingFormulas(1)));
+        Set<Formula> expectedSucceedingFormulasQ0_1 = ImmutableSet.of();
+        assertEquals(expectedSucceedingFormulasQ0_1, ImmutableSet.copyOf(q0.succeedingFormulas(1)));
+        Set<Formula> expectedSucceedingFormulasQ1_0 = ImmutableSet.of(bUc, initialLabel);
+        assertEquals(expectedSucceedingFormulasQ1_0, ImmutableSet.copyOf(q1.succeedingFormulas(0)));
+
     }
 }

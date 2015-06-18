@@ -6,6 +6,8 @@ import ltl2rabin.LTL.*;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * This class describes a mojmir automaton.
@@ -27,20 +29,6 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
         return alphabet;
     }
 
-    /*public int getMaxRank() { // ranks start at 0
-        if (-1 == maxRank) {
-            int result = states.size() - 1;
-            for (State<T, U> state : states) {
-                if (state.isSink()) {
-                    result -= 1;
-                }
-            }
-            maxRank = result;
-            return result;
-        }
-        return maxRank;
-    }*/
-
     public State<T, U> getInitialState() {
         return initialState;
     }
@@ -51,10 +39,6 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
         this.initialState = initialState;
         this.acceptingStates = acceptingStates;
         this.alphabet = alphabet;
-    }
-
-    public boolean isAcceptingState(State<T, U> s) {
-        return acceptingStates.contains(s);
     }
 
     public static class State<R, S> extends Automaton.State<R, S> {
@@ -88,7 +72,7 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
             if (curlyG.isEmpty()) {
                 gConjunction = new PropEquivalenceClass(new ltl2rabin.LTL.Boolean(true));
             } else {
-                gConjunction = new PropEquivalenceClass(new And(ImmutableList.copyOf(curlyG)));
+                gConjunction = new PropEquivalenceClass(new And(ImmutableList.copyOf(curlyG.stream().map(G::new).collect(Collectors.toList()))));
             }
             return gConjunction.implies((PropEquivalenceClass) label);
         }

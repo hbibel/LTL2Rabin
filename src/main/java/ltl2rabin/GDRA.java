@@ -22,6 +22,11 @@ public class GDRA extends RabinAutomaton<Pair<PropEquivalenceClass, List<Slave.S
         return gdraCondition;
     }
 
+    @Override
+    public ImmutableSet<? extends Set<String>> getAlphabet() {
+        return super.getAlphabet();
+    }
+
     public static class State extends RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> {
 
         /**

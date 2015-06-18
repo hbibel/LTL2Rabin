@@ -183,6 +183,8 @@ public class LTLPropEquivalenceClassTest {
         assertFalse(new PropEquivalenceClass(new Or(variables.get(0), variables.get(1))).implies(equivalenceClasses.get(0)));
         // a | b |/= b
         assertFalse(new PropEquivalenceClass(new Or(variables.get(0), variables.get(1))).implies(equivalenceClasses.get(1)));
+        // a |= a | b
+        assertTrue(equivalenceClasses.get(1).implies(new PropEquivalenceClass(new Or(variables.get(0), variables.get(1)))));
 
         // a & b |= a | b
         assertTrue(new PropEquivalenceClass(new And(variables.get(0), variables.get(1))).implies(

@@ -7,6 +7,8 @@ import ltl2rabin.LTL.Boolean;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -15,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 public class MojmirAutomatonTest {
     MojmirAutomatonFactoryFromString automatonFactory;
-    MojmirAutomatonFactoryFromLTLSetRanking automatonFactoryWithSet;
+    MojmirAutomatonFactoryFromLTL automatonFactoryWithSet;
 
     Formula aVariable;
     Formula bVariable;
@@ -26,7 +28,7 @@ public class MojmirAutomatonTest {
     @Before
     public void setUp() {
         automatonFactory = new MojmirAutomatonFactoryFromString(ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3)));
-        automatonFactoryWithSet = new MojmirAutomatonFactoryFromLTLSetRanking(ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3)));
+        automatonFactoryWithSet = new MojmirAutomatonFactoryFromLTL(ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3)));
         aVariable = new Variable("a");
         bVariable = new Variable("b");
         cVariable = new Variable("c");
@@ -41,13 +43,12 @@ public class MojmirAutomatonTest {
         assertEquals(new PropEquivalenceClass(aVariable), mojmirAutomaton.getInitialState().getLabel());
         // assertEquals(2, mojmirAutomaton.getMaxRank());
         assertEquals(3, mojmirAutomaton.getStates().size());
-        assertTrue(mojmirAutomaton.isAcceptingState(new MojmirAutomaton.State<>(new PropEquivalenceClass(tt))));
-        assertFalse(mojmirAutomaton.isAcceptingState(new MojmirAutomaton.State<>(new PropEquivalenceClass(ff))));
-        assertFalse(mojmirAutomaton.isAcceptingState(new MojmirAutomaton.State<>(new PropEquivalenceClass(aVariable))));
-        mojmirAutomaton.getStates().forEach(state -> {
-            PropEquivalenceClass label = state.getLabel();
-            if (!label.equals(new PropEquivalenceClass(tt))) {
-                assertFalse(mojmirAutomaton.isAcceptingState(state));
+        mojmirAutomaton.getStates().forEach(mState -> {
+            if (mState.equals(new MojmirAutomaton.State<PropEquivalenceClass, Set<String>>(new PropEquivalenceClass(tt)))) {
+                assertTrue(mState.isAcceptingState(Collections.emptySet()));
+            }
+            else {
+                assertFalse(mState.isAcceptingState(Collections.emptySet()));
             }
         });
         assertEquals(new PropEquivalenceClass(tt), mojmirAutomaton.getInitialState().readLetter(ImmutableSet.of("a")).getLabel());
@@ -68,44 +69,64 @@ public class MojmirAutomatonTest {
         ImmutableList.of(phi, new Or(phi, phi1), new Or(phi, cVariable), new Or(phi, new Or(cVariable, phi1)), tt)
                 .forEach(ltlFormula -> {
                     assertTrue(m.getStates().contains(new MojmirAutomaton.State<PropEquivalenceClass, Set<String>>(new PropEquivalenceClass(ltlFormula))));
-                    // only the state labeled 'tt' is accepting, the others are not
-                    if (!ltlFormula.equals(tt)) {
-                        assertFalse(m.isAcceptingState(new MojmirAutomaton.State<>(new PropEquivalenceClass(ltlFormula))));
-                    }
-                    else {
-                        assertTrue(m.isAcceptingState((new MojmirAutomaton.State<>(new PropEquivalenceClass(tt)))));
-                    }
                 });
     }
 
     @Test
     public void curlyGTest() throws Exception {
-        Formula phi = new Or(
+        Formula phi = new Or( // (a & G b) | G (a & b)
                 new And(aVariable, new G(bVariable)),
                 new G(new And(aVariable, bVariable))
         );
-        ImmutableSet<Formula> curlyG = ImmutableSet.of(bVariable);
-        MojmirAutomaton<PropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactoryWithSet.createFrom(new Pair<>(phi, curlyG));
-        Formula phi1 = new Or(new G(bVariable), new G(new And(aVariable, bVariable)));
+        ImmutableSet<Formula> curlyG1 = ImmutableSet.of(bVariable);
+        ImmutableSet<Formula> curlyG2 = ImmutableSet.of(bVariable, new And(aVariable, bVariable));
+        ImmutableSet<Formula> curlyG3 = ImmutableSet.of(new And(aVariable, bVariable));
+        MojmirAutomaton<PropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactoryWithSet.createFrom(phi);
+        Formula gBOrGAAndB = new Or(new G(bVariable), new G(new And(aVariable, bVariable)));
 
         assertEquals(3, mojmirAutomaton.getStates().size());
-        ImmutableList.of(phi, phi1, new G(new And(aVariable, bVariable)))
+        ImmutableList.of(phi, gBOrGAAndB, new G(new And(aVariable, bVariable)))
                 .forEach(ltlFormula -> {
                     assertTrue(mojmirAutomaton.getStates().contains(new MojmirAutomaton.State<PropEquivalenceClass, Set<String>>(new PropEquivalenceClass(ltlFormula))));
-                    // only the state labeled with phi_1 is accepting, the others are not
-                    if (!ltlFormula.equals(phi1)) {
-                        assertFalse(mojmirAutomaton.isAcceptingState(new MojmirAutomaton.State<>(new PropEquivalenceClass(ltlFormula))));
-                    }
-                    else {
-                        assertTrue(mojmirAutomaton.isAcceptingState((new MojmirAutomaton.State<>(new PropEquivalenceClass(phi1)))));
-                    }
                 });
+        mojmirAutomaton.getStates().forEach(mState -> {
+            // the state labeled with (G b) | G (a & b) is accepting, the others are not
+            if (mState.getLabel().equals(new PropEquivalenceClass(gBOrGAAndB))) {
+                // the state labeled with (G b) | G (a & b) accepts under curlyG1, curlyG2 and curlyG3
+                assertTrue(mState.isAcceptingState(curlyG1));
+                assertTrue(mState.isAcceptingState(curlyG2));
+                assertTrue(mState.isAcceptingState(curlyG3));
+            }
+            else if (mState.getLabel().equals(new PropEquivalenceClass(new G(new And(aVariable, bVariable))))) {
+                // the state labeled with G (a & b) accepts under curlyG2 and curlyG3
+                assertFalse(mState.isAcceptingState(curlyG1));
+                assertTrue(mState.isAcceptingState(curlyG2));
+                assertTrue(mState.isAcceptingState(curlyG3));
+            }
+            else {
+                // the initial state, labeled with phi, accepts under curlyG2 and curlyG3
+                assertFalse(mState.isAcceptingState(curlyG1));
+                assertTrue(mState.isAcceptingState(curlyG2));
+                assertTrue(mState.isAcceptingState(curlyG3));
+            }
+        });
     }
 
     @Test
-    public void testCase1() throws Exception {
+    public void example33() throws Exception {
+        /* This is example 3.3 from the paper. */
         MojmirAutomaton<PropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactory.createFrom("a | (b U c)");
+
+        Set<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> expectedStates = new HashSet<>();
+        expectedStates.add(new MojmirAutomaton.State<>(new PropEquivalenceClass(new LTLFactoryFromString().buildLTL("a | (b U c)").getLtlFormula()))); // q1
+        expectedStates.add(new MojmirAutomaton.State<>(new PropEquivalenceClass(new LTLFactoryFromString().buildLTL("b U c").getLtlFormula()))); // q2
+        expectedStates.add(new MojmirAutomaton.State<>(new PropEquivalenceClass(new LTLFactoryFromString().buildLTL("tt").getLtlFormula()))); // q3
+        expectedStates.add(new MojmirAutomaton.State<>(new PropEquivalenceClass(new LTLFactoryFromString().buildLTL("ff").getLtlFormula()))); // q4
         assertEquals(4, mojmirAutomaton.getStates().size());
+        expectedStates.forEach(expectedState -> {
+            assertTrue(mojmirAutomaton.getStates().contains(expectedState));
+        });
+
     }
 
     @Test

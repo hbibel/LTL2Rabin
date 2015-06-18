@@ -27,7 +27,6 @@ public class MAMockFactory {
     public static class MAMock {
         private ImmutableSet<Set<String>> alphabet;
         private List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> states = new ArrayList<>();
-        private List<PropEquivalenceClass> acceptingLabels = new ArrayList<>();
         private MojmirAutomaton.State<PropEquivalenceClass, Set<String>> initialState;
 
         private MAMock(ImmutableSet<Set<String>> alphabet, Formula initialLabel) {
@@ -43,7 +42,7 @@ public class MAMockFactory {
             when(result.getStates()).thenReturn(ImmutableSet.copyOf(states));
             when(result.getAlphabet()).thenReturn(alphabet);
             when(result.getInitialState()).thenReturn(initialState);
-            when(result.isAcceptingState(anyObject())).thenAnswer(new Answer<Boolean>() {
+            /* when(result.isAcceptingState(anyObject())).thenAnswer(new Answer<Boolean>() {
                 @Override
                 public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable {
                     Object[] args = invocationOnMock.getArguments();
@@ -51,20 +50,32 @@ public class MAMockFactory {
                     PropEquivalenceClass label = arg.getLabel();
                     return acceptingLabels.contains(label);
                 }
-            });
+            });*/
             return result;
         }
 
-        public void addState(Formula label, boolean isSink) {
+        public void addState(Formula label, boolean isSink, Set<Set<Formula>> acceptingCurlyGs) {
             MojmirAutomaton.State<PropEquivalenceClass, Set<String>> newState = (MojmirAutomaton.State<PropEquivalenceClass, Set<String>>) mock(MojmirAutomaton.State.class);
             when(newState.getLabel()).thenReturn(new PropEquivalenceClass(label));
             when(newState.isSink()).thenReturn(isSink);
+            when(newState.isAcceptingState(anyObject())).thenAnswer(new Answer<Boolean>() {
+                @Override
+                public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable {
+                    Object[] args = invocationOnMock.getArguments();
+                    Set<Formula> arg = (Set<Formula>) args[0];
+                    return acceptingCurlyGs.contains(arg);
+                }
+            });
             if (isSink) {
                 alphabet.forEach(letter -> {
                     when(newState.readLetter(letter)).thenReturn(newState);
                 });
             }
             states.add(newState);
+        }
+
+        public void addState(Formula label, boolean isSink) {
+            addState(label, isSink, Collections.emptySet());
         }
 
         public void whenReadingToken(Formula from, String token, Formula to) {
@@ -89,10 +100,6 @@ public class MAMockFactory {
             MojmirAutomaton.State<PropEquivalenceClass, Set<String>> fromState = states.stream().filter(state -> state.getLabel().equals(new PropEquivalenceClass(from))).findAny().get();
             MojmirAutomaton.State<PropEquivalenceClass, Set<String>> toState = states.stream().filter(state -> state.getLabel().equals(new PropEquivalenceClass(to))).findAny().get();
             when(fromState.readLetter(letter)).thenReturn(toState);
-        }
-
-        public void setStateAccepting(Formula label) {
-            acceptingLabels.add(new PropEquivalenceClass(label));
         }
     }
 }
