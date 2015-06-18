@@ -15,6 +15,7 @@ public class GDRAFactory {
     private Map<Pair<PropEquivalenceClass, List<Slave.State>>,
                 GDRA.State> existingStates = new HashMap<>();
     private LTLFactoryFromString ltlFactory = new LTLFactoryFromString();
+    private Map<Pair<Pair<Integer, Set<Formula>>, Formula>, Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accPiCurlyGPsis = new HashMap<>();
 
     public GDRA createFrom(String from) {
         LTLFactory.Result parserResult = ltlFactory.buildLTL(from);
@@ -107,25 +108,29 @@ public class GDRAFactory {
                         Slave ra = slaveFactory.createFrom(psi);
                         Set<Slave.Transition> succeedPi = ra.succeed(piForPsi, curlyG);
                         Set<Slave.Transition> failMergePi = ra.failMerge(piForPsi, curlyG);
-                        Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> accPiCurlyGPsi = new Pair<>(new HashSet<>(), new HashSet<>());
-                        for(Slave.Transition slaveReachTransition : succeedPi) {
-                            if (slaveReachTransition.getLetter().equals(letter) &&
-                                    tempTransition.getTo().getLabel().getSecond().contains(slaveReachTransition.getTo())) {
-                                accPiCurlyGPsi.getFirst().add(tempTransition);
-                                break;
+
+                        if (!accPiCurlyGPsiExists(piForPsi, curlyG, psi)) {
+                            Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> accPiCurlyGPsi = new Pair<>(new HashSet<>(), new HashSet<>());
+                            for(Slave.Transition slaveReachTransition : succeedPi) {
+                                if (slaveReachTransition.getLetter().equals(letter) &&
+                                        tempTransition.getTo().getLabel().getSecond().contains(slaveReachTransition.getTo())) {
+                                    accPiCurlyGPsi.getFirst().add(tempTransition);
+                                    break;
+                                }
                             }
-                        }
-                        for(Slave.Transition slaveAvoidTransition : failMergePi) {
-                            if (slaveAvoidTransition.getLetter().equals(letter)
-                                    && temp.getLabel().getSecond().contains(slaveAvoidTransition.getFrom())) {
-                                accPiCurlyGPsi.getSecond().add(tempTransition);
-                                break;
+                            for(Slave.Transition slaveAvoidTransition : failMergePi) {
+                                if (slaveAvoidTransition.getLetter().equals(letter)
+                                        && temp.getLabel().getSecond().contains(slaveAvoidTransition.getFrom())) {
+                                    accPiCurlyGPsi.getSecond().add(tempTransition);
+                                    break;
+                                }
                             }
-                        }
-                        if ((!accPiCurlyGPsi.getFirst().isEmpty()) || (!accPiCurlyGPsi.getSecond().isEmpty())) {
-                            Pair<Set<Formula>, Map<Formula, Integer>> key = new Pair<>(curlyG, pi);
-                            Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accPiCurlyG = piCurlyGToAccMap.get(key);
-                            accPiCurlyG.add(accPiCurlyGPsi);
+                            if ((!accPiCurlyGPsi.getFirst().isEmpty()) || (!accPiCurlyGPsi.getSecond().isEmpty())) {
+                                Pair<Set<Formula>, Map<Formula, Integer>> key = new Pair<>(curlyG, pi);
+                                Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accPiCurlyG = piCurlyGToAccMap.get(key);
+                                accPiCurlyG.add(accPiCurlyGPsi);
+                                accPiCurlyGPsis.put(new Pair<>(new Pair<>(piForPsi, curlyG), psi), accPiCurlyGPsi);
+                            }
                         }
                     });
                 });
@@ -158,7 +163,6 @@ public class GDRAFactory {
             });
         });
 
-        // Set<Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>>> acc = ImmutableSet.copyOf(piCurlyGToAccMap.values());
         Set<Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>>> acc = new HashSet<>();
         curlyGPis.forEach(key -> {
             acc.add(piCurlyGToAccMap.get(key));
@@ -173,5 +177,10 @@ public class GDRAFactory {
             existingStates.put(label, result);
         }
         return result;
+    }
+
+    private boolean accPiCurlyGPsiExists(int pi, Set<Formula> curlyG, Formula psi) {
+        Pair<Pair<Integer, Set<Formula>>, Formula> key = new Pair<>(new Pair<>(pi, curlyG), psi);
+        return accPiCurlyGPsis.get(key) != null;
     }
 }
