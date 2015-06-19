@@ -101,35 +101,44 @@ public class GDRAFactory {
                 // This loop checks whether the transition is in Acc_pi^curlyG(psi) or not
                 curlyGPis.forEach(curlyGPi -> { // TODO: Might want to make this parallel
                     Set<Formula> curlyG = curlyGPi.getFirst();
-                    Map<Formula, Integer> pi = curlyGPi.getSecond();
+                    Map<Formula, Integer> rankMap = curlyGPi.getSecond();
 
                     curlyG.forEach(psi -> {
-                        int piForPsi = pi.get(psi);
+                        int rankForPsi = rankMap.get(psi);
                         Slave ra = slaveFactory.createFrom(psi);
-                        Set<Slave.Transition> succeedPi = ra.succeed(piForPsi, curlyG);
-                        Set<Slave.Transition> failMergePi = ra.failMerge(piForPsi, curlyG);
+                        // The acceptance sets of the Slave:
+                        Set<Slave.Transition> succeedAtRank = ra.succeed(rankForPsi, curlyG);
+                        Set<Slave.Transition> failMergeAtRank = ra.failMerge(rankForPsi, curlyG);
 
-                        if (!accPiCurlyGPsiExists(piForPsi, curlyG, psi)) {
-                            Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> accPiCurlyGPsi = new Pair<>(new HashSet<>(), new HashSet<>());
-                            for(Slave.Transition slaveReachTransition : succeedPi) {
-                                if (slaveReachTransition.getLetter().equals(letter) &&
-                                        tempTransition.getTo().getLabel().getSecond().contains(slaveReachTransition.getTo())) {
-                                    accPiCurlyGPsi.getFirst().add(tempTransition);
-                                    break;
-                                }
+                        /*** TODO: Remove after debugging *
+                         System.out.println("psi has " + failMergeAtRank.size() + " transitions failing at rank " + rankForPsi + ":");
+                         failMergeAtRank.forEach(t -> {
+                         System.out.println("(" + (t.getFrom().getLabel().size() == 1 ? "sr0, " : "sr1, ") + t.getLetter() + ", " + (t.getTo().getLabel().size() == 1 ? "sr0)" : "sr1)"));
+                         });
+                         System.out.println("\n\n");/**/
+
+                        Pair<Pair<Integer, Set<Formula>>, Formula> keyForAccRCurlyGPsis = new Pair<>(new Pair<>(rankForPsi, curlyG), psi);
+                        Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> accRCurlyGPsi = accPiCurlyGPsis.get(keyForAccRCurlyGPsis); // Acc_r^G (psi)
+                        if (null == accRCurlyGPsi) {
+                            accRCurlyGPsi = new Pair<>(new HashSet<>(), new HashSet<>());
+                            accPiCurlyGPsis.put(keyForAccRCurlyGPsis, accRCurlyGPsi);
+
+                            // Add the newly created Acc_r^G (psi) to Acc_r^G
+                            Pair<Set<Formula>, Map<Formula, Integer>> keyForAccRCurlyG = new Pair<>(curlyG, rankMap);
+                            Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accRCurlyG = piCurlyGToAccMap.get(keyForAccRCurlyG);
+                            accRCurlyG.add(accRCurlyGPsi);
+                        }
+
+                        for (Slave.Transition slaveReachTransition : succeedAtRank) {
+                            if (slaveReachTransition.getLetter().equals(letter)
+                                    && tempTransition.getFrom().getLabel().getSecond().contains(slaveReachTransition.getFrom())) {
+                                accRCurlyGPsi.getSecond().add(tempTransition);
                             }
-                            for(Slave.Transition slaveAvoidTransition : failMergePi) {
-                                if (slaveAvoidTransition.getLetter().equals(letter)
-                                        && temp.getLabel().getSecond().contains(slaveAvoidTransition.getFrom())) {
-                                    accPiCurlyGPsi.getSecond().add(tempTransition);
-                                    break;
-                                }
-                            }
-                            if ((!accPiCurlyGPsi.getFirst().isEmpty()) || (!accPiCurlyGPsi.getSecond().isEmpty())) {
-                                Pair<Set<Formula>, Map<Formula, Integer>> key = new Pair<>(curlyG, pi);
-                                Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accPiCurlyG = piCurlyGToAccMap.get(key);
-                                accPiCurlyG.add(accPiCurlyGPsi);
-                                accPiCurlyGPsis.put(new Pair<>(new Pair<>(piForPsi, curlyG), psi), accPiCurlyGPsi);
+                        }
+                        for (Slave.Transition slaveAvoidTransition : failMergeAtRank) {
+                            if (slaveAvoidTransition.getLetter().equals(letter)
+                                    && tempTransition.getFrom().getLabel().getSecond().contains(slaveAvoidTransition.getFrom())) {
+                                accRCurlyGPsi.getFirst().add(tempTransition);
                             }
                         }
                     });
@@ -145,16 +154,21 @@ public class GDRAFactory {
             Map<Formula, Integer> pi = curlyGPi.getSecond();
             Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> mPiG = new Pair<>(new HashSet<>(), univ);
 
+
             states.forEach(state -> {
                 List<Formula> conjuncts = new ArrayList<>();
                 state.getLabel().getSecond().forEach(slaveState -> {
                     Formula psi = slaveState.getPsi();
                     if (curlyG.contains(psi)) {
                         int piForPsi = pi.get(psi);
-                        conjuncts.add(psi);
+                        conjuncts.add(new G(psi));
                         conjuncts.addAll(slaveState.succeedingFormulas(piForPsi));
                     }
                 });
+                /*** TODO: Remove after debugging*
+                 System.out.println("M^{" + curlyG.toString() + "} conjunction = " + conjuncts);
+                /***                              ***/
+
                 if (!new PropEquivalenceClass(conjuncts.isEmpty() ? new Boolean(true) : new And(conjuncts)).implies(state.getLabel().getFirst())) {
                     // the state "state" is not in F and thus its outgoing transitions are in M(pi, curlyG)
                     alphabet.forEach(letter -> mPiG.getFirst().add(new GDRA.Transition(state, letter, state.readLetter(letter))));
@@ -179,10 +193,5 @@ public class GDRAFactory {
             existingStates.put(label, result);
         }
         return result;
-    }
-
-    private boolean accPiCurlyGPsiExists(int pi, Set<Formula> curlyG, Formula psi) {
-        Pair<Pair<Integer, Set<Formula>>, Formula> key = new Pair<>(new Pair<>(pi, curlyG), psi);
-        return accPiCurlyGPsis.get(key) != null;
     }
 }

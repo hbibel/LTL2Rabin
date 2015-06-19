@@ -65,9 +65,13 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
                 });
                 // merge: A token with r < rank moves to the non-accepting state q' and another token also moves there
                 final int maxMergeRank = rank > slaveState.getLabel().size() - 1 ? slaveState.getLabel().size() - 1 : rank;
-                for (int r = 0; r <= maxMergeRank; r++) {
+                for (int r = 0; r < maxMergeRank; r++) {
                     MojmirAutomaton.State<PropEquivalenceClass, Set<String>> mFromState = slaveState.getLabel().get(r); // q
                     MojmirAutomaton.State<PropEquivalenceClass, Set<String>> mToState = mFromState.readLetter(letter); // q'
+                    // if mToState is a sink, it is either accepting (==> not in merge) or failing (==> also not in merge)
+                    if (mToState.isSink() || mToState.isAcceptingState(curlyG)) { // TODO: Are there accepting states that are not sinks? If no --> mToState.isSink()
+                        break;
+                    }
                     if (mToState.equals(getInitialState().getLabel().get(0))) {
                         resultBuilder.add(new Transition(slaveState, letter, toState));
                     }
@@ -119,7 +123,7 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
         /**
          * @param label The list representing the ranking of the states of the corresponding mojmir automaton.
          *              The elder states come first in the list. The lowest rank is 0.
-         *        psi   The LTL Formula that is used to generate the automaton the state belongs to. This is the
+         * @param psi   The LTL Formula that is used to generate the automaton the state belongs to. This is the
          *              connection between the state and the automaton.
          */
         public State(List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> label, Formula psi) {
@@ -134,7 +138,6 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
         public List<Formula> succeedingFormulas(int rank) {
             if (rank >= getLabel().size()) {
                 return Collections.emptyList();
-
             }
             ImmutableList.Builder<Formula> conjunctsBuilder = new ImmutableList.Builder<>();
             for (int i = rank; i < getLabel().size(); i++) {
