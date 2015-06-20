@@ -5,9 +5,7 @@ import ltl2rabin.LTL.*;
 import ltl2rabin.LTL.Boolean;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -75,20 +73,20 @@ public class GDRATest {
         // M^{psi}_(psi->0)
         Set<GDRA.Transition> mPsi0Avoid = new HashSet<>();
         gdra.getStates().forEach(q -> {
-            if (q.getLabel().getFirst().equals(new PropEquivalenceClass(new Boolean(true)))
-                    || q.getLabel().getFirst().equals(new PropEquivalenceClass(new Boolean(false)))) { // q = q1 or q4
+            if (q.getLabel().getFirst().equals(new PropEquivalenceClass(phi))
+                    || q.getLabel().getFirst().equals(new PropEquivalenceClass(new Boolean(false)))) { // q = q0 or q4
                 alphabet.forEach(l -> {
                     mPsi0Avoid.add(new GDRA.Transition((GDRA.State) q, l, (GDRA.State) q.readLetter(l)));
                 });
             }
         });
-        assertEquals(32, mPsi0Avoid.size());
+        assertEquals(24, mPsi0Avoid.size());
         Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> expectedMPsi0 = new Pair<>(mPsi0Avoid, univ);
         // Acc^{psi}_(psi->0) (psi)
         Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> expectedAccPsi0Psi = new Pair<>(new HashSet<>(), new HashSet<>());
         expectedAccPsi0Psi.getFirst().add(new GDRA.Transition(q2sr1, Collections.emptySet(), q3sr1));
         expectedAccPsi0Psi.getFirst().add(new GDRA.Transition(q1sr1, Collections.emptySet(), q1sr1));
-        expectedAccPsi0Psi.getFirst().add(new GDRA.Transition(q3sr1, Collections.emptySet(), q3sr1));
+        expectedAccPsi0Psi.getFirst().add(new GDRA.Transition(q3sr1, Collections.emptySet(), q4sr1));
         expectedAccPsi0Psi.getFirst().add(new GDRA.Transition(q4sr1, Collections.emptySet(), q4sr1));
         expectedAccPsi0Psi.getFirst().add(new GDRA.Transition(q2sr1, ImmutableSet.of("a"), q2sr0));
         expectedAccPsi0Psi.getFirst().add(new GDRA.Transition(q1sr1, ImmutableSet.of("a"), q1sr0));
@@ -117,15 +115,14 @@ public class GDRATest {
         // M^{psi}_(psi->1)
         Set<GDRA.Transition> mPsi1Avoid = new HashSet<>();
         gdra.getStates().forEach(q -> {
-            if (!(q.getLabel().getFirst().equals(new PropEquivalenceClass(phi))
-                    || q.getLabel().getFirst().equals(new PropEquivalenceClass(new G(psi))))) { // qi != q0 or q2
-                final GDRA.State blah = (GDRA.State) q;
+            if (!(q.getLabel().getFirst().equals(new PropEquivalenceClass(new Boolean(true)))
+                    || q.getLabel().getFirst().equals(new PropEquivalenceClass(new G(psi))))) { // qi != q1 or q2
                 alphabet.forEach(l -> {
                     mPsi1Avoid.add(new GDRA.Transition((GDRA.State) q, l, (GDRA.State) q.readLetter(l)));
                 });
             }
         });
-        assertEquals(40, mPsi1Avoid.size());
+        assertEquals(32, mPsi1Avoid.size());
         Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> expectedMPsi1 = new Pair<>(mPsi1Avoid, univ);
 
         // Acc^{psi}_(psi->1) (psi)
@@ -155,141 +152,57 @@ public class GDRATest {
         Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> expectedAccPsi1 = ImmutableSet.of(expectedMPsi1, expectedAccPsi1Psi);
         expectedGDRACondition.add(expectedAccPsi1);
 
-        gdraCondition.forEach(pairs -> {
-            pairs.forEach(setSetPair -> {
-                if (setSetPair.getFirst().size() == 32 && setSetPair.getSecond().size() == 8) {
-                    setSetPair.getSecond().forEach(transition -> {
-                        StringBuilder resultStringBuilder = new StringBuilder();
-                        resultStringBuilder.append("(");
-                        if (transition.getFrom().equals(q0sr0)) {
-                            resultStringBuilder.append("q0sr0");
-                        }
-                        else if (transition.getFrom().equals(q1sr0)) {
-                            resultStringBuilder.append("q1sr0");
-                        }
-                        else if (transition.getFrom().equals(q1sr1)) {
-                            resultStringBuilder.append("q1sr1");
-                        }
-                        else if (transition.getFrom().equals(q2sr0)) {
-                            resultStringBuilder.append("q2sr0");
-                        }
-                        else if (transition.getFrom().equals(q2sr1)) {
-                            resultStringBuilder.append("q2sr1");
-                        }
-                        else if (transition.getFrom().equals(q3sr1)) {
-                            resultStringBuilder.append("q3sr1");
-                        }
-                        else if (transition.getFrom().equals(q4sr0)) {
-                            resultStringBuilder.append("q4sr0");
-                        }
-                        else if (transition.getFrom().equals(q4sr1)) {
-                            resultStringBuilder.append("q4sr1");
-                        }
-                        resultStringBuilder.append(", ").append(transition.getLetter()).append(", ");
-                        if (transition.getTo().equals(q0sr0)) {
-                            resultStringBuilder.append("q0sr0");
-                        }
-                        else if (transition.getTo().equals(q1sr0)) {
-                            resultStringBuilder.append("q1sr0");
-                        }
-                        else if (transition.getTo().equals(q1sr1)) {
-                            resultStringBuilder.append("q1sr1");
-                        }
-                        else if (transition.getTo().equals(q2sr0)) {
-                            resultStringBuilder.append("q2sr0");
-                        }
-                        else if (transition.getTo().equals(q2sr1)) {
-                            resultStringBuilder.append("q2sr1");
-                        }
-                        else if (transition.getTo().equals(q3sr1)) {
-                            resultStringBuilder.append("q3sr1");
-                        }
-                        else if (transition.getTo().equals(q4sr0)) {
-                            resultStringBuilder.append("q4sr0");
-                        }
-                        else if (transition.getTo().equals(q4sr1)) {
-                            resultStringBuilder.append("q4sr1");
-                        }
-                        resultStringBuilder.append(")");
-                        System.out.println(resultStringBuilder.toString());
-                    });
-                }
-            });
-        });
-
+        java.lang.Boolean checkedPairs[] = new java.lang.Boolean[5];
+        for (int i = 0; i < 5; i++) {
+            checkedPairs[i] = false;
+        }
         gdraCondition.forEach(pairs -> {
             if (1 == pairs.size()) {
                 // M^{}_()
                 pairs.forEach(m0 -> {
                     assertEquals(expectedM0, m0);
+                    checkedPairs[0] = true;
                 });
             }
             else {
                 // pairs is either Acc^psi_0 or Acc^psi_1
-                pairs.forEach(accI -> {
-                    if (accI.getSecond().size() == 64) {
-                        System.out.println("\n\nIs:");
-
-                        accI.getFirst().forEach(transition -> {
-                            StringBuilder resultStringBuilder = new StringBuilder();
-                            resultStringBuilder.append("(");
-                            if (transition.getFrom().equals(q0sr0)) {
-                                resultStringBuilder.append("q0sr0");
-                            }
-                            else if (transition.getFrom().equals(q1sr0)) {
-                                resultStringBuilder.append("q1sr0");
-                            }
-                            else if (transition.getFrom().equals(q1sr1)) {
-                                resultStringBuilder.append("q1sr1");
-                            }
-                            else if (transition.getFrom().equals(q2sr0)) {
-                                resultStringBuilder.append("q2sr0");
-                            }
-                            else if (transition.getFrom().equals(q2sr1)) {
-                                resultStringBuilder.append("q2sr1");
-                            }
-                            else if (transition.getFrom().equals(q3sr1)) {
-                                resultStringBuilder.append("q3sr1");
-                            }
-                            else if (transition.getFrom().equals(q4sr0)) {
-                                resultStringBuilder.append("q4sr0");
-                            }
-                            else if (transition.getFrom().equals(q4sr1)) {
-                                resultStringBuilder.append("q4sr1");
-                            }
-                            resultStringBuilder.append(", ").append(transition.getLetter()).append(", ");
-                            if (transition.getTo().equals(q0sr0)) {
-                                resultStringBuilder.append("q0sr0");
-                            }
-                            else if (transition.getTo().equals(q1sr0)) {
-                                resultStringBuilder.append("q1sr0");
-                            }
-                            else if (transition.getTo().equals(q1sr1)) {
-                                resultStringBuilder.append("q1sr1");
-                            }
-                            else if (transition.getTo().equals(q2sr0)) {
-                                resultStringBuilder.append("q2sr0");
-                            }
-                            else if (transition.getTo().equals(q2sr1)) {
-                                resultStringBuilder.append("q2sr1");
-                            }
-                            else if (transition.getTo().equals(q3sr1)) {
-                                resultStringBuilder.append("q3sr1");
-                            }
-                            else if (transition.getTo().equals(q4sr0)) {
-                                resultStringBuilder.append("q4sr0");
-                            }
-                            else if (transition.getTo().equals(q4sr1)) {
-                                resultStringBuilder.append("q4sr1");
-                            }
-                            resultStringBuilder.append(")");
-                            System.out.println(resultStringBuilder.toString());
-                        });
+                boolean isAccPsi1 = false;
+                for (Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> accPair : pairs) {
+                    isAccPsi1 = isAccPsi1 || ((accPair.getFirst().size() == 32) && (accPair.getSecond().size() == 64));
+                    if ((accPair.getFirst().size() == 32) && (accPair.getSecond().size() == 64)) {
+                        assertEquals(expectedMPsi1, accPair);
+                        checkedPairs[1] = true;
                     }
-                });
+                    if ((accPair.getFirst().size() == 24) && (accPair.getSecond().size() == 64)) {
+                        assertEquals(expectedMPsi0, accPair);
+                        checkedPairs[2] = true;
+                    }
+                }
+                if (isAccPsi1) {
+                    // pairs is Acc^psi_1
+                    for (Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> accPair : pairs) {
+                        if (!((accPair.getFirst().size() == 32) && (accPair.getSecond().size() == 64))) {
+                            // Acc^{psi}_(psi->1) (psi)
+                            assertEquals(expectedAccPsi1Psi, accPair);
+                            checkedPairs[3] = true;
+                        }
+                    }
+                }
+                else {
+                    // pairs is Acc^psi_0
+                    for (Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> accPair : pairs) {
+                        if (!((accPair.getFirst().size() == 24) && (accPair.getSecond().size() == 64))) {
+                            // Acc^{psi}_(psi->0) (psi)
+                            assertEquals(expectedAccPsi0Psi, accPair);
+                            checkedPairs[4] = true;
+                        }
+                    }
+                }
             }
         });
 
-        System.out.println(3457);
+        for (java.lang.Boolean isPairChecked : checkedPairs) {
+            assertTrue(isPairChecked);
+        }
     }
 }

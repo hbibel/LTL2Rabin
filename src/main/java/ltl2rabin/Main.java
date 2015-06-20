@@ -22,8 +22,10 @@ public class Main {
         // System.out.println("This program runs, but does not do anything useful yet.");
         long startTime = System.currentTimeMillis();
         GDRAFactory factory = new GDRAFactory();
-        //GDRA gdra = factory.createFrom("(a U b) & ((F G a) | (G F b)) & ((F G c) | (G F d)) | (a U c) & ((F G d) | (G F a)) & ((F G b) | (G F c))");
-        GDRA gdra = factory.createFrom("(r U s) & ((F G a) | (G F b)) & ((F G c) | (G F d)) ");
+
+        String input = "b | (X G (a | (X (b U c))))";
+        String otherInput = "(r U s) & ((F G a) | (G F b)) & ((F G c) | (G F d)) ";
+        GDRA gdra = factory.createFrom(otherInput);
 
         long stopTime = System.currentTimeMillis();
         long elapsedTime = stopTime - startTime;
