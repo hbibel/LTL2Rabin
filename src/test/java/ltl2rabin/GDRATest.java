@@ -58,7 +58,7 @@ public class GDRATest {
         // M^{}_()
         Set<GDRA.Transition> m0Avoid = new HashSet<>();
         gdra.getStates().forEach(q -> {
-            if (!q.getLabel().getFirst().equals(new PropEquivalenceClass(new Boolean(true)))) {
+            if (!q.getLabel().getFirst().equals(new PropEquivalenceClassWithBeeDeeDee(new Boolean(true)))) {
                 alphabet.forEach(l -> {
                     m0Avoid.add(new GDRA.Transition((GDRA.State) q, l, (GDRA.State) q.readLetter(l)));
                 });
@@ -73,8 +73,8 @@ public class GDRATest {
         // M^{psi}_(psi->0)
         Set<GDRA.Transition> mPsi0Avoid = new HashSet<>();
         gdra.getStates().forEach(q -> {
-            if (q.getLabel().getFirst().equals(new PropEquivalenceClass(phi))
-                    || q.getLabel().getFirst().equals(new PropEquivalenceClass(new Boolean(false)))) { // q = q0 or q4
+            if (q.getLabel().getFirst().equals(new PropEquivalenceClassWithBeeDeeDee(phi))
+                    || q.getLabel().getFirst().equals(new PropEquivalenceClassWithBeeDeeDee(new Boolean(false)))) { // q = q0 or q4
                 alphabet.forEach(l -> {
                     mPsi0Avoid.add(new GDRA.Transition((GDRA.State) q, l, (GDRA.State) q.readLetter(l)));
                 });
@@ -115,8 +115,8 @@ public class GDRATest {
         // M^{psi}_(psi->1)
         Set<GDRA.Transition> mPsi1Avoid = new HashSet<>();
         gdra.getStates().forEach(q -> {
-            if (!(q.getLabel().getFirst().equals(new PropEquivalenceClass(new Boolean(true)))
-                    || q.getLabel().getFirst().equals(new PropEquivalenceClass(new G(psi))))) { // qi != q1 or q2
+            if (!(q.getLabel().getFirst().equals(new PropEquivalenceClassWithBeeDeeDee(new Boolean(true)))
+                    || q.getLabel().getFirst().equals(new PropEquivalenceClassWithBeeDeeDee(new G(psi))))) { // qi != q1 or q2
                 alphabet.forEach(l -> {
                     mPsi1Avoid.add(new GDRA.Transition((GDRA.State) q, l, (GDRA.State) q.readLetter(l)));
                 });

@@ -1,7 +1,5 @@
 package ltl2rabin;
 
-import org.apache.commons.collections4.set.ListOrderedSet;
-
 import java.util.*;
 
 public abstract class Automaton<T, U> {

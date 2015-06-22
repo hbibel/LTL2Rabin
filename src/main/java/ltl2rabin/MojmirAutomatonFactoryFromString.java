@@ -1,10 +1,9 @@
 package ltl2rabin;
 
 import com.google.common.collect.ImmutableSet;
-import ltl2rabin.LTL.Formula;
 import ltl2rabin.LTL.LTLFactory;
 import ltl2rabin.LTL.LTLFactoryFromString;
-import ltl2rabin.LTL.PropEquivalenceClass;
+import ltl2rabin.LTL.PropEquivalenceClassWithBeeDeeDee;
 
 import java.util.*;
 
@@ -15,11 +14,11 @@ public class MojmirAutomatonFactoryFromString extends MojmirAutomatonFactory<Str
     }
 
     @Override
-    public MojmirAutomaton<PropEquivalenceClass, Set<String>> createFrom(String from) {
+    public MojmirAutomaton<PropEquivalenceClassWithBeeDeeDee, Set<String>> createFrom(String from) {
         LTLFactoryFromString ltlFactory = new LTLFactoryFromString();
         LTLFactory.Result parserResult = ltlFactory.buildLTL(from);
 
-        MojmirAutomaton<PropEquivalenceClass, Set<String>> cachedResult = getFromCache(parserResult.getLtlFormula());
+        MojmirAutomaton<PropEquivalenceClassWithBeeDeeDee, Set<String>> cachedResult = getFromCache(parserResult.getLtlFormula());
         if (null != cachedResult) {
             return cachedResult;
         }

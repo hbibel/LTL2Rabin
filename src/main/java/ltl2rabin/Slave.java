@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>, Set<String>> {
+public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>>>, Set<String>> {
     private final int maxRank;
     private final ImmutableCollection<State> slaveStates;
 
@@ -47,18 +47,18 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
             return ImmutableSet.copyOf(Collections.emptySet());
         }
         ImmutableSet.Builder<Transition> resultBuilder = new ImmutableSet.Builder<>();
-        PropEquivalenceClass gConjunction;
+        PropEquivalenceClassWithBeeDeeDee gConjunction;
         if (curlyG.isEmpty()) {
-            gConjunction = new PropEquivalenceClass(new Boolean(true));
+            gConjunction = new PropEquivalenceClassWithBeeDeeDee(new Boolean(true));
         } else {
-            gConjunction = new PropEquivalenceClass(new And(ImmutableList.copyOf(curlyG)));
+            gConjunction = new PropEquivalenceClassWithBeeDeeDee(new And(ImmutableList.copyOf(curlyG)));
         }
         slaveStates.stream().forEach(slaveState -> {
             getAlphabet().stream().forEach(letter -> {
                 // fail: Add transitions that move tokens from all Mojmir states in slaveState in a non-accepting sink
                 final State toState = slaveState.readLetter(letter);
                 slaveState.getLabel().stream().forEach(ms -> {
-                    final MojmirAutomaton.State<PropEquivalenceClass, Set<String>> msToState = ms.readLetter(letter);
+                    final MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>> msToState = ms.readLetter(letter);
                     if (msToState.isSink() && !gConjunction.implies(msToState.getLabel())) {
                         resultBuilder.add(new Transition(slaveState, letter, toState));
                     }
@@ -66,8 +66,8 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
                 // merge: A token with r < rank moves to the non-accepting state q' and another token also moves there
                 final int maxMergeRank = rank > slaveState.getLabel().size() - 1 ? slaveState.getLabel().size() - 1 : rank;
                 for (int r = 0; r < maxMergeRank; r++) {
-                    MojmirAutomaton.State<PropEquivalenceClass, Set<String>> mFromState = slaveState.getLabel().get(r); // q
-                    MojmirAutomaton.State<PropEquivalenceClass, Set<String>> mToState = mFromState.readLetter(letter); // q'
+                    MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>> mFromState = slaveState.getLabel().get(r); // q
+                    MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>> mToState = mFromState.readLetter(letter); // q'
                     // if mToState is a sink, it is either accepting (==> not in merge) or failing (==> also not in merge)
                     if (mToState.isSink() || mToState.isAcceptingState(curlyG)) { // TODO: Are there accepting states that are not sinks? If no --> mToState.isSink()
                         break;
@@ -76,7 +76,7 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
                         resultBuilder.add(new Transition(slaveState, letter, toState));
                     }
                     else {
-                        List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> otherTokens = slaveState.getLabel().stream()
+                        List<MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>>> otherTokens = slaveState.getLabel().stream()
                                 .filter(ms -> !ms.equals(mFromState)) // tokens that don't come from q ...
                                 .map(ms -> ms.readLetter(letter))
                                 .filter(ms -> ms.equals(mToState)) // ... also move to q'
@@ -100,11 +100,11 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
             return ImmutableSet.copyOf(Collections.emptySet());
         }
         ImmutableSet.Builder<Transition> resultBuilder = new ImmutableSet.Builder<>();
-        PropEquivalenceClass gConjunction;
+        PropEquivalenceClassWithBeeDeeDee gConjunction;
         if (curlyG.isEmpty()) {
-            gConjunction = new PropEquivalenceClass(new Boolean(true));
+            gConjunction = new PropEquivalenceClassWithBeeDeeDee(new Boolean(true));
         } else {
-            gConjunction = new PropEquivalenceClass(new And(ImmutableList.copyOf(curlyG)));
+            gConjunction = new PropEquivalenceClassWithBeeDeeDee(new And(ImmutableList.copyOf(curlyG)));
         }
         slaveStates.stream()
                 .forEach(state -> {
@@ -117,7 +117,7 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
         return resultBuilder.build();
     }
 
-    public static class State extends RabinAutomaton.State<List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>, Set<String>> {
+    public static class State extends RabinAutomaton.State<List<MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>>>, Set<String>> {
         private final Formula psi;
 
         /**
@@ -126,7 +126,7 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
          * @param psi   The LTL Formula that is used to generate the automaton the state belongs to. This is the
          *              connection between the state and the automaton.
          */
-        public State(List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> label, Formula psi) {
+        public State(List<MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>>> label, Formula psi) {
             super(label);
             this.psi = psi;
         }

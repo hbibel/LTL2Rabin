@@ -6,7 +6,6 @@ import ltl2rabin.LTL.*;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -17,9 +16,7 @@ import java.util.stream.Collectors;
 public class MojmirAutomaton<T, U> extends Automaton<T, U> {
     private final ImmutableSet<State<T, U>> states;
     private final State<T, U> initialState;
-    private final ImmutableSet<State<T, U>> acceptingStates; // TODO: Remove everything that has to do with accepting states of Mojmir automata
     private final ImmutableSet<U> alphabet;
-    private int maxRank = -1;
 
     public ImmutableSet<State<T, U>> getStates() {
         return states;
@@ -33,11 +30,10 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
         return initialState;
     }
 
-    public MojmirAutomaton(ImmutableSet<State<T, U>> states, State<T, U> initialState, ImmutableSet<State<T, U>> acceptingStates,
+    public MojmirAutomaton(ImmutableSet<State<T, U>> states, State<T, U> initialState,
                            ImmutableSet<U> alphabet) {
         this.states = states;
         this.initialState = initialState;
-        this.acceptingStates = acceptingStates;
         this.alphabet = alphabet;
     }
 
@@ -68,13 +64,13 @@ public class MojmirAutomaton<T, U> extends Automaton<T, U> {
         }
 
         public boolean isAcceptingState(Set<Formula> curlyG) {
-            PropEquivalenceClass gConjunction;
+            PropEquivalenceClassWithBeeDeeDee gConjunction;
             if (curlyG.isEmpty()) {
-                gConjunction = new PropEquivalenceClass(new ltl2rabin.LTL.Boolean(true));
+                gConjunction = new PropEquivalenceClassWithBeeDeeDee(new ltl2rabin.LTL.Boolean(true));
             } else {
-                gConjunction = new PropEquivalenceClass(new And(ImmutableList.copyOf(curlyG.stream().map(G::new).collect(Collectors.toList()))));
+                gConjunction = new PropEquivalenceClassWithBeeDeeDee(new And(ImmutableList.copyOf(curlyG.stream().map(G::new).collect(Collectors.toList()))));
             }
-            return gConjunction.implies((PropEquivalenceClass) label);
+            return gConjunction.implies((PropEquivalenceClassWithBeeDeeDee) label);
         }
 
         @Override

@@ -2,16 +2,16 @@ package ltl2rabin;
 
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
-import ltl2rabin.LTL.PropEquivalenceClass;
+import ltl2rabin.LTL.PropEquivalenceClassWithBeeDeeDee;
 
 import java.util.List;
 import java.util.Set;
 
-public class GDRA extends RabinAutomaton<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> {
+public class GDRA extends RabinAutomaton<Pair<PropEquivalenceClassWithBeeDeeDee, List<Slave.State>>, Set<String>> {
     private final Set<Set<Pair<Set<Transition>, Set<Transition>>>> gdraCondition;
 
-    public GDRA(ImmutableCollection<? extends RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>>> states,
-                RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> initialState,
+    public GDRA(ImmutableCollection<? extends RabinAutomaton.State<Pair<PropEquivalenceClassWithBeeDeeDee, List<Slave.State>>, Set<String>>> states,
+                RabinAutomaton.State<Pair<PropEquivalenceClassWithBeeDeeDee, List<Slave.State>>, Set<String>> initialState,
                 Set<Set<Pair<Set<Transition>, Set<Transition>>>> rabinCondition,
                 ImmutableSet<Set<String>> alphabet) {
         super(states, initialState, alphabet);
@@ -32,13 +32,13 @@ public class GDRA extends RabinAutomaton<Pair<PropEquivalenceClass, List<Slave.S
         return super.getAlphabet();
     }
 
-    public static class State extends RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> {
+    public static class State extends RabinAutomaton.State<Pair<PropEquivalenceClassWithBeeDeeDee, List<Slave.State>>, Set<String>> {
 
         /**
          * @param label the list representing the ranking of the states of the corresponding mojmir automaton.
          *              The elder states come first in the list.
          */
-        public State(Pair<PropEquivalenceClass, List<Slave.State>> label) {
+        public State(Pair<PropEquivalenceClassWithBeeDeeDee, List<Slave.State>> label) {
             super(label);
         }
 

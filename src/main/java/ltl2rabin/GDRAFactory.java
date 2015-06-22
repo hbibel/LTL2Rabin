@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class GDRAFactory {
-    private Map<Pair<PropEquivalenceClass, List<Slave.State>>,
+    private Map<Pair<PropEquivalenceClassWithBeeDeeDee, List<Slave.State>>,
                 GDRA.State> existingStates = new HashMap<>();
     private LTLFactoryFromString ltlFactory = new LTLFactoryFromString();
     private Map<Pair<Pair<Integer, Set<Formula>>, Formula>, Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accRCurlyGPsis = new HashMap<>();
@@ -21,7 +21,6 @@ public class GDRAFactory {
         LTLFactory.Result parserResult = ltlFactory.buildLTL(from);
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(parserResult.getAlphabet());
         SlaveFactory slaveFactory = new SlaveFactory(alphabet);
-
         ImmutableSet<Formula> gSet = (new ImmutableSet.Builder<Formula>())
                 .addAll(parserResult.getgFormulas()).build();
         ImmutableSet<Set<Formula>> curlyGSets = (new ImmutableSet.Builder<Set<Formula>>())
@@ -32,9 +31,12 @@ public class GDRAFactory {
         ImmutableSet.Builder<GDRA.State> statesBuilder = new ImmutableSet.Builder<>();
         Map<Pair<Set<Formula>, Map<Formula, Integer>>, Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>>> curlyGRankToAccMap = new HashMap<>();
 
+        long startTime = System.currentTimeMillis();
+
+        System.out.println("Here");
         // All possible combinations of curlyG and their possible ranks:
         ImmutableList.Builder<Pair<Set<Formula>, Map<Formula, Integer>>> curlyGRanksBuilder = new ImmutableList.Builder<>();
-        for (Set<Formula> curlyG : curlyGSets) {
+        curlyGSets.forEach(curlyG -> {
             ImmutableList.Builder<Set<Pair<Formula, Integer>>> psiAndRankPairs = new ImmutableList.Builder<>();
             curlyG.forEach(psi -> {
                 ImmutableSet.Builder<Pair<Formula, Integer>> pairBuilder = new ImmutableSet.Builder<>();
@@ -54,8 +56,14 @@ public class GDRAFactory {
                 curlyGRankToAccMap.put(new Pair<>(curlyG, rankMap), new HashSet<>());
                 curlyGRanksBuilder.add(curlyGRanks);
             });
-        }
+        });
+        System.out.println("Here");
         ImmutableList<Pair<Set<Formula>, Map<Formula, Integer>>> curlyGRanks = curlyGRanksBuilder.build();
+
+        long stopTime = System.currentTimeMillis();
+        long elapsedTime = stopTime - startTime;
+        System.out.println("Finished in " + elapsedTime + "ms " +
+                "(=" + elapsedTime / 1000 / 60 + "m " + (elapsedTime % 60000) / 1000 + "s " + (elapsedTime % 1000) +"ms)");
 
         // Create the initial state:
         ImmutableList.Builder<Slave.State> initialLabelSlaveStatesBuilder = new ImmutableList.Builder<>();
@@ -63,8 +71,8 @@ public class GDRAFactory {
         gSet.forEach(subFormula -> {
             initialLabelSlaveStatesBuilder.add(slaveFactory.createFrom(subFormula).getInitialState());
         });
-        Pair<PropEquivalenceClass, List<Slave.State>> initialLabel
-                = new Pair<>(new PropEquivalenceClass(phi), initialLabelSlaveStatesBuilder.build());
+        Pair<PropEquivalenceClassWithBeeDeeDee, List<Slave.State>> initialLabel
+                = new Pair<>(new PropEquivalenceClassWithBeeDeeDee(phi), initialLabelSlaveStatesBuilder.build());
         GDRA.State initialState = new GDRA.State(initialLabel);
         statesBuilder.add(initialState);
 
@@ -74,7 +82,7 @@ public class GDRAFactory {
         while (!statesToBeAdded.isEmpty()) {
             GDRA.State temp = statesToBeAdded.poll();
 
-            for (Set<String> letter : alphabet) { // TODO: This might be possible to be turned into a parallel forEach loop
+            alphabet.forEach(letter -> { // TODO: This might be possible to be turned into a parallel forEach loop
                 LTLAfGVisitor afVisitor = new LTLAfGVisitor(letter) {
                     // We want to use af here, not afG
                     @Override
@@ -83,7 +91,7 @@ public class GDRAFactory {
                         return new And(formula, afOperand);
                     }
                 };
-                PropEquivalenceClass newLabelLTL = new PropEquivalenceClass(afVisitor.afG(temp.getLabel().getFirst().getRepresentative()));
+                PropEquivalenceClassWithBeeDeeDee newLabelLTL = new PropEquivalenceClassWithBeeDeeDee(afVisitor.afG(temp.getLabel().getFirst().getRepresentative()));
                 ImmutableList.Builder<Slave.State> newLabelSlaveStatesBuilder = new ImmutableList.Builder<>();
                 temp.getLabel().getSecond().forEach(slaveState -> newLabelSlaveStatesBuilder.add(slaveState.readLetter(letter)));
                 GDRA.State newState = addOrGet(new Pair<>(newLabelLTL, newLabelSlaveStatesBuilder.build()));
@@ -137,7 +145,7 @@ public class GDRAFactory {
                     });
                 });
 
-            }
+            });
         }
         ImmutableSet<GDRA.State> states = statesBuilder.build();
 
@@ -159,7 +167,7 @@ public class GDRAFactory {
                     }
                 });
 
-                if (!new PropEquivalenceClass(conjuncts.isEmpty() ? new Boolean(true) : new And(conjuncts)).implies(state.getLabel().getFirst())) {
+                if (!new PropEquivalenceClassWithBeeDeeDee(conjuncts.isEmpty() ? new Boolean(true) : new And(conjuncts)).implies(state.getLabel().getFirst())) {
                     // the state "state" is not in F and thus its outgoing transitions are in M_r^curlyG
                     alphabet.forEach(letter -> mRG.getFirst().add(new GDRA.Transition(state, letter, state.readLetter(letter))));
                 }
@@ -176,7 +184,7 @@ public class GDRAFactory {
         return new GDRA(states, initialState, acc.build(), alphabet);
     }
 
-    private GDRA.State addOrGet(Pair<PropEquivalenceClass, List<Slave.State>> label) {
+    private GDRA.State addOrGet(Pair<PropEquivalenceClassWithBeeDeeDee, List<Slave.State>> label) {
         GDRA.State result = existingStates.get(label);
         if (result == null) {
             result = new GDRA.State(label);

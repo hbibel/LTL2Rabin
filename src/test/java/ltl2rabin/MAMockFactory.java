@@ -2,7 +2,7 @@ package ltl2rabin;
 
 import com.google.common.collect.ImmutableSet;
 import ltl2rabin.LTL.Formula;
-import ltl2rabin.LTL.PropEquivalenceClass;
+import ltl2rabin.LTL.PropEquivalenceClassWithBeeDeeDee;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -23,22 +23,22 @@ public class MAMockFactory {
     // - getAlphabet()
     // (-) getMaxRank()
     // - getInitialState()
-    // - isAcceptingState(new State(new PropEquivalenceClass(Formula blah)))
+    // - isAcceptingState(new State(new PropEquivalenceClassWithBeeDeeDee(Formula blah)))
     public static class MAMock {
         private ImmutableSet<Set<String>> alphabet;
-        private List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> states = new ArrayList<>();
-        private MojmirAutomaton.State<PropEquivalenceClass, Set<String>> initialState;
+        private List<MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>>> states = new ArrayList<>();
+        private MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>> initialState;
 
         private MAMock(ImmutableSet<Set<String>> alphabet, Formula initialLabel) {
             this.alphabet = alphabet;
-            initialState = (MojmirAutomaton.State<PropEquivalenceClass, Set<String>>) mock(MojmirAutomaton.State.class);
-            when(initialState.getLabel()).thenReturn(new PropEquivalenceClass(initialLabel));
+            initialState = (MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>>) mock(MojmirAutomaton.State.class);
+            when(initialState.getLabel()).thenReturn(new PropEquivalenceClassWithBeeDeeDee(initialLabel));
             when(initialState.isSink()).thenReturn(false);
             states.add(initialState);
         }
 
-        public MojmirAutomaton<PropEquivalenceClass, Set<String>> toMA() {
-            MojmirAutomaton<PropEquivalenceClass, Set<String>> result = (MojmirAutomaton<PropEquivalenceClass, Set<String>>) mock(MojmirAutomaton.class);
+        public MojmirAutomaton<PropEquivalenceClassWithBeeDeeDee, Set<String>> toMA() {
+            MojmirAutomaton<PropEquivalenceClassWithBeeDeeDee, Set<String>> result = (MojmirAutomaton<PropEquivalenceClassWithBeeDeeDee, Set<String>>) mock(MojmirAutomaton.class);
             when(result.getStates()).thenReturn(ImmutableSet.copyOf(states));
             when(result.getAlphabet()).thenReturn(alphabet);
             when(result.getInitialState()).thenReturn(initialState);
@@ -46,8 +46,8 @@ public class MAMockFactory {
                 @Override
                 public Boolean answer(InvocationOnMock invocationOnMock) throws Throwable {
                     Object[] args = invocationOnMock.getArguments();
-                    MojmirAutomaton.State<PropEquivalenceClass, Set<String>> arg = (MojmirAutomaton.State<PropEquivalenceClass, Set<String>>) args[0];
-                    PropEquivalenceClass label = arg.getLabel();
+                    MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>> arg = (MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>>) args[0];
+                    PropEquivalenceClassWithBeeDeeDee label = arg.getLabel();
                     return acceptingLabels.contains(label);
                 }
             });*/
@@ -55,8 +55,8 @@ public class MAMockFactory {
         }
 
         public void addState(Formula label, boolean isSink, Set<Set<Formula>> acceptingCurlyGs) {
-            MojmirAutomaton.State<PropEquivalenceClass, Set<String>> newState = (MojmirAutomaton.State<PropEquivalenceClass, Set<String>>) mock(MojmirAutomaton.State.class);
-            when(newState.getLabel()).thenReturn(new PropEquivalenceClass(label));
+            MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>> newState = (MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>>) mock(MojmirAutomaton.State.class);
+            when(newState.getLabel()).thenReturn(new PropEquivalenceClassWithBeeDeeDee(label));
             when(newState.isSink()).thenReturn(isSink);
             when(newState.isAcceptingState(anyObject())).thenAnswer(new Answer<Boolean>() {
                 @Override
@@ -80,8 +80,8 @@ public class MAMockFactory {
 
         public void whenReadingToken(Formula from, String token, Formula to) {
             Set<Set<String>> letters = alphabet.stream().filter(letter -> letter.contains(token)).collect(Collectors.toSet());
-            MojmirAutomaton.State<PropEquivalenceClass, Set<String>> fromState = states.stream().filter(state -> state.getLabel().equals(new PropEquivalenceClass(from))).findAny().get();
-            MojmirAutomaton.State<PropEquivalenceClass, Set<String>> toState = states.stream().filter(state -> state.getLabel().equals(new PropEquivalenceClass(to))).findAny().get();
+            MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>> fromState = states.stream().filter(state -> state.getLabel().equals(new PropEquivalenceClassWithBeeDeeDee(from))).findAny().get();
+            MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>> toState = states.stream().filter(state -> state.getLabel().equals(new PropEquivalenceClassWithBeeDeeDee(to))).findAny().get();
             letters.forEach(letter -> {
                 when(fromState.readLetter(letter)).thenReturn(toState);
             });
@@ -89,16 +89,16 @@ public class MAMockFactory {
 
         public void whenNotReadingToken(Formula from, String token, Formula to) {
             Set<Set<String>> letters = alphabet.stream().filter(letter -> !letter.contains(token)).collect(Collectors.toSet());
-            MojmirAutomaton.State<PropEquivalenceClass, Set<String>> fromState = states.stream().filter(state -> state.getLabel().equals(new PropEquivalenceClass(from))).findAny().get();
-            MojmirAutomaton.State<PropEquivalenceClass, Set<String>> toState = states.stream().filter(state -> state.getLabel().equals(new PropEquivalenceClass(to))).findAny().get();
+            MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>> fromState = states.stream().filter(state -> state.getLabel().equals(new PropEquivalenceClassWithBeeDeeDee(from))).findAny().get();
+            MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>> toState = states.stream().filter(state -> state.getLabel().equals(new PropEquivalenceClassWithBeeDeeDee(to))).findAny().get();
             letters.forEach(letter -> {
                 when(fromState.readLetter(letter)).thenReturn(toState);
             });
         }
 
         public void whenReadingLetter(Formula from, Set<String> letter, Formula to) {
-            MojmirAutomaton.State<PropEquivalenceClass, Set<String>> fromState = states.stream().filter(state -> state.getLabel().equals(new PropEquivalenceClass(from))).findAny().get();
-            MojmirAutomaton.State<PropEquivalenceClass, Set<String>> toState = states.stream().filter(state -> state.getLabel().equals(new PropEquivalenceClass(to))).findAny().get();
+            MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>> fromState = states.stream().filter(state -> state.getLabel().equals(new PropEquivalenceClassWithBeeDeeDee(from))).findAny().get();
+            MojmirAutomaton.State<PropEquivalenceClassWithBeeDeeDee, Set<String>> toState = states.stream().filter(state -> state.getLabel().equals(new PropEquivalenceClassWithBeeDeeDee(to))).findAny().get();
             when(fromState.readLetter(letter)).thenReturn(toState);
         }
     }

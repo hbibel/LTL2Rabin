@@ -65,7 +65,7 @@ public class SlaveTest {
         m.whenReadingLetter(initLabel, Collections.emptySet(), ff);
         m.whenReadingLetter(initLabel, ImmutableSet.of("a"), ff);
 
-        MojmirAutomaton<PropEquivalenceClass, Set<String>> mockMA = m.toMA();
+        MojmirAutomaton<PropEquivalenceClassWithBeeDeeDee, Set<String>> mockMA = m.toMA();
 
         Slave ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(1, ra.getStates().size());
@@ -96,7 +96,7 @@ public class SlaveTest {
         m.whenReadingToken(initlabel, "c", tt);
         m.whenReadingLetter(initlabel, Collections.emptySet(), ff);
 
-        MojmirAutomaton<PropEquivalenceClass, Set<String>> mockMA = m.toMA();
+        MojmirAutomaton<PropEquivalenceClassWithBeeDeeDee, Set<String>> mockMA = m.toMA();
 
         Slave ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(1, ra.getStates().size());
@@ -146,7 +146,7 @@ public class SlaveTest {
         m.whenReadingLetter(bUc, ImmutableSet.of("a"), ff);
         m.whenReadingLetter(bUc, Collections.emptySet(), ff);
         m.whenReadingToken(bUc, "c", tt);
-        MojmirAutomaton<PropEquivalenceClass, Set<String>> mockMA = m.toMA();
+        MojmirAutomaton<PropEquivalenceClassWithBeeDeeDee, Set<String>> mockMA = m.toMA();
 
         Slave ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(2, ra.getStates().size());

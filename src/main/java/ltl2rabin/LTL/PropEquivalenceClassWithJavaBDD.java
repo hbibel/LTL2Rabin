@@ -7,20 +7,20 @@ import java.util.*;
 
 /**
  * An object of this class represents an equivalence class of LTL formulas.
- * This class solves several problems:
+ * This class serves the following purposes:
  *  - It separates the BDD library from the rest of the code
  *  - It eliminates formulas that are propositionally equivalent
  *  - It serves as a point where all variables and their BDD representations get stored
  */
-public class PropEquivalenceClass {
+public class PropEquivalenceClassWithJavaBDD {
     private static int bddVarCount = 0;
-    private static final BDDFactory bddFactory = BDDFactory.init("java", 2, 2);
+    private static final BDDFactory bddFactory = BDDFactory.init("java", 1000, 2);
 
     private Formula representative;
     private BDD cachedBDD;
     private static final Map<Formula, BDD> formulaBDDMap = new HashMap<>();
 
-    public PropEquivalenceClass(Formula representative) {
+    public PropEquivalenceClassWithJavaBDD(Formula representative) {
         this.representative = representative;
         this.cachedBDD = getOrCreateBDD(representative);
     }
@@ -29,7 +29,7 @@ public class PropEquivalenceClass {
         return representative;
     }
 
-    public boolean implies(PropEquivalenceClass other) {
+    public boolean implies(PropEquivalenceClassWithJavaBDD other) {
         return cachedBDD.imp(other.cachedBDD).isOne();
     }
 
@@ -92,7 +92,7 @@ public class PropEquivalenceClass {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        PropEquivalenceClass that = (PropEquivalenceClass) o;
+        PropEquivalenceClassWithJavaBDD that = (PropEquivalenceClassWithJavaBDD) o;
 
         return (that.representative.equals(this.representative)) || cachedBDD.equals(that.cachedBDD);
     }

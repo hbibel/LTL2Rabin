@@ -1,14 +1,11 @@
 package ltl2rabin;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import ltl2rabin.LTL.PropEquivalenceClass;
 
 import java.util.*;
 
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @SuppressWarnings("unchecked")
 public abstract class AutomatonMockFactory<T> {
