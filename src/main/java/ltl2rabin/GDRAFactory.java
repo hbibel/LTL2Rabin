@@ -33,7 +33,6 @@ public class GDRAFactory {
 
         long startTime = System.currentTimeMillis();
 
-        System.out.println("Here");
         // All possible combinations of curlyG and their possible ranks:
         ImmutableList.Builder<Pair<Set<Formula>, Map<Formula, Integer>>> curlyGRanksBuilder = new ImmutableList.Builder<>();
         curlyGSets.forEach(curlyG -> {
@@ -57,7 +56,6 @@ public class GDRAFactory {
                 curlyGRanksBuilder.add(curlyGRanks);
             });
         });
-        System.out.println("Here");
         ImmutableList<Pair<Set<Formula>, Map<Formula, Integer>>> curlyGRanks = curlyGRanksBuilder.build();
 
         long stopTime = System.currentTimeMillis();

@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class PropEquivalenceClassWithBeeDeeDee {
     private static int bddVarCount = 0;
-    private static final Factory bddFactory = Factory.mkResizingAndGarbageCollected(1000, 1000);
+    private static final Factory bddFactory = Factory.mkResizingAndGarbageCollected(10, 5);
 
     private Formula representative;
     private BDD cachedBDD;
