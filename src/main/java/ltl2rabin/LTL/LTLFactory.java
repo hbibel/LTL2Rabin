@@ -2,11 +2,12 @@ package ltl2rabin.LTL;
 
 import com.google.common.collect.ImmutableSet;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 
 public abstract class LTLFactory<T> {
-    public abstract Result buildLTL(T input);
+    public abstract Result buildLTL(T input) throws IOException;
 
     public static class Result {
         private Formula ltlFormula;

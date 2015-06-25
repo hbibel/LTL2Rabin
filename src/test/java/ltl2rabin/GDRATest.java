@@ -14,7 +14,10 @@ public class GDRATest {
 
     @Test
     public void basicTest() {
-        GDRA gdra = new GDRAFactory().createFrom("a");
+        final String input = "a";
+        LTLFactoryFromString ltlFactoryFromString = new LTLFactoryFromString();
+        final LTLFactory.Result parserResult = ltlFactoryFromString.buildLTL(input);
+        GDRA gdra = new GDRAFactory(parserResult.getAlphabet()).createFrom(parserResult);
         assertEquals(3, gdra.getStates().size());
 //        Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> mPiPsi = (new ArrayList<>(gdra.getGdraCondition())).get(0);
 //        assertEquals(4, mPiPsi.size());
@@ -22,7 +25,10 @@ public class GDRATest {
 
     @Test
     public void simpleGTest() {
-        GDRA gdra = new GDRAFactory().createFrom("a & (G b)");
+        LTLFactoryFromString ltlFactoryFromString = new LTLFactoryFromString();
+        final String input = "a & (G b)";
+        final LTLFactory.Result parserResult = ltlFactoryFromString.buildLTL(input);
+        GDRA gdra = new GDRAFactory(parserResult.getAlphabet()).createFrom(parserResult);
         assertEquals(3, gdra.getStates().size());
     }
 
@@ -32,7 +38,11 @@ public class GDRATest {
         String input = "b | (X G (a | (X (b U c))))";
         Formula psi = new Or(new Variable("a"), new X(new U(new Variable("b"), new Variable("c"))));
         Formula phi = new LTLFactoryFromString().buildLTL(input).getLtlFormula();
-        GDRA gdra = new GDRAFactory().createFrom(input);
+
+        LTLFactoryFromString ltlFactoryFromString = new LTLFactoryFromString();
+
+        final LTLFactory.Result parserResult = ltlFactoryFromString.buildLTL(input);
+        GDRA gdra = new GDRAFactory(parserResult.getAlphabet()).createFrom(parserResult);
         assertEquals(8, gdra.getStates().size());
 
         ImmutableSet<? extends Set<String>> alphabet = gdra.getAlphabet();

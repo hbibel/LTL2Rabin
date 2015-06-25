@@ -87,6 +87,10 @@ public class PropEquivalenceClass {
         return cachedBDD.isOne();
     }
 
+    public static void clear() {
+        bddFactory.done();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

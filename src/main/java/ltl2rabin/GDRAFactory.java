@@ -11,14 +11,16 @@ import ltl2rabin.LTL.Boolean;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class GDRAFactory {
+public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> {
     private Map<Pair<PropEquivalenceClass, List<Slave.State>>,
                 GDRA.State> existingStates = new HashMap<>();
-    private LTLFactoryFromString ltlFactory = new LTLFactoryFromString();
     private Map<Pair<Pair<Integer, Set<Formula>>, Formula>, Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accRCurlyGPsis = new HashMap<>();
 
-    public GDRA createFrom(String from) {
-        LTLFactory.Result parserResult = ltlFactory.buildLTL(from);
+    public GDRAFactory(ImmutableSet<Set<String>> alphabet) {
+        super(alphabet);
+    }
+
+    public GDRA createFrom(LTLFactory.Result parserResult) {
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(parserResult.getAlphabet());
         SlaveFactory slaveFactory = new SlaveFactory(alphabet);
 

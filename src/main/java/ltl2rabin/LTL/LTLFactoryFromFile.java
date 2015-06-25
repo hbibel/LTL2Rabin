@@ -3,15 +3,18 @@ package ltl2rabin.LTL;
 import com.google.common.collect.Sets;
 import ltl2rabin.parser.LTLLexer;
 import ltl2rabin.parser.LTLParser;
-import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
-public class LTLFactoryFromString extends LTLFactoryWithAntlr<String> {
+import java.io.File;
+import java.io.IOException;
+
+public class LTLFactoryFromFile extends LTLFactoryWithAntlr<File> {
     @Override
-    public Result buildLTL(String input) {
-        ANTLRInputStream antlrInputStream = new ANTLRInputStream(input);
+    public Result buildLTL(File input) throws IOException {
+        ANTLRFileStream antlrInputStream = new ANTLRFileStream(input.getName());
         LTLLexer lexer = new LTLLexer(antlrInputStream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         LTLParser parser = new LTLParser(tokens);
