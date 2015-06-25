@@ -16,6 +16,32 @@ public class PropEquivalenceClass {
     private static int bddVarCount = 0;
     private static final BDDFactory bddFactory = BDDFactory.init("java", 2, 2);
 
+    /**
+     * This class serves as a callback class for the output of the bddFactory. By default, the bddFactory will
+     * print stuff like this:
+     * <pre>
+     *     Garbage collection #1: 3 nodes / 0 free / 0.0s / 0.0s total
+     *     Resizing node table from 3 to 5
+     *     Resizing node table from 5 to 7
+     *     Resizing node table from 7 to 13
+     * </pre>
+     * This information has little to no value to the user of this tool here, so the output of the bddFactory will be
+     * redirected into this black hole where it never can get out from.
+     */
+    public static class BlackHole {
+        public void eatEverything() {}
+    }
+
+    public static void init() {
+        try {
+            bddFactory.registerGCCallback(new BlackHole(), Class.forName("ltl2rabin.LTL.PropEquivalenceClass$BlackHole").getMethod("eatEverything"));
+            bddFactory.registerResizeCallback(new BlackHole(), Class.forName("ltl2rabin.LTL.PropEquivalenceClass$BlackHole").getMethod("eatEverything"));
+            bddFactory.registerReorderCallback(new BlackHole(), Class.forName("ltl2rabin.LTL.PropEquivalenceClass$BlackHole").getMethod("eatEverything"));
+        } catch (NoSuchMethodException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     private Formula representative;
     private BDD cachedBDD;
     private static final Map<Formula, BDD> formulaBDDMap = new HashMap<>();
