@@ -9,39 +9,39 @@ import java.util.Objects;
  * This class represents a logical conjunction (&) in an LTL formula.
  */
 public class And extends Formula {
-    private final List<Formula> conjuncts;
+    private final List<Formula> operands;
 
     /**
-     * @param conjuncts The LTL formulae that are connected by the conjunction. For example, the conjunction
-     *                  a & (X b) has the conjuncts a and (X b)
+     * @param operands The LTL formulae that are connected by the conjunction. For example, the conjunction
+     *                  a & (X b) has the operands a and (X b)
      */
-    public And(List<Formula> conjuncts) {
-        this.conjuncts = conjuncts;
+    public And(List<Formula> operands) {
+        this.operands = operands;
     }
 
     /**
-     * This constructor is for an conjunction with two conjuncts.
-     * @param l The left conjunct. For example, for a & b, a is the left conjunct.
-     * @param r The left conjunct. For example, for a & b, b is the right conjunct.
+     * This constructor is for an conjunction with two operands.
+     * @param l The left operand. For example, for a & b, a is the left operand.
+     * @param r The left operand. For example, for a & b, b is the right operand.
      */
     public And(Formula l, Formula r) {
         List<Formula> params = new ArrayList<>();
         params.add(l);
         params.add(r);
-        conjuncts = params;
+        operands = params;
     }
 
-    public List<Formula> getConjuncts() {
-        return conjuncts;
+    public List<Formula> getOperands() {
+        return operands;
     }
 
     /**
-     * Use this method to iterate over the conjuncts.
+     * Use this method to iterate over the operands.
      *
-     * @return The iterator over all conjuncts
+     * @return The iterator over all operands
      */
     public Iterator<Formula> getIterator() {
-        return conjuncts.iterator();
+        return operands.iterator();
     }
 
     @Override
@@ -51,17 +51,17 @@ public class And extends Formula {
 
     @Override
     public String toString() {
-        if (0 == conjuncts.size()) {
+        if (0 == operands.size()) {
             return "tt"; // an empty conjunction is, by definition, true
         }
-        else if (1 == conjuncts.size()) {
-            return conjuncts.get(0).toString();
+        else if (1 == operands.size()) {
+            return operands.get(0).toString();
         }
 
         StringBuilder builder = new StringBuilder();
-        Iterator<Formula> conjunctsIterator = conjuncts.iterator();
-        while (conjunctsIterator.hasNext()) {
-            Formula operand = conjunctsIterator.next();
+        Iterator<Formula> operandListIterator = operands.iterator();
+        while (operandListIterator.hasNext()) {
+            Formula operand = operandListIterator.next();
             if (operand instanceof Variable || operand instanceof Boolean) {
                 builder.append(operand.toString()); // ... & a & ..., no parentheses needed
             }
@@ -97,7 +97,7 @@ public class And extends Formula {
                 }
             }
 
-            if (conjunctsIterator.hasNext()) {
+            if (operandListIterator.hasNext()) {
                 builder.append(" & ");
             }
         }
@@ -106,7 +106,7 @@ public class And extends Formula {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.getClass(), conjuncts);
+        return Objects.hash(this.getClass(), operands);
     }
 
     // Since this equals method tests for structural equivalence, a & b does NOT equal b & a.
@@ -117,6 +117,6 @@ public class And extends Formula {
 
         And ltlAnd = (And) o;
 
-        return conjuncts != null ? conjuncts.equals(ltlAnd.conjuncts) : ltlAnd.conjuncts == null;
+        return operands != null ? operands.equals(ltlAnd.operands) : ltlAnd.operands == null;
     }
 }

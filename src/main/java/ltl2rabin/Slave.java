@@ -139,11 +139,11 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
             if (rank >= getLabel().size()) {
                 return Collections.emptyList();
             }
-            ImmutableList.Builder<Formula> conjunctsBuilder = new ImmutableList.Builder<>();
+            ImmutableList.Builder<Formula> conjunctionListBuilder = new ImmutableList.Builder<>();
             for (int i = rank; i < getLabel().size(); i++) {
-                conjunctsBuilder.add(getLabel().get(i).getLabel().getRepresentative());
+                conjunctionListBuilder.add(getLabel().get(i).getLabel().getRepresentative());
             }
-            return conjunctsBuilder.build();
+            return conjunctionListBuilder.build();
         }
 
         private Formula eval(Formula f, Set<Formula> curlyG) {
@@ -157,13 +157,13 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
                 }
             }
             else if (f instanceof And) {
-                return new And(((And) f).getConjuncts().stream().map(conjunct -> eval(conjunct, curlyG)).collect(Collectors.toList()));
+                return new And(((And) f).getOperands().stream().map(operand -> eval(operand, curlyG)).collect(Collectors.toList()));
             }
             else if (f instanceof F) {
                 return new F(eval(((F) f).getOperand(), curlyG));
             }
             else if (f instanceof Or) {
-                return new Or(((Or) f).getDisjuncts().stream().map(disjunct -> eval(disjunct, curlyG)).collect(Collectors.toList()));
+                return new Or(((Or) f).getOperands().stream().map(operand -> eval(operand, curlyG)).collect(Collectors.toList()));
             }
             else if (f instanceof U) {
                 return new U(eval(((U) f).getLeft(), curlyG), eval(((U) f).getRight(), curlyG));

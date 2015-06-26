@@ -8,7 +8,11 @@ public class MainTest {
 
     @Test
     public void testMain() throws Exception {
-        Main.main(new String[] {"-h"});
         Main.main(new String[] {"-f G (a & b)"});
+    }
+
+    @Test
+    public void testMain2() throws Exception {
+        Main.main(new String[] {"-h"});
     }
 }

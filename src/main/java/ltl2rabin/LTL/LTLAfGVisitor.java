@@ -13,13 +13,13 @@ public class LTLAfGVisitor implements IVisitor<Formula> {
     }
 
     public Formula visit(And formula) {
-        ArrayList<Formula> newConjuncts = new ArrayList<>();
+        ArrayList<Formula> newConjunctList = new ArrayList<>();
         Iterator<Formula> iterator = formula.getIterator();
         while (iterator.hasNext()) {
             Formula temp = iterator.next();
-            newConjuncts.add(afG(temp));
+            newConjunctList.add(afG(temp));
         }
-        return new And(newConjuncts);
+        return new And(newConjunctList);
     }
 
     public Formula visit(Boolean formula) {
@@ -38,7 +38,7 @@ public class LTLAfGVisitor implements IVisitor<Formula> {
     }
 
     public Formula visit(Or formula) {
-        return new Or(formula.getDisjuncts().stream().map(this::afG).collect(Collectors.toList()));
+        return new Or(formula.getOperands().stream().map(this::afG).collect(Collectors.toList()));
     }
 
     public Formula visit(U formula) {

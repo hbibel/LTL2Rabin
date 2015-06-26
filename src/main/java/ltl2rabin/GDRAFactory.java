@@ -151,17 +151,17 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
 
 
             states.forEach(state -> {
-                List<Formula> conjuncts = new ArrayList<>();
+                List<Formula> conjunctList = new ArrayList<>();
                 state.getLabel().getSecond().forEach(slaveState -> {
                     Formula psi = slaveState.getPsi();
                     if (curlyG.contains(psi)) {
                         int rankForPsi = rankMap.get(psi);
-                        conjuncts.add(new G(psi));
-                        conjuncts.addAll(slaveState.succeedingFormulas(rankForPsi));
+                        conjunctList.add(new G(psi));
+                        conjunctList.addAll(slaveState.succeedingFormulas(rankForPsi));
                     }
                 });
 
-                if (!new PropEquivalenceClass(conjuncts.isEmpty() ? new Boolean(true) : new And(conjuncts)).implies(state.getLabel().getFirst())) {
+                if (!new PropEquivalenceClass(conjunctList.isEmpty() ? new Boolean(true) : new And(conjunctList)).implies(state.getLabel().getFirst())) {
                     // the state "state" is not in F and thus its outgoing transitions are in M_r^curlyG
                     alphabet.forEach(letter -> mRG.getFirst().add(new GDRA.Transition(state, letter, state.readLetter(letter))));
                 }

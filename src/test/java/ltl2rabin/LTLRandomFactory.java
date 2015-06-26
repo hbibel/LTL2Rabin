@@ -91,12 +91,12 @@ public class LTLRandomFactory extends LTLFactory<Integer> {
     }
 
     private And createRandomConjunction() {
-        int numberOfConjuncts = 2 + random.nextInt(4); // The number 4 is chosen arbitrarily.
-        List<Formula> conjuncts = new ArrayList<>();
-        for (int i = 0; i < numberOfConjuncts; i++) {
-            conjuncts.add(createRandomFormula());
+        int numberOfOperands = 2 + random.nextInt(4); // The number 4 is chosen arbitrarily.
+        List<Formula> conjunctList = new ArrayList<>();
+        for (int i = 0; i < numberOfOperands; i++) {
+            conjunctList.add(createRandomFormula());
         }
-        return new And(conjuncts);
+        return new And(conjunctList);
     }
 
     private Boolean createRandomBoolean() {
@@ -112,12 +112,12 @@ public class LTLRandomFactory extends LTLFactory<Integer> {
     }
 
     private Or createRandomDisjunction() {
-        int numberOfDisjuncts = 2 + random.nextInt(4); // The number 4 is chosen arbitrarily.
-        List<Formula> disjuncts = new ArrayList<>();
-        for (int i = 0; i < numberOfDisjuncts; i++) {
-            disjuncts.add(createRandomFormula());
+        int numberOfOperands = 2 + random.nextInt(4); // The number 4 is chosen arbitrarily.
+        List<Formula> operands = new ArrayList<>();
+        for (int i = 0; i < numberOfOperands; i++) {
+            operands.add(createRandomFormula());
         }
-        return new Or(disjuncts);
+        return new Or(operands);
     }
 
     private U createRandomU() {

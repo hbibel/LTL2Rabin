@@ -34,11 +34,11 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, Prop
             curlyGConjunction = new PropEquivalenceClass(new Boolean(true));
         }
         else {
-            List<Formula> curlyGConjuncts = new ArrayList<>();
+            List<Formula> curlyGConjunctList = new ArrayList<>();
             curlyG.forEach(ltlFormula -> {
-                curlyGConjuncts.add(new G(ltlFormula));
+                curlyGConjunctList.add(new G(ltlFormula));
             });
-            curlyGConjunction = new PropEquivalenceClass(new And(curlyGConjuncts));
+            curlyGConjunction = new PropEquivalenceClass(new And(curlyGConjunctList));
         }
 
         Map<PropEquivalenceClass, MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> states = new HashMap<>();

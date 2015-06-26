@@ -1,7 +1,5 @@
 package ltl2rabin.LTL;
 
-import net.sf.javabdd.BDD;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,15 +9,14 @@ import java.util.Objects;
  * This class represents a logical disjunction (|) in an LTL formula.
  */
 public class Or extends Formula {
-    private final List<Formula> disjuncts;
-    private BDD cachedBDD = null;
+    private final List<Formula> operands;
 
     /**
      *
-     * @param disjuncts The LTL formulae that are connected by the disjunction
+     * @param operands The LTL formulae that are connected by the disjunction
      */
-    public Or(List<Formula> disjuncts) {
-        this.disjuncts = disjuncts;
+    public Or(List<Formula> operands) {
+        this.operands = operands;
     }
 
     public Or(final Formula l, final Formula r) {
@@ -36,26 +33,26 @@ public class Or extends Formula {
     }
 
     public Iterator<Formula> getIterator() {
-        return disjuncts.iterator();
+        return operands.iterator();
     }
 
-    public List<Formula> getDisjuncts() {
-        return disjuncts;
+    public List<Formula> getOperands() {
+        return operands;
     }
 
     @Override
     public String toString() {
-        if (0 == disjuncts.size()) {
+        if (0 == operands.size()) {
             return "ff";
         }
-        else if (1 == disjuncts.size()) {
-            return disjuncts.get(0).toString();
+        else if (1 == operands.size()) {
+            return operands.get(0).toString();
         }
 
         StringBuilder builder = new StringBuilder();
-        Iterator<Formula> disjunctsIterator = disjuncts.iterator();
-        while (disjunctsIterator.hasNext()) {
-            Formula operand = disjunctsIterator.next();
+        Iterator<Formula> disjunctionIterator = operands.iterator();
+        while (disjunctionIterator.hasNext()) {
+            Formula operand = disjunctionIterator.next();
             if (operand instanceof And || operand instanceof Variable || operand instanceof Boolean) {
                 builder.append(operand.toString());
             }
@@ -88,7 +85,7 @@ public class Or extends Formula {
                 }
             }
 
-            if (disjunctsIterator.hasNext()) {
+            if (disjunctionIterator.hasNext()) {
                 builder.append(" | ");
             }
         }
@@ -102,7 +99,7 @@ public class Or extends Formula {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.getClass(), disjuncts);
+        return Objects.hash(this.getClass(), operands);
     }
 
     // Since this equals method tests for structural equivalence, a & b does NOT equal b & a.
@@ -113,6 +110,6 @@ public class Or extends Formula {
 
         Or ltlOr = (Or) o;
 
-        return disjuncts != null ? disjuncts.equals(ltlOr.disjuncts) : ltlOr.disjuncts == null;
+        return operands != null ? operands.equals(ltlOr.operands) : ltlOr.operands == null;
     }
 }
