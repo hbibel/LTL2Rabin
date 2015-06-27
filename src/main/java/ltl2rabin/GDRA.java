@@ -22,6 +22,12 @@ public class GDRA extends RabinAutomaton<Pair<PropEquivalenceClass, List<Slave.S
         return gdraCondition;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public ImmutableCollection<State> getStates() {
+        return (ImmutableCollection<State>) super.getStates();
+    }
+
     @Override
     public GDRA.State getInitialState() {
         return (GDRA.State) super.getInitialState();

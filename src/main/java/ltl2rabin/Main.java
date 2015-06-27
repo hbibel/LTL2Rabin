@@ -29,6 +29,7 @@ public class Main {
         CommandLineParser parser = new DefaultParser();
 
         String inputString = "";
+        String outputFilename = "ltl2rabin.hoa";
         LTLFactory.Result parserResult = null;
         CommandLine cmdLine;
         List<String> remainingArguments; // The arguments that don't have a corresponding object of the Options type
@@ -70,6 +71,7 @@ public class Main {
             // Input via file
             // For now, only one file gets read per run.
             String fileName = remainingArguments.get(0);
+            outputFilename = fileName + ".hoa";
             try {
                 parserResult = new LTLFactoryFromFile().buildLTL(new File(fileName));
             } catch (IOException e) {
@@ -87,6 +89,13 @@ public class Main {
 
             GDRAFactory factory = new GDRAFactory(parserResult.getAlphabet());
             GDRA gdra = factory.createFrom(parserResult);
+            try {
+                PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFilename)));
+                out.print(HanoiFormat.toHOAFv1(gdra));
+                out.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             clear();
 
             long stopTime = System.currentTimeMillis();
