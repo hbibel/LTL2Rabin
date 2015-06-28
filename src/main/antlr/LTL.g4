@@ -12,10 +12,6 @@ formula
     | atom                          # formulaatom
     ;
 
-formulainparentheses
-    : '(' formula ')'
-    ;
-
 orformula
     : andformula ('|' andformula)*
     ;
