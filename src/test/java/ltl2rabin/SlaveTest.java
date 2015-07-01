@@ -18,7 +18,7 @@ public class SlaveTest {
     Variable cVariable;
     Formula tt;
     Formula ff;
-    LTLFactoryFromString ltlFactoryFromString;
+    LTLFactory<String> ltlFactoryFromString;
     MAMockFactory maMockFactory;
 
     private String mojmirStateStringFromLTL(Formula f) {

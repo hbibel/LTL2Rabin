@@ -22,7 +22,7 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
 
     public GDRA createFrom(LTLFactory.Result parserResult) {
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(parserResult.getAlphabet());
-        SlaveFactory slaveFactory = new SlaveFactory(alphabet);
+        SlaveFromFormulaFactory slaveFactory = new SlaveFromFormulaFactory(alphabet);
 
         ImmutableSet<Formula> gSet = (new ImmutableSet.Builder<Formula>())
                 .addAll(parserResult.getgFormulas()).build();
@@ -71,10 +71,10 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
         statesBuilder.add(initialState);
 
         // Generate all other states:
-        Queue<GDRA.State> statesToBeAdded = new ConcurrentLinkedQueue<>();
-        statesToBeAdded.add(initialState);
-        while (!statesToBeAdded.isEmpty()) {
-            GDRA.State temp = statesToBeAdded.poll();
+        Queue<GDRA.State> statesToBeExpanded = new ConcurrentLinkedQueue<>();
+        statesToBeExpanded.add(initialState);
+        while (!statesToBeExpanded.isEmpty()) {
+            GDRA.State temp = statesToBeExpanded.poll();
 
             for (Set<String> letter : alphabet) { // TODO: This might be possible to be turned into a parallel forEach loop
                 LTLAfGVisitor afVisitor = new LTLAfGVisitor(letter) {
@@ -92,7 +92,7 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
 
                 // if the states set already contains the newState then it already has been visited and expanded
                 if (!statesBuilder.build().contains(newState)) {
-                    statesToBeAdded.offer(newState);
+                    statesToBeExpanded.offer(newState);
                     statesBuilder.add(newState);
                 }
                 temp.setTransition(letter, newState);

@@ -40,10 +40,6 @@ public class GDRA extends RabinAutomaton<Pair<PropEquivalenceClass, List<Slave.S
 
     public static class State extends RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> {
 
-        /**
-         * @param label the list representing the ranking of the states of the corresponding mojmir automaton.
-         *              The elder states come first in the list.
-         */
         public State(Pair<PropEquivalenceClass, List<Slave.State>> label) {
             super(label);
         }

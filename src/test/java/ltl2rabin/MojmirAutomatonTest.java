@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 
 public class MojmirAutomatonTest {
     MojmirAutomatonFactoryFromString automatonFactory;
-    MojmirAutomatonFactoryFromLTL automatonFactoryWithSet;
+    MojmirAutomatonFactoryFromFormula automatonFactoryWithSet;
 
     Formula aVariable;
     Formula bVariable;
@@ -28,7 +28,7 @@ public class MojmirAutomatonTest {
     @Before
     public void setUp() {
         automatonFactory = new MojmirAutomatonFactoryFromString(ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3)));
-        automatonFactoryWithSet = new MojmirAutomatonFactoryFromLTL(ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3)));
+        automatonFactoryWithSet = new MojmirAutomatonFactoryFromFormula(ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3)));
         aVariable = new Variable("a");
         bVariable = new Variable("b");
         cVariable = new Variable("c");

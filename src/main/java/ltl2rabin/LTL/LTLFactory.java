@@ -7,7 +7,7 @@ import java.util.Collection;
 import java.util.Set;
 
 public abstract class LTLFactory<T> {
-    public abstract Result buildLTL(T input) throws IOException;
+    public abstract Result buildLTL(T input);
 
     public static class Result {
         private Formula ltlFormula;

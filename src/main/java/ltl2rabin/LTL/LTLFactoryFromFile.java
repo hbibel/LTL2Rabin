@@ -13,8 +13,13 @@ import java.io.IOException;
 
 public class LTLFactoryFromFile extends LTLFactoryWithAntlr<File> {
     @Override
-    public Result buildLTL(File input) throws IOException {
-        ANTLRFileStream antlrInputStream = new ANTLRFileStream(input.getName());
+    public Result buildLTL(File input) {
+        ANTLRFileStream antlrInputStream = null;
+        try {
+            antlrInputStream = new ANTLRFileStream(input.getName());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         LTLLexer lexer = new LTLLexer(antlrInputStream);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         LTLParser parser = new LTLParser(tokens);

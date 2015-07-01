@@ -6,9 +6,9 @@ import ltl2rabin.LTL.PropEquivalenceClass;
 
 import java.util.*;
 
-public class MojmirAutomatonFactoryFromLTL extends MojmirAutomatonFactory<Formula> {
+public class MojmirAutomatonFactoryFromFormula extends MojmirAutomatonFactory<Formula> {
 
-    public MojmirAutomatonFactoryFromLTL(ImmutableSet<Set<String>> alphabet) {
+    public MojmirAutomatonFactoryFromFormula(ImmutableSet<Set<String>> alphabet) {
         super(alphabet);
     }
 

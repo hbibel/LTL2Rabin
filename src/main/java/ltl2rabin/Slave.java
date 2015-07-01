@@ -38,10 +38,6 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
         return (State) super.run(word);
     }
 
-    /* public ImmutableSet<Transition> failMerge(int i) {
-        return failMergeSucceed.getFirst().get(i); // TODO: Remove
-    } */
-
     public ImmutableSet<Transition> failMerge(int rank, Set<Formula> curlyG) {
         if (rank > maxRank) {
             return ImmutableSet.copyOf(Collections.emptySet());

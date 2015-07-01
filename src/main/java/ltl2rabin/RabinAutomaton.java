@@ -38,6 +38,7 @@ public abstract class RabinAutomaton<T, U extends Collection> extends Automaton<
         return alphabet;
     }
 
+    // TODO: This method only is used in tests, so it should be outsourced into a test class.
     public State<T, U> run(List<U> word) {
         State<T, U> result = initialState;
         Iterator<U> letterIterator = word.iterator();

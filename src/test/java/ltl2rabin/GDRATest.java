@@ -15,7 +15,7 @@ public class GDRATest {
     @Test
     public void basicTest() {
         final String input = "a";
-        LTLFactoryFromString ltlFactoryFromString = new LTLFactoryFromString();
+        LTLFactory<String> ltlFactoryFromString = new LTLFactoryFromString();
         final LTLFactory.Result parserResult = ltlFactoryFromString.buildLTL(input);
         GDRA gdra = new GDRAFactory(parserResult.getAlphabet()).createFrom(parserResult);
         assertEquals(3, gdra.getStates().size());
@@ -25,7 +25,7 @@ public class GDRATest {
 
     @Test
     public void simpleGTest() {
-        LTLFactoryFromString ltlFactoryFromString = new LTLFactoryFromString();
+        LTLFactory<String> ltlFactoryFromString = new LTLFactoryFromString();
         final String input = "a & (G b)";
         final LTLFactory.Result parserResult = ltlFactoryFromString.buildLTL(input);
         GDRA gdra = new GDRAFactory(parserResult.getAlphabet()).createFrom(parserResult);
@@ -39,7 +39,7 @@ public class GDRATest {
         Formula psi = new Or(new Variable("a"), new X(new U(new Variable("b"), new Variable("c"))));
         Formula phi = new LTLFactoryFromString().buildLTL(input).getLtlFormula();
 
-        LTLFactoryFromString ltlFactoryFromString = new LTLFactoryFromString();
+        LTLFactory<String> ltlFactoryFromString = new LTLFactoryFromString();
 
         final LTLFactory.Result parserResult = ltlFactoryFromString.buildLTL(input);
         GDRA gdra = new GDRAFactory(parserResult.getAlphabet()).createFrom(parserResult);

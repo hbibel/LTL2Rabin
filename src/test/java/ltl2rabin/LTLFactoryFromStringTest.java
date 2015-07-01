@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import static org.junit.Assert.assertEquals;
 
 public class LTLFactoryFromStringTest {
-    LTLFactoryFromString factory;
+    LTLFactory<String> factory;
     LTLRandomFactory randomFactory;
 
     @Before

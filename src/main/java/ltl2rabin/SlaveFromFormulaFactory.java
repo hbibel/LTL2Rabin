@@ -8,16 +8,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-public class SlaveFactory extends RabinAutomatonFactory<Formula,
+public class SlaveFromFormulaFactory extends RabinAutomatonFactory<Formula,
         List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>,
         Set<String>> {
-    private final MojmirAutomatonFactoryFromLTL mojmirAutomatonFactory;
+    private final MojmirAutomatonFactoryFromFormula mojmirAutomatonFactory;
     private final SlaveFromMojmirFactory slaveFromMojmirFactory;
     private static HashMap<Formula, Slave> slaves = new HashMap<>();
 
-    public SlaveFactory(ImmutableSet<Set<String>> alphabet) {
+    public SlaveFromFormulaFactory(ImmutableSet<Set<String>> alphabet) {
         super(alphabet);
-        mojmirAutomatonFactory = new MojmirAutomatonFactoryFromLTL(alphabet);
+        mojmirAutomatonFactory = new MojmirAutomatonFactoryFromFormula(alphabet);
         slaveFromMojmirFactory = new SlaveFromMojmirFactory(alphabet);
     }
 

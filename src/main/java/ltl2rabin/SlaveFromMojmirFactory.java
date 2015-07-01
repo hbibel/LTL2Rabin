@@ -1,6 +1,5 @@
 package ltl2rabin;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import ltl2rabin.LTL.PropEquivalenceClass;
 import org.apache.commons.collections4.set.ListOrderedSet;
@@ -22,8 +21,8 @@ public class SlaveFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomato
         Slave.State initialState;
         int maxRank = 0;
 
-        List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> initialMojmirStates = new ArrayList<>(Collections.singletonList(from.getInitialState()));
-        initialState = new Slave.State(initialMojmirStates, from.getInitialState().getLabel().getRepresentative());
+        List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> initialStateRanking = new ArrayList<>(Collections.singletonList(from.getInitialState()));
+        initialState = new Slave.State(initialStateRanking, from.getInitialState().getLabel().getRepresentative());
         states.add(initialState);
 
         ConcurrentLinkedQueue<Slave.State> queue = new ConcurrentLinkedQueue<>();
@@ -31,18 +30,18 @@ public class SlaveFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomato
         while (!queue.isEmpty()) {
             Slave.State tempState = queue.poll();
             if (tempState.getTransitions().size() != getAlphabet().size()) {
-                // tempState has transitions for any letter ==> tempState has been visited before
-                List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> tempMojmirStates = tempState.getLabel();
+                // tempState does not have transitions for any letter ==> tempState has not been visited before
+                List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> tempStateRanking = tempState.getLabel();
                 for (Set<String> letter : getAlphabet()) {
-                    List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> newMojmirStateList = Stream.concat(tempMojmirStates.stream()
-                            .map(e -> e.readLetter(letter)), Stream.of(initialMojmirStates.get(0)))
+                    List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> newStateRanking = Stream.concat(tempStateRanking.stream()
+                            .map(e -> e.readLetter(letter)), Stream.of(initialStateRanking.get(0)))
                             // According to the javadocs: For ordered streams, the selection of distinct elements is
                             // stable (for duplicated elements, the element appearing first in the encounter order is
                             // preserved.)
                             .distinct()
                             .filter(e -> !e.isSink())
                             .collect(Collectors.toList());
-                    Slave.State newState = new Slave.State(newMojmirStateList, from.getInitialState().getLabel().getRepresentative());
+                    Slave.State newState = new Slave.State(newStateRanking, from.getInitialState().getLabel().getRepresentative());
                     int indexOfExistingState = states.indexOf(newState);
                     if (indexOfExistingState != -1) {
                         newState = states.get(indexOfExistingState);

@@ -6,35 +6,33 @@ import ltl2rabin.LTL.*;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
  * This class describes a mojmir automaton.
  * @param <T> The type of information associated with a state, e.g. its corresponding LTL formula
- * @param <U> The type that represents the "letters", e.g. Set of Strings
+ * @param <L> The type that represents the "letters", e.g. Set of Strings
  */
-public class MojmirAutomaton<T, U> extends Automaton<T, U> {
-    private final ImmutableSet<State<T, U>> states;
-    private final State<T, U> initialState;
-    private final ImmutableSet<State<T, U>> acceptingStates; // TODO: Remove everything that has to do with accepting states of Mojmir automata
-    private final ImmutableSet<U> alphabet;
-    private int maxRank = -1;
+public class MojmirAutomaton<T, L> extends Automaton<T, L> {
+    private final ImmutableSet<State<T, L>> states;
+    private final State<T, L> initialState;
+    private final ImmutableSet<State<T, L>> acceptingStates; // TODO: Remove everything that has to do with accepting states of Mojmir automata
+    private final ImmutableSet<L> alphabet;
 
-    public ImmutableSet<State<T, U>> getStates() {
+    public ImmutableSet<State<T, L>> getStates() {
         return states;
     }
 
-    public ImmutableSet<U> getAlphabet() {
+    public ImmutableSet<L> getAlphabet() {
         return alphabet;
     }
 
-    public State<T, U> getInitialState() {
+    public State<T, L> getInitialState() {
         return initialState;
     }
 
-    public MojmirAutomaton(ImmutableSet<State<T, U>> states, State<T, U> initialState, ImmutableSet<State<T, U>> acceptingStates,
-                           ImmutableSet<U> alphabet) {
+    public MojmirAutomaton(ImmutableSet<State<T, L>> states, State<T, L> initialState, ImmutableSet<State<T, L>> acceptingStates,
+                           ImmutableSet<L> alphabet) {
         this.states = states;
         this.initialState = initialState;
         this.acceptingStates = acceptingStates;

@@ -72,12 +72,7 @@ public class Main {
             // For now, only one file gets read per run.
             String fileName = remainingArguments.get(0);
             outputFilename = fileName + ".hoa";
-            try {
-                parserResult = new LTLFactoryFromFile().buildLTL(new File(fileName));
-            } catch (IOException e) {
-                System.err.println("An error occured when reading the input. Reason: " + e.getMessage());
-                e.printStackTrace();
-            }
+            parserResult = new LTLFactoryFromFile().buildLTL(new File(fileName));
         }
         else {
             // String input
