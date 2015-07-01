@@ -22,10 +22,10 @@ public class MojmirAutomatonFactoryFromFormula extends MojmirAutomatonFactory<Fo
         PropEquivalenceClass initialLabel = new PropEquivalenceClass(from);
         MojmirAutomaton.State<PropEquivalenceClass, Set<String>> initialState =
                 new MojmirAutomaton.State<>(initialLabel);
-        Pair<Set<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>, ImmutableSet<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>> reachResult = super.reach(initialState, super.getAlphabet(), Collections.<Formula>emptySet());
-        ImmutableSet<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> states = ImmutableSet.copyOf(reachResult.getFirst());
+        Set<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>reachResult = super.reach(initialState, super.getAlphabet(), Collections.<Formula>emptySet());
+        ImmutableSet<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> states = ImmutableSet.copyOf(reachResult);
 
-        cachedResult = new MojmirAutomaton<>(states, initialState, reachResult.getSecond(), super.getAlphabet());
+        cachedResult = new MojmirAutomaton<>(states, initialState, super.getAlphabet());
         putIntoCache(from, cachedResult);
         return cachedResult;
     }

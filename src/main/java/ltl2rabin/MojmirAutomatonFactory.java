@@ -25,8 +25,7 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, Prop
         return mojmirAutomata.get(psi);
     }
 
-    protected Pair<Set<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>,
-            ImmutableSet<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>> reach(MojmirAutomaton.State<PropEquivalenceClass, Set<String>> initialState,
+    protected Set<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> reach(MojmirAutomaton.State<PropEquivalenceClass, Set<String>> initialState,
                                                                                              Set<Set<String>> alphabet,
                                                                                              Set<Formula> curlyG) {
         PropEquivalenceClass curlyGConjunction;
@@ -42,7 +41,6 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, Prop
         }
 
         Map<PropEquivalenceClass, MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> states = new HashMap<>();
-        ImmutableSet.Builder<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> acceptingStatesBuilder = new ImmutableSet.Builder<>();
         states.put(initialState.getLabel(), initialState);
 
         Queue<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> statesToBeExpanded = new ConcurrentLinkedQueue<>();
@@ -71,13 +69,6 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, Prop
                     statesToBeExpanded.offer(newState);
                     states.put(newLabel, newState);
                 }
-
-                // state is accepting if state label
-                // - is a tautology (propositionally equivalent to true)
-                // - is implied by curlyG
-                if (newLabel.isTautology() || curlyGConjunction.implies(newLabel)) {
-                    acceptingStatesBuilder.add(newState);
-                }
                 transitions.put(letter, newState);
             }
             if (isSink && !(temp == initialState)) {
@@ -86,6 +77,6 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, Prop
             temp.setTransitions(transitions);
         }
 
-        return new Pair<>(ImmutableSet.copyOf(states.values()), acceptingStatesBuilder.build());
+        return ImmutableSet.copyOf(states.values());
     }
 }

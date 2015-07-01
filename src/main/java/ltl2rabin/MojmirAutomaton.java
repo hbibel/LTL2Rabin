@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 public class MojmirAutomaton<T, L> extends Automaton<T, L> {
     private final ImmutableSet<State<T, L>> states;
     private final State<T, L> initialState;
-    private final ImmutableSet<State<T, L>> acceptingStates; // TODO: Remove everything that has to do with accepting states of Mojmir automata
     private final ImmutableSet<L> alphabet;
 
     public ImmutableSet<State<T, L>> getStates() {
@@ -31,11 +30,10 @@ public class MojmirAutomaton<T, L> extends Automaton<T, L> {
         return initialState;
     }
 
-    public MojmirAutomaton(ImmutableSet<State<T, L>> states, State<T, L> initialState, ImmutableSet<State<T, L>> acceptingStates,
+    public MojmirAutomaton(ImmutableSet<State<T, L>> states, State<T, L> initialState, 
                            ImmutableSet<L> alphabet) {
         this.states = states;
         this.initialState = initialState;
-        this.acceptingStates = acceptingStates;
         this.alphabet = alphabet;
     }
 
