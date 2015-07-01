@@ -186,33 +186,6 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
             return conjunctionListBuilder.build();
         }
 
-        private Formula eval(Formula f, Set<Formula> curlyG) {
-            if (f instanceof G) {
-                Formula operand = ((G) f).getOperand();
-                if (curlyG.contains(operand)) {
-                    return new G(eval(operand, curlyG));
-                }
-                else {
-                    return new Boolean(false);
-                }
-            }
-            else if (f instanceof And) {
-                return new And(((And) f).getOperands().stream().map(operand -> eval(operand, curlyG)).collect(Collectors.toList()));
-            }
-            else if (f instanceof F) {
-                return new F(eval(((F) f).getOperand(), curlyG));
-            }
-            else if (f instanceof Or) {
-                return new Or(((Or) f).getOperands().stream().map(operand -> eval(operand, curlyG)).collect(Collectors.toList()));
-            }
-            else if (f instanceof U) {
-                return new U(eval(((U) f).getLeft(), curlyG), eval(((U) f).getRight(), curlyG));
-            }
-            else if (f instanceof X) {
-                return new X(eval(((X) f).getOperand(), curlyG));
-            }
-            return f; // Booleans and Variables don't change at all
-        }
         @Override
         public State readLetter(Set<String> letter) {
             return (State) super.readLetter(letter);

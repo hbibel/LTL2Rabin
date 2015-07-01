@@ -91,7 +91,6 @@ public class Main {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            clear();
 
             long stopTime = System.currentTimeMillis();
             long elapsedTime = stopTime - startTime;
@@ -106,11 +105,5 @@ public class Main {
     private static void printHelp(Options options) {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("java -jar LTL2Rabin.jar [options] [<filename>]", options);
-    }
-
-    // Note to developer: When parsing several LTLs, don't forget to call clear() in between to clean up
-    // the BDD variable space.
-    private static void clear() {
-        PropEquivalenceClass.clear();
     }
 }

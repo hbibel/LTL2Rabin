@@ -26,20 +26,7 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, Prop
     }
 
     protected Set<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> reach(MojmirAutomaton.State<PropEquivalenceClass, Set<String>> initialState,
-                                                                                             Set<Set<String>> alphabet,
-                                                                                             Set<Formula> curlyG) {
-        PropEquivalenceClass curlyGConjunction;
-        if (curlyG.isEmpty()) {
-            curlyGConjunction = new PropEquivalenceClass(new Boolean(true));
-        }
-        else {
-            List<Formula> curlyGConjunctList = new ArrayList<>();
-            curlyG.forEach(ltlFormula -> {
-                curlyGConjunctList.add(new G(ltlFormula));
-            });
-            curlyGConjunction = new PropEquivalenceClass(new And(curlyGConjunctList));
-        }
-
+                                                                                             Set<Set<String>> alphabet) {
         Map<PropEquivalenceClass, MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> states = new HashMap<>();
         states.put(initialState.getLabel(), initialState);
 
