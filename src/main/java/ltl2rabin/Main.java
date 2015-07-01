@@ -95,7 +95,7 @@ public class Main {
 
             long stopTime = System.currentTimeMillis();
             long elapsedTime = stopTime - startTime;
-            System.out.println("Finished in " + elapsedTime + "ms " +
+            System.out.println(parserResult.getLtlFormula() + " Finished in " + elapsedTime + "ms " +
                     "(=" + elapsedTime / 1000 / 60 + "m " + (elapsedTime % 60000) / 1000 + "s " + (elapsedTime % 1000) +"ms)");
         }
 
