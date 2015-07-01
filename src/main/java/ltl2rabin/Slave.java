@@ -1,5 +1,8 @@
 package ltl2rabin;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -9,11 +12,32 @@ import ltl2rabin.LTL.Boolean;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>, Set<String>> {
     private final int maxRank;
     private final ImmutableCollection<State> slaveStates;
+    private final CacheLoader<Pair<Integer, Set<Formula>>, ImmutableSet<Transition>> failMergeLoader =
+            new CacheLoader<Pair<Integer, Set<Formula>>, ImmutableSet<Transition>>() {
+                @Override
+                public ImmutableSet<Transition> load(Pair<Integer, Set<Formula>> integerSetPair) throws Exception {
+                    return calculateFailMerge(integerSetPair.getFirst(), integerSetPair.getSecond());
+                }
+            };
+    private final LoadingCache<Pair<Integer, Set<Formula>>, ImmutableSet<Transition>> failMergeCache =
+            CacheBuilder.newBuilder()
+                    .build(failMergeLoader);
+    private final CacheLoader<Pair<Integer, Set<Formula>>, ImmutableSet<Transition>> succeedLoader =
+            new CacheLoader<Pair<Integer, Set<Formula>>, ImmutableSet<Transition>>() {
+                @Override
+                public ImmutableSet<Transition> load(Pair<Integer, Set<Formula>> integerSetPair) throws Exception {
+                    return calculateSucceed(integerSetPair.getFirst(), integerSetPair.getSecond());
+                }
+            };
+    private final LoadingCache<Pair<Integer, Set<Formula>>, ImmutableSet<Transition>> succeedCache =
+            CacheBuilder.newBuilder()
+                    .build(succeedLoader);
 
     public Slave(ImmutableCollection<State> states,
                  State initialState,
@@ -39,6 +63,16 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
     }
 
     public ImmutableSet<Transition> failMerge(int rank, Set<Formula> curlyG) {
+        ImmutableSet<Transition> result = null;
+        try {
+            result = failMergeCache.get(new Pair<>(rank, curlyG));
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return result == null ? ImmutableSet.of() : result;
+    }
+
+    private ImmutableSet<Transition> calculateFailMerge(int rank, Set<Formula> curlyG) {
         if (rank > maxRank) {
             return ImmutableSet.copyOf(Collections.emptySet());
         }
@@ -92,6 +126,16 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
     } */
 
     public ImmutableSet<Transition> succeed(int rank, Set<Formula> curlyG) {
+        ImmutableSet<Transition> result = null;
+        try {
+            result = succeedCache.get(new Pair<>(rank, curlyG));
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        return result == null ? ImmutableSet.of() : result;
+    }
+
+    private ImmutableSet<Transition> calculateSucceed(int rank, Set<Formula> curlyG) {
         if (rank > maxRank) {
             return ImmutableSet.copyOf(Collections.emptySet());
         }
