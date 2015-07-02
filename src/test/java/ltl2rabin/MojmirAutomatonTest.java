@@ -78,9 +78,9 @@ public class MojmirAutomatonTest {
                 new And(aVariable, new G(bVariable)),
                 new G(new And(aVariable, bVariable))
         );
-        ImmutableSet<Formula> curlyG1 = ImmutableSet.of(bVariable);
-        ImmutableSet<Formula> curlyG2 = ImmutableSet.of(bVariable, new And(aVariable, bVariable));
-        ImmutableSet<Formula> curlyG3 = ImmutableSet.of(new And(aVariable, bVariable));
+        ImmutableSet<G> curlyG1 = ImmutableSet.of(new G(bVariable));
+        ImmutableSet<G> curlyG2 = ImmutableSet.of(new G(bVariable), new G(new And(aVariable, bVariable)));
+        ImmutableSet<G> curlyG3 = ImmutableSet.of(new G(new And(aVariable, bVariable)));
         MojmirAutomaton<PropEquivalenceClass, Set<String>> mojmirAutomaton = automatonFactoryWithSet.createFrom(phi);
         Formula gBOrGAAndB = new Or(new G(bVariable), new G(new And(aVariable, bVariable)));
 

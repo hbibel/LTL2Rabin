@@ -63,12 +63,12 @@ public class MojmirAutomaton<T, L> extends Automaton<T, L> {
             this.transitions = transitions;
         }
 
-        public boolean isAcceptingState(Set<Formula> curlyG) {
+        public boolean isAcceptingState(Set<G> curlyG) {
             PropEquivalenceClass gConjunction;
             if (curlyG.isEmpty()) {
                 gConjunction = new PropEquivalenceClass(new ltl2rabin.LTL.Boolean(true));
             } else {
-                gConjunction = new PropEquivalenceClass(new And(ImmutableList.copyOf(curlyG.stream().map(G::new).collect(Collectors.toList()))));
+                gConjunction = new PropEquivalenceClass(new And(ImmutableList.copyOf(curlyG)));
             }
             return gConjunction.implies((PropEquivalenceClass) label);
         }

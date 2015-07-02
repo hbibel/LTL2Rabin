@@ -19,7 +19,7 @@ public abstract class LTLFactory<T> {
     public static class Result {
         private Formula ltlFormula;
         private ImmutableSet<Set<String>> alphabet;
-        private Collection<Formula> gFormulas;
+        private Collection<G> gFormulas;
 
         /**
          * A Result is an object that bundles its parameters.
@@ -28,7 +28,7 @@ public abstract class LTLFactory<T> {
          * @param alphabet All possible combinations of tokens.
          * @param gFormulas The set of Formulas of type <code>G</code> that appear within the ltlFormula.
          */
-        public Result(Formula ltlFormula, Set<Set<String>> alphabet, Collection<Formula> gFormulas) {
+        public Result(Formula ltlFormula, Set<Set<String>> alphabet, Collection<G> gFormulas) {
             this.ltlFormula = ltlFormula;
             this.alphabet = ImmutableSet.copyOf(alphabet);
             this.gFormulas = gFormulas;
@@ -42,7 +42,7 @@ public abstract class LTLFactory<T> {
             return alphabet;
         }
 
-        public Collection<Formula> getgFormulas() {
+        public Collection<G> getgFormulas() {
             return gFormulas;
         }
     }

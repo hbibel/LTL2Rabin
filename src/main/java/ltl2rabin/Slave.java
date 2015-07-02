@@ -18,24 +18,24 @@ import java.util.stream.Collectors;
 public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>, Set<String>> {
     private final int maxRank;
     private final ImmutableCollection<State> slaveStates;
-    private final CacheLoader<Pair<Integer, Set<Formula>>, ImmutableSet<Transition>> failMergeLoader =
-            new CacheLoader<Pair<Integer, Set<Formula>>, ImmutableSet<Transition>>() {
+    private final CacheLoader<Pair<Integer, Set<G>>, ImmutableSet<Transition>> failMergeLoader =
+            new CacheLoader<Pair<Integer, Set<G>>, ImmutableSet<Transition>>() {
                 @Override
-                public ImmutableSet<Transition> load(Pair<Integer, Set<Formula>> integerSetPair) throws Exception {
+                public ImmutableSet<Transition> load(Pair<Integer, Set<G>> integerSetPair) throws Exception {
                     return calculateFailMerge(integerSetPair.getFirst(), integerSetPair.getSecond());
                 }
             };
-    private final LoadingCache<Pair<Integer, Set<Formula>>, ImmutableSet<Transition>> failMergeCache =
+    private final LoadingCache<Pair<Integer, Set<G>>, ImmutableSet<Transition>> failMergeCache =
             CacheBuilder.newBuilder()
                     .build(failMergeLoader);
-    private final CacheLoader<Pair<Integer, Set<Formula>>, ImmutableSet<Transition>> succeedLoader =
-            new CacheLoader<Pair<Integer, Set<Formula>>, ImmutableSet<Transition>>() {
+    private final CacheLoader<Pair<Integer, Set<G>>, ImmutableSet<Transition>> succeedLoader =
+            new CacheLoader<Pair<Integer, Set<G>>, ImmutableSet<Transition>>() {
                 @Override
-                public ImmutableSet<Transition> load(Pair<Integer, Set<Formula>> integerSetPair) throws Exception {
+                public ImmutableSet<Transition> load(Pair<Integer, Set<G>> integerSetPair) throws Exception {
                     return calculateSucceed(integerSetPair.getFirst(), integerSetPair.getSecond());
                 }
             };
-    private final LoadingCache<Pair<Integer, Set<Formula>>, ImmutableSet<Transition>> succeedCache =
+    private final LoadingCache<Pair<Integer, Set<G>>, ImmutableSet<Transition>> succeedCache =
             CacheBuilder.newBuilder()
                     .build(succeedLoader);
 
@@ -62,7 +62,7 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
         return (State) super.run(word);
     }
 
-    public ImmutableSet<Transition> failMerge(int rank, Set<Formula> curlyG) {
+    public ImmutableSet<Transition> failMerge(int rank, Set<G> curlyG) {
         ImmutableSet<Transition> result = null;
         try {
             result = failMergeCache.get(new Pair<>(rank, curlyG));
@@ -72,7 +72,7 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
         return result == null ? ImmutableSet.of() : result;
     }
 
-    private ImmutableSet<Transition> calculateFailMerge(int rank, Set<Formula> curlyG) {
+    private ImmutableSet<Transition> calculateFailMerge(int rank, Set<G> curlyG) {
         if (rank > maxRank) {
             return ImmutableSet.copyOf(Collections.emptySet());
         }
@@ -125,7 +125,7 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
         return failMergeSucceed.getSecond().get(i); // TODO: Remove
     } */
 
-    public ImmutableSet<Transition> succeed(int rank, Set<Formula> curlyG) {
+    public ImmutableSet<Transition> succeed(int rank, Set<G> curlyG) {
         ImmutableSet<Transition> result = null;
         try {
             result = succeedCache.get(new Pair<>(rank, curlyG));
@@ -135,7 +135,7 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
         return result == null ? ImmutableSet.of() : result;
     }
 
-    private ImmutableSet<Transition> calculateSucceed(int rank, Set<Formula> curlyG) {
+    private ImmutableSet<Transition> calculateSucceed(int rank, Set<G> curlyG) {
         if (rank > maxRank) {
             return ImmutableSet.copyOf(Collections.emptySet());
         }

@@ -10,11 +10,12 @@ import ltl2rabin.LTL.Boolean;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> {
     private Map<Pair<PropEquivalenceClass, List<Slave.State>>,
                 GDRA.State> existingStates = new HashMap<>();
-    private Map<Pair<Pair<Integer, Set<Formula>>, Formula>, Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accRCurlyGPsis = new HashMap<>();
+    private Map<Pair<Pair<Integer, Set<G>>, Formula>, Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accRCurlyGPsis = new HashMap<>();
 
     public GDRAFactory(ImmutableSet<Set<String>> alphabet) {
         super(alphabet);
@@ -24,21 +25,22 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(parserResult.getAlphabet());
         SlaveFromFormulaFactory slaveFactory = new SlaveFromFormulaFactory(alphabet);
 
-        ImmutableSet<Formula> gSet = (new ImmutableSet.Builder<Formula>())
+        ImmutableSet<G> gSet = (new ImmutableSet.Builder<G>())
                 .addAll(parserResult.getgFormulas()).build();
-        ImmutableSet<Set<Formula>> curlyGSets = (new ImmutableSet.Builder<Set<Formula>>())
+        ImmutableSet<Set<G>> curlyGSets = (new ImmutableSet.Builder<Set<G>>())
                 .addAll(Sets.powerSet(gSet)).build();
         Formula phi = parserResult.getLtlFormula();
 
         Set<GDRA.Transition> univ = new HashSet<>(); // UNIV = Universe, all transitions in the automaton.
         ImmutableSet.Builder<GDRA.State> statesBuilder = new ImmutableSet.Builder<>();
-        Map<Pair<Set<Formula>, Map<Formula, Integer>>, Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>>> curlyGRankToAccMap = new HashMap<>();
+        Map<Map<Formula, Integer>, Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>>> curlyGRankToAccMap = new HashMap<>();
 
         // All possible combinations of curlyG and their possible ranks:
         ImmutableList.Builder<Map<Formula, Integer>> curlyGRanksBuilder = new ImmutableList.Builder<>();
-        for (Set<Formula> curlyG : curlyGSets) {
+        for (Set<G> curlyG : curlyGSets) {
             ImmutableList.Builder<Set<Pair<Formula, Integer>>> psiAndRankPairs = new ImmutableList.Builder<>();
-            curlyG.forEach(psi -> {
+            curlyG.forEach(gPsi -> {
+                Formula psi = gPsi.getOperand();
                 ImmutableSet.Builder<Pair<Formula, Integer>> pairBuilder = new ImmutableSet.Builder<>();
                 for (int i = 0; i <= slaveFactory.createFrom(psi).getMaxRank(); i++) {
                     pairBuilder.add(new Pair<>(psi, i));
@@ -52,7 +54,7 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
                     mapBuilder.put(pair.getFirst(), pair.getSecond());
                 });
                 Map<Formula, Integer> curlyGRanks = mapBuilder.build();
-                curlyGRankToAccMap.put(new Pair<>(curlyG, curlyGRanks), new HashSet<>());
+                curlyGRankToAccMap.put(curlyGRanks, new HashSet<>());
                 curlyGRanksBuilder.add(curlyGRanks);
             });
         }
@@ -62,7 +64,7 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
         ImmutableList.Builder<Slave.State> initialLabelSlaveStatesBuilder = new ImmutableList.Builder<>();
         // for each subformula from gSet add the initial state of the corresponding Slave
         gSet.forEach(subFormula -> {
-            initialLabelSlaveStatesBuilder.add(slaveFactory.createFrom(subFormula).getInitialState());
+            initialLabelSlaveStatesBuilder.add(slaveFactory.createFrom(subFormula.getOperand()).getInitialState());
         });
         Pair<PropEquivalenceClass, List<Slave.State>> initialLabel
                 = new Pair<>(new PropEquivalenceClass(phi), initialLabelSlaveStatesBuilder.build());
@@ -100,25 +102,24 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
                 univ.add(tempTransition);
 
                 // This loop checks whether the transition is in Acc_r^curlyG(psi) or not
-                curlyGRanks.forEach(curlyGRanking -> { // TODO: Might want to make this parallel
-                    Set<Formula> curlyG = ImmutableSet.copyOf(curlyGRanking.keySet());
+                curlyGRanks.forEach(formulaToRankMap -> {
+                    Set<G> curlyG = ImmutableSet.copyOf(formulaToRankMap.keySet().stream().map(G::new).collect(Collectors.toSet()));
 
-                    curlyGRanking.forEach((psi, rank) -> {
-                        int rankForPsi = curlyGRanking.get(psi);
+                    formulaToRankMap.forEach((psi, rank) -> {
+                        int rankForPsi = formulaToRankMap.get(psi);
                         Slave ra = slaveFactory.createFrom(psi);
                         // The acceptance sets of the Slave:
                         Set<Slave.Transition> succeedAtRank = ra.succeed(rankForPsi, curlyG);
                         Set<Slave.Transition> failMergeAtRank = ra.failMerge(rankForPsi, curlyG);
 
-                        Pair<Pair<Integer, Set<Formula>>, Formula> keyForAccRCurlyGPsis = new Pair<>(new Pair<>(rankForPsi, curlyG), psi);
+                        Pair<Pair<Integer, Set<G>>, Formula> keyForAccRCurlyGPsis = new Pair<>(new Pair<>(rankForPsi, curlyG), psi);
                         Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> accRCurlyGPsi = accRCurlyGPsis.get(keyForAccRCurlyGPsis); // Acc_r^G (psi)
                         if (null == accRCurlyGPsi) {
                             accRCurlyGPsi = new Pair<>(new HashSet<>(), new HashSet<>());
                             accRCurlyGPsis.put(keyForAccRCurlyGPsis, accRCurlyGPsi);
 
                             // Add the newly created Acc_r^G (psi) to Acc_r^G
-                            Pair<Set<Formula>, Map<Formula, Integer>> keyForAccRCurlyG = new Pair<>(curlyG, curlyGRanking);
-                            Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accRCurlyG = curlyGRankToAccMap.get(keyForAccRCurlyG);
+                            Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accRCurlyG = curlyGRankToAccMap.get(formulaToRankMap);
                             accRCurlyG.add(accRCurlyGPsi);
                         }
 
@@ -143,7 +144,7 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
 
         // Now that all states and transitions have been generated, we can construct M_r^curlyG:
         curlyGRanks.forEach(curlyGRanking -> {
-            Set<Formula> curlyG = ImmutableSet.copyOf(curlyGRanking.keySet());
+            Set<G> curlyG = ImmutableSet.copyOf(curlyGRanking.keySet().stream().map(G::new).collect(Collectors.toSet()));
             Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> mRG = new Pair<>(new HashSet<>(), univ);
 
 
@@ -151,7 +152,7 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
                 List<Formula> conjunctList = new ArrayList<>();
                 state.getLabel().getSecond().forEach(slaveState -> {
                     Formula psi = slaveState.getPsi();
-                    if (curlyG.contains(psi)) {
+                    if (curlyG.contains(new G(psi))) {
                         int rankForPsi = curlyGRanking.get(psi);
                         conjunctList.add(new G(psi));
                         conjunctList.addAll(slaveState.succeedingFormulas(rankForPsi));
@@ -163,15 +164,13 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
                     alphabet.forEach(letter -> mRG.getFirst().add(new GDRA.Transition(state, letter, state.readLetter(letter))));
                 }
             });
-            Pair<Set<Formula>, Map<Formula, Integer>> key = new Pair<>(curlyG, curlyGRanking);
-            Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accRCurlyG = curlyGRankToAccMap.get(key);
+            Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accRCurlyG = curlyGRankToAccMap.get(curlyGRanking);
             accRCurlyG.add(mRG);
         });
 
         ImmutableSet.Builder<Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>>> acc = new ImmutableSet.Builder<>();
         curlyGRanks.forEach(curlyGRanking -> {
-            Set<Formula> curlyG = ImmutableSet.copyOf(curlyGRanking.keySet());
-            acc.add(curlyGRankToAccMap.get(new Pair<>(curlyG, curlyGRanking)));
+            acc.add(curlyGRankToAccMap.get(curlyGRanking));
         });
         return new GDRA(states, initialState, acc.build(), alphabet);
     }
