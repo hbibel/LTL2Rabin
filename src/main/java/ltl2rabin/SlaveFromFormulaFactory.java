@@ -8,6 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * A <code>SlaveFromFormulaFactory</code> can create a Slave from an <code>LTL</code> object, using its alphabet.
+ * Once constructed, every generated automaton will be put into a cache, so constructing a Slave several
+ * times from the same formula will be efficient.
+ */
 public class SlaveFromFormulaFactory extends RabinAutomatonFactory<Formula,
         List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>,
         Set<String>> {
@@ -15,6 +20,10 @@ public class SlaveFromFormulaFactory extends RabinAutomatonFactory<Formula,
     private final SlaveFromMojmirFactory slaveFromMojmirFactory;
     private static HashMap<Formula, Slave> slaves = new HashMap<>();
 
+    /**
+     *
+     * @param alphabet    The set of letters that will be used to construct a Slave automaton.
+     */
     public SlaveFromFormulaFactory(ImmutableSet<Set<String>> alphabet) {
         super(alphabet);
         mojmirAutomatonFactory = new MojmirAutomatonFactoryFromFormula(alphabet);

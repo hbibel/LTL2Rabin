@@ -15,46 +15,34 @@ import java.util.*;
 public class PropEquivalenceClass {
     private static int bddVarCount = 0;
     private static final BDDFactory bddFactory = BDDFactory.init("java", 2, 2);
-
-    /**
-     * This class serves as a callback class for the output of the bddFactory. By default, the bddFactory will
-     * print stuff like this:
-     * <pre>
-     *     Garbage collection #1: 3 nodes / 0 free / 0.0s / 0.0s total
-     *     Resizing node table from 3 to 5
-     *     Resizing node table from 5 to 7
-     *     Resizing node table from 7 to 13
-     * </pre>
-     * This information has little to no value to the user of this tool here, so the output of the bddFactory will be
-     * redirected into this black hole where it never can get out from.
-     */
-    public static class BlackHole {
-        public void eatEverything() {}
-    }
-
-    public static void init() {
-        try {
-            bddFactory.registerGCCallback(new BlackHole(), Class.forName("ltl2rabin.LTL.PropEquivalenceClass$BlackHole").getMethod("eatEverything"));
-            bddFactory.registerResizeCallback(new BlackHole(), Class.forName("ltl2rabin.LTL.PropEquivalenceClass$BlackHole").getMethod("eatEverything"));
-            bddFactory.registerReorderCallback(new BlackHole(), Class.forName("ltl2rabin.LTL.PropEquivalenceClass$BlackHole").getMethod("eatEverything"));
-        } catch (NoSuchMethodException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
     private Formula representative;
     private BDD cachedBDD;
     private static final Map<Formula, BDD> formulaBDDMap = new HashMap<>();
 
+    /**
+     * A PropEquivalenceClass wraps a Formula into a propositional equivalence class. Two propositional equivalence
+     * classes are considered equal if their representatives are propositionally equivalent.
+     * @param representative The formula that represents the class. For example, "a &amp; b" can serve as a representative
+     *                       for "a &amp; b &amp; a", "b &amp; a", "a &amp; b | ff", ... since they all are propositionally equivalent.
+     */
     public PropEquivalenceClass(Formula representative) {
         this.representative = representative;
         this.cachedBDD = getOrCreateBDD(representative);
     }
 
+    /**
+     *
+     * @return The representative used to create this PropEquivalenceClass
+     */
     public Formula getRepresentative() {
         return representative;
     }
 
+    /**
+     *
+     * @param other The PropEquivalenceClass <code>this</code> is compared to
+     * @return true, if <i>this</i> propositionally implies <i>other</i>
+     */
     public boolean implies(PropEquivalenceClass other) {
         return cachedBDD.imp(other.cachedBDD).isOne();
     }
@@ -109,12 +97,12 @@ public class PropEquivalenceClass {
         }
     }
 
+    /**
+     *
+     * @return true, if the propositional equivalence class contains <i>true</i>. For example, "a | tt" is a tautology.
+     */
     public boolean isTautology() {
         return cachedBDD.isOne();
-    }
-
-    public static void clear() {
-        bddFactory.done();
     }
 
     @Override
@@ -130,5 +118,35 @@ public class PropEquivalenceClass {
     @Override
     public int hashCode() {
         return Objects.hash(cachedBDD);
+    }
+
+    /**
+     * This class serves as a callback class for the output of the bddFactory. By default, the bddFactory will
+     * print stuff like this:
+     * <pre>
+     *     Garbage collection #1: 3 nodes / 0 free / 0.0s / 0.0s total
+     *     Resizing node table from 3 to 5
+     *     Resizing node table from 5 to 7
+     *     Resizing node table from 7 to 13
+     * </pre>
+     * This information has little to no value to the user of this tool here, so the output of the bddFactory will be
+     * redirected into this black hole where it never can get out from.
+     */
+    public static class BlackHole {
+        public void eatEverything() {}
+    }
+
+    /**
+     * Call this method if you don't want to see any output by the BDD library. Usually, this information only is
+     * of value for a developer, not an end user.
+     */
+    public static void suppressBDDOutput() {
+        try {
+            bddFactory.registerGCCallback(new BlackHole(), Class.forName("ltl2rabin.LTL.PropEquivalenceClass$BlackHole").getMethod("eatEverything"));
+            bddFactory.registerResizeCallback(new BlackHole(), Class.forName("ltl2rabin.LTL.PropEquivalenceClass$BlackHole").getMethod("eatEverything"));
+            bddFactory.registerReorderCallback(new BlackHole(), Class.forName("ltl2rabin.LTL.PropEquivalenceClass$BlackHole").getMethod("eatEverything"));
+        } catch (NoSuchMethodException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 }

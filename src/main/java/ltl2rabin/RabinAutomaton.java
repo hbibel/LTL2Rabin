@@ -1,20 +1,22 @@
 package ltl2rabin;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.util.*;
 
+/**
+ * Base class for Rabin Automata. Seems unnecessary, since it does not provide anything more of value than
+ * the <code>Automaton</code> class. Thus, this class can be removed.
+ * @param <T> The type of the object that States are labelled with.
+ * @param <U> Letters are of this type.
+ */
 public abstract class RabinAutomaton<T, U extends Collection> extends Automaton<T, U> {
-    private final ImmutableCollection<? extends State<T, U>> states;
+    private final ImmutableSet<? extends State<T, U>> states;
     private final State<T, U> initialState;
-    // private final Pair<? extends ImmutableCollection<? extends Automaton.Transition>, ? extends ImmutableCollection<? extends Automaton.Transition>> rabinPair;
     private final ImmutableSet<U> alphabet;
 
-    public RabinAutomaton(ImmutableCollection<? extends State<T, U>> states,
+    public RabinAutomaton(ImmutableSet<? extends State<T, U>> states,
                           State<T, U> initialState,
-                          // Pair<? extends ImmutableCollection<? extends Transition>, ? extends ImmutableCollection<? extends Automaton.Transition>> rabinPair,
                           ImmutableSet<U> alphabet) {
         this.states = states;
         this.initialState = initialState;
@@ -25,12 +27,7 @@ public abstract class RabinAutomaton<T, U extends Collection> extends Automaton<
         return initialState;
     }
 
-
-    /*public Pair<? extends ImmutableCollection<? extends Automaton.Transition>, ? extends ImmutableCollection<? extends Automaton.Transition>> getRabinPair() {
-        return rabinPair;
-    }*/
-
-    public ImmutableCollection<? extends State<T, U>> getStates() {
+    public ImmutableSet<? extends State<T, U>> getStates() {
         return states;
     }
 
@@ -41,9 +38,7 @@ public abstract class RabinAutomaton<T, U extends Collection> extends Automaton<
     // TODO: This method only is used in tests, so it should be outsourced into a test class.
     public State<T, U> run(List<U> word) {
         State<T, U> result = initialState;
-        Iterator<U> letterIterator = word.iterator();
-        while (letterIterator.hasNext()) {
-            U nextLetter = letterIterator.next();
+        for (U nextLetter : word) {
             result = result.readLetter(nextLetter);
         }
         return result;
@@ -69,11 +64,6 @@ public abstract class RabinAutomaton<T, U extends Collection> extends Automaton<
             return transitions.get(letter);
         }
 
-        /**
-         *
-         * @param label the list representing the ranking of the states of the corresponding mojmir automaton.
-         *                     The elder states come first in the list.
-         */
         public State(R label) {
             this.label = label;
         }
@@ -89,13 +79,6 @@ public abstract class RabinAutomaton<T, U extends Collection> extends Automaton<
         @Override
         public int hashCode() {
             return Objects.hash(label);
-        }
-
-        @Override
-        public String toString() {
-            return "State{" +
-                    "label=" + label +
-                    '}';
         }
     }
 }

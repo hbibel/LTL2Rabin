@@ -11,6 +11,9 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * This is the factory that constructs an LTL formula from a file, using antlr4.
+ */
 public class LTLFactoryFromFile extends LTLFactoryWithAntlr<File> {
     @Override
     public Result buildLTL(File input) {

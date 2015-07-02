@@ -8,6 +8,9 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+/**
+ * This is the factory that constructs an LTL formula from a String, using antlr4.
+ */
 public class LTLFactoryFromString extends LTLFactoryWithAntlr<String> {
     @Override
     public Result buildLTL(String input) {

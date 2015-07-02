@@ -68,7 +68,7 @@ public class SlaveTest {
         MojmirAutomaton<PropEquivalenceClass, Set<String>> mockMA = m.toMA();
 
         Slave ra = rabinAutomatonFactory.createFrom(mockMA);
-        assertEquals(1, ra.getStates().size());
+        assertEquals(1, (ra.getStates()).size());
         assertEquals(0, ra.getMaxRank());
 
         // check for correct rabin pair

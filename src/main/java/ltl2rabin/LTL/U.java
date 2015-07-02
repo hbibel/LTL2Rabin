@@ -10,9 +10,9 @@ public class U extends Formula {
     private final Formula right;
 
     /**
-     * The only valid constructor for U
-     * @param left The Formula left of the U operator
-     * @param right The Formula right of the U operator
+     *
+     * @param left The Formula left of the U operator (i.e. what should happen <b>before</b>)
+     * @param right The Formula right of the U operator (i.e. what should happen <b>thereafter</b>)
      */
     public U(final Formula left, final Formula right) {
         this.left = left;

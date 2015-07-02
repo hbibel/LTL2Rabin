@@ -13,15 +13,18 @@ public class Or extends Formula {
 
     /**
      *
-     * @param operands The LTL formulae that are connected by the disjunction
+     * @param operands The LTL formulas that are connected by the disjunction
      */
     public Or(List<Formula> operands) {
         this.operands = operands;
     }
 
+    /**
+     * Two argument constructor for Or.
+     * @param l The disjunct left of the | operator
+     * @param r The disjunct right of the | operator
+     */
     public Or(final Formula l, final Formula r) {
-        // In case you wonder why I created the mergeTwoArguments method: A constructor call (this(...)) must be the
-        // first statement in a constructor.
         this(mergeTwoArguments(l, r));
     }
 
@@ -32,6 +35,11 @@ public class Or extends Formula {
         return params;
     }
 
+    /**
+     * Use this method to iterate over the operands.
+     *
+     * @return The iterator over all operands
+     */
     public Iterator<Formula> getIterator() {
         return operands.iterator();
     }
@@ -102,7 +110,11 @@ public class Or extends Formula {
         return Objects.hash(this.getClass(), operands);
     }
 
-    // Since this equals method tests for structural equivalence, a & b does NOT equal b & a.
+    /**
+     * This method tests for structural equivalence. For example, a | b is NOT structurally equivalent to b | a.
+     * @param o If this is not of type Or, the result is false
+     * @return Equivalence of this and o.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

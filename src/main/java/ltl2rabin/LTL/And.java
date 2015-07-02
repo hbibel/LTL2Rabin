@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * This class represents a logical conjunction (&) in an LTL formula.
+ * This class represents a logical conjunction (&amp;) in an LTL formula.
  */
 public class And extends Formula {
     private final List<Formula> operands;
 
     /**
      * @param operands The LTL formulae that are connected by the conjunction. For example, the conjunction
-     *                  a & (X b) has the operands a and (X b)
+     *                  a &amp; (X b) has the operands a and (X b)
      */
     public And(List<Formula> operands) {
         this.operands = operands;
@@ -21,8 +21,8 @@ public class And extends Formula {
 
     /**
      * This constructor is for an conjunction with two operands.
-     * @param l The left operand. For example, for a & b, a is the left operand.
-     * @param r The left operand. For example, for a & b, b is the right operand.
+     * @param l The left operand. For example, for a &amp; b, a is the left operand.
+     * @param r The left operand. For example, for a &amp; b, b is the right operand.
      */
     public And(Formula l, Formula r) {
         List<Formula> params = new ArrayList<>();
@@ -110,7 +110,7 @@ public class And extends Formula {
     }
 
     /**
-     * This method tests for structural equivalence. For example, a & b is NOT structurally equivalent to b & a.
+     * This method tests for structural equivalence. For example, a &amp; b is NOT structurally equivalent to b &amp; a.
      * @param o If this is not of type And, the result is false
      * @return Equivalence of this and o.
      */

@@ -10,12 +10,16 @@ public class Variable extends Formula {
     private final boolean negated;
 
     /**
-     * Default constructor for Variable
+     * This constructor creates a <code>Variable</code> that optionally can be negated.
      *
-     * @param value The char literal
-     * @param negated Indicates whether or not the char is preceded by a negation ('!'). Example usages:
+     * @param value The token that represents the variable
+     * @param negated Indicates whether or not the char is preceded by a negation ('!'). Example usages: <pre>
+     * {@code
      *                a --> <code>Variable('a', false)</code>
      *                !a --> <code>Variable('a', true)</code>
+     * }
+     * </pre>
+     *
      */
     public Variable(String value, boolean negated) {
         this.value = value;
@@ -24,7 +28,7 @@ public class Variable extends Formula {
 
     /**
      * This constructor initializes <code>negated</code> to <code>false</code>
-     * @param value The char literal
+     * @param value The token that represents the variable
      */
     public Variable(String value) {
         this.value = value;

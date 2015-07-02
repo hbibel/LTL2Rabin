@@ -9,6 +9,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * A factory of this type will create Slaves (which are state rankings for Mojmir automatons) out of a given
+ * <code>MojmirAutomaton</code>.
+ */
 public class SlaveFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomaton<PropEquivalenceClass, Set<String>>,
         List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>,
         Set<String>> {
@@ -16,6 +20,11 @@ public class SlaveFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomato
         super(alphabet);
     }
 
+    /**
+     *
+     * @param from    The Mojmir automaton whose states are to be ranked
+     * @return        The Slave, by definition 4.19 in the paper "From LTL to Deterministic Automata."
+     */
     public Slave createFrom(MojmirAutomaton<PropEquivalenceClass, Set<String>> from) {
         ListOrderedSet<Slave.State> states = new ListOrderedSet<>();
         Slave.State initialState;

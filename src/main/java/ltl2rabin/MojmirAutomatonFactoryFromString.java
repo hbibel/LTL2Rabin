@@ -7,12 +7,20 @@ import ltl2rabin.LTL.PropEquivalenceClass;
 
 import java.util.*;
 
+/**
+ * This factory can create a <code>MojmirAutomaton</code> from a <code>String</code>.
+ */
 public class MojmirAutomatonFactoryFromString extends MojmirAutomatonFactory<String> {
 
     public MojmirAutomatonFactoryFromString(ImmutableSet<Set<String>> alphabet) {
         super(alphabet);
     }
 
+    /**
+     *
+     * @param from    A string that matches LTL grammar rules.
+     * @return        A Mojmir automaton whose initial state is labelled with the LTL formula in the string.
+     */
     @Override
     public MojmirAutomaton<PropEquivalenceClass, Set<String>> createFrom(String from) {
         LTLFactory<String> ltlFactory = new LTLFactoryFromString();

@@ -42,7 +42,7 @@ public class GDRATest {
         LTLFactory<String> ltlFactoryFromString = new LTLFactoryFromString();
 
         final LTLFactory.Result parserResult = ltlFactoryFromString.buildLTL(input);
-        GDRA gdra = new GDRAFactory(parserResult.getAlphabet()).createFrom(parserResult);
+        GDRA gdra = new GDRAFactory(ImmutableSet.of()).createFrom(parserResult);
         assertEquals(8, gdra.getStates().size());
 
         ImmutableSet<? extends Set<String>> alphabet = gdra.getAlphabet();

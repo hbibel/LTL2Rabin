@@ -10,7 +10,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
-        PropEquivalenceClass.init(); // keep System.out clean from messages by the BDD library.
+        PropEquivalenceClass.suppressBDDOutput(); // keep System.out clean from messages by the BDD library.
 
         Options options = new Options();
         options.addOption("nofile", false, "Don't read the LTL formula from a file, instead enter it in the console (via stdin).\n");
@@ -97,9 +97,6 @@ public class Main {
             System.out.println(parserResult.getLtlFormula() + " Finished in " + elapsedTime + "ms " +
                     "(=" + elapsedTime / 1000 / 60 + "m " + (elapsedTime % 60000) / 1000 + "s " + (elapsedTime % 1000) +"ms)");
         }
-
-        //String input = "b | (X G (a | (X (b U c))))";
-        //String otherInput = "(r U s) & ((F G a) | (G F b)) & ((F G c) | (G F d)) ";
     }
 
     private static void printHelp(Options options) {

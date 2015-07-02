@@ -2,6 +2,11 @@ package ltl2rabin;
 
 import java.util.Objects;
 
+/**
+ * A 2-tuple
+ * @param <F>    Type of the first object (arbitrary).
+ * @param <S>    Type of the second object (arbitrary).
+ */
 public class Pair<F, S> {
     private final F first;
     private final S second;
@@ -17,14 +22,6 @@ public class Pair<F, S> {
     public Pair(F first, S second) {
         this.first = first;
         this.second = second;
-    }
-
-    public static <F, S> F getFirst(Pair<F, S> p) {
-        return p.getFirst();
-    }
-
-    public static <F, S> S getSecond(Pair<F, S> p) {
-        return p.getSecond();
     }
 
     @Override

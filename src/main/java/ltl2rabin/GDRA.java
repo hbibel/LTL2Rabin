@@ -7,10 +7,20 @@ import ltl2rabin.LTL.PropEquivalenceClass;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * A <code>GDRA</code> object represents a generalized deterministic Rabin automaton.
+ */
 public class GDRA extends RabinAutomaton<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> {
     private final Set<Set<Pair<Set<Transition>, Set<Transition>>>> gdraCondition;
 
-    public GDRA(ImmutableCollection<? extends RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>>> states,
+    /**
+     *
+     * @param states The immutable set of all <code>State</code>s of this automaton.
+     * @param initialState The initial <code>State</code>
+     * @param rabinCondition The set that represents the generalized rabin condition
+     * @param alphabet The alphabet the automaton runs on
+     */
+    public GDRA(ImmutableSet<? extends RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>>> states,
                 RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> initialState,
                 Set<Set<Pair<Set<Transition>, Set<Transition>>>> rabinCondition,
                 ImmutableSet<Set<String>> alphabet) {
@@ -24,8 +34,8 @@ public class GDRA extends RabinAutomaton<Pair<PropEquivalenceClass, List<Slave.S
 
     @SuppressWarnings("unchecked")
     @Override
-    public ImmutableCollection<State> getStates() {
-        return (ImmutableCollection<State>) super.getStates();
+    public ImmutableSet<State> getStates() {
+        return (ImmutableSet<State>) super.getStates();
     }
 
     @Override
@@ -39,7 +49,14 @@ public class GDRA extends RabinAutomaton<Pair<PropEquivalenceClass, List<Slave.S
     }
 
     public static class State extends RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> {
-
+        /**
+         *
+         * @param label The label consists of a <code>Pair</code> of
+         *              - The PropEquivalenceClass that is reached after reading a word <i>w</i> starting from the
+         *                initial state
+         *              - The List of <code>Slave.State</code>s that are reached after the <code>Slave</code>
+         *                automatons also read the word <i>w</i>.
+         */
         public State(Pair<PropEquivalenceClass, List<Slave.State>> label) {
             super(label);
         }
