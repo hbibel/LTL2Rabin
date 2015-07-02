@@ -3,7 +3,7 @@ package ltl2rabin.LTL;
 import java.util.Objects;
 
 /**
- * Represents a boolean value in an LTL formula (true or false)
+ * Represents a boolean value in an LTL formula (true or false). The methods all do what you probably think they do.
  */
 public class Boolean extends Formula {
     private final boolean value;

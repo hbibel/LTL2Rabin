@@ -2,7 +2,6 @@ package ltl2rabin;
 
 import com.google.common.collect.ImmutableSet;
 import ltl2rabin.LTL.*;
-import ltl2rabin.LTL.Boolean;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;

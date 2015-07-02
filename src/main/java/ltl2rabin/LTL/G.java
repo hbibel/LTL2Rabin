@@ -9,7 +9,6 @@ public class G extends Formula {
     private final Formula operand;
 
     /**
-     * The only valid constructor for G.
      * @param operand The Formula following the operator
      */
     public G(Formula operand) {

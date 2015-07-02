@@ -5,6 +5,18 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * This visitor implements the afG function for a fixed letter. The afG function unfolds a Formula over a letter.
+ * To unfold a Formula over a word, you have to chain several LTLAfGVisitors, one for each letter.
+ * Example: You want to unfold the <code>Formula</code> f over the letters {"a"}, then {"b", "c"}, then again {"a"}:
+ * <pre>
+ * {@code
+ * LTLAfGVisitor visitor1 = new LTLAfGVisitor(ImmutableSet.of("a"));
+ * LTLAfGVisitor visitor2 = new LTLAfGVisitor(ImmutableSet.of("b", "c"));
+ * Formula result = f.accept(visitor1).accept(visitor2).accept(visitor1);
+ * }
+ * </pre>
+ */
 public class LTLAfGVisitor implements IVisitor<Formula> {
     private final Set<String> letter;
 

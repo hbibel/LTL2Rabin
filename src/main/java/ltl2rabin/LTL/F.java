@@ -8,6 +8,10 @@ import java.util.Objects;
 public class F extends Formula {
     private final Formula operand;
 
+    /**
+     *
+     * @param operand The formula the F operator is applied to.
+     */
     public F(Formula operand) {
         this.operand = operand;
     }

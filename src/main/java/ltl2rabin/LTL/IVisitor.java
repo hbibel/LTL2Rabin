@@ -1,8 +1,9 @@
 package ltl2rabin.LTL;
 
-import ltl2rabin.LTL.*;
-import ltl2rabin.LTL.Boolean;
-
+/**
+ * The interface a visitor for Formula objects must implement.
+ * @param <T> The return type of the visit function (and also of the accept function of the IVisitable interface).
+ */
 public interface IVisitor<T> {
     T visit(And formula);
     T visit(Boolean formula);

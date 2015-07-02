@@ -109,7 +109,11 @@ public class And extends Formula {
         return Objects.hash(this.getClass(), operands);
     }
 
-    // Since this equals method tests for structural equivalence, a & b does NOT equal b & a.
+    /**
+     * This method tests for structural equivalence. For example, a & b is NOT structurally equivalent to b & a.
+     * @param o If this is not of type And, the result is false
+     * @return Equivalence of this and o.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
