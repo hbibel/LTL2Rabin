@@ -51,9 +51,9 @@ public class GDRA extends RabinAutomaton<Pair<PropEquivalenceClass, List<Slave.S
     public static class State extends RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> {
         /**
          *
-         * @param label The label consists of a <code>Pair</code> of
+         * @param label The label consists of a <code>Pair</code> of<p>
          *              - The PropEquivalenceClass that is reached after reading a word <i>w</i> starting from the
-         *                initial state
+         *                initial state<p>
          *              - The List of <code>Slave.State</code>s that are reached after the <code>Slave</code>
          *                automatons also read the word <i>w</i>.
          */
