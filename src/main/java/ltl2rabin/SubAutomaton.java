@@ -15,12 +15,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
- * Slaves are Rabin automata that are constructed for a G-subformula. States of GDRAs have a collection of Slave states.
- * Slaves provide the GDRA with valuable information that is used to construct the acceptance condition of the GDRA.
- * A <code>Slave.State</code> represents a ranking of <code>MojmirAutomaton.State</code>s. The <code>failMerge</code>
+ * SubAutomata are Rabin automata that are constructed for a G-subformula. States of GDRAs have a collection of SubAutomaton states.
+ * SubAutomata provide the GDRA with valuable information that is used to construct the acceptance condition of the GDRA.
+ * A <code>SubAutomaton.State</code> represents a ranking of <code>MojmirAutomaton.State</code>s. The <code>failMerge</code>
  * and <code>succeed</code> methods generate the acceptance sets for a given rank and set of G-subformulas.
  */
-public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>, Set<String>> {
+public class SubAutomaton extends RabinAutomaton<List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>, Set<String>> {
     private final int maxRank;
     // computing caches for the (expensive to create) acceptance sets by Guava:
     private final CacheLoader<Pair<Integer, Set<G>>, ImmutableSet<Transition>> failMergeLoader =
@@ -44,23 +44,23 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
             CacheBuilder.newBuilder()
                     .build(succeedLoader);
 
-    public Slave(ImmutableSet<State> states,
-                 State initialState,
-                 ImmutableSet<Set<String>> alphabet,
-                 int maxRank) {
+    public SubAutomaton(ImmutableSet<State> states,
+                        State initialState,
+                        ImmutableSet<Set<String>> alphabet,
+                        int maxRank) {
         super(states, initialState, alphabet);
         this.maxRank = maxRank;
     }
 
     /**
-     * @return The maximum rank for any Mojmir automaton state in any of the Slave automaton states.
+     * @return The maximum rank for any Mojmir automaton state in any of the SubAutomaton automaton states.
      */
     public int getMaxRank() {
         return maxRank;
     }
 
     @Override
-    public Slave.State getInitialState() {
+    public SubAutomaton.State getInitialState() {
         return (State) super.getInitialState();
     }
 
@@ -103,38 +103,38 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
         } else {
             gConjunction = new PropEquivalenceClass(new And(ImmutableList.copyOf(curlyG)));
         }
-        getStates().stream().forEach(slaveState -> {
+        getStates().stream().forEach(subState -> {
             getAlphabet().stream().forEach(letter -> {
-                // fail: Add transitions that move tokens from all Mojmir states in slaveState in a non-accepting sink
-                final State toState = slaveState.readLetter(letter);
-                slaveState.getLabel().stream().forEach(ms -> {
+                // fail: Add transitions that move tokens from all Mojmir states in subState in a non-accepting sink
+                final State toState = subState.readLetter(letter);
+                subState.getLabel().stream().forEach(ms -> {
                     final MojmirAutomaton.State<PropEquivalenceClass, Set<String>> msToState = ms.readLetter(letter);
                     if (msToState.isSink() && !gConjunction.implies(msToState.getLabel())) {
-                        resultBuilder.add(new Transition(slaveState, letter, toState));
+                        resultBuilder.add(new Transition(subState, letter, toState));
                     }
                 });
                 // merge: A token with r < rank moves to the non-accepting state q' and another token also moves there
-                final int maxMergeRank = rank > slaveState.getLabel().size() - 1 ? slaveState.getLabel().size() - 1 : rank;
+                final int maxMergeRank = rank > subState.getLabel().size() - 1 ? subState.getLabel().size() - 1 : rank;
                 for (int r = 0; r < maxMergeRank; r++) {
                     // TODO: failMerge(i) is a superset of failMerge(i-1). Calculating failMerge(i-1) again is
                     // unnecessary. Better get failMerge(j) for all j<i from the cache.
-                    MojmirAutomaton.State<PropEquivalenceClass, Set<String>> mFromState = slaveState.getLabel().get(r); // q
+                    MojmirAutomaton.State<PropEquivalenceClass, Set<String>> mFromState = subState.getLabel().get(r); // q
                     MojmirAutomaton.State<PropEquivalenceClass, Set<String>> mToState = mFromState.readLetter(letter); // q'
                     // if mToState is a sink, it is either accepting (==> not in merge) or failing (==> also not in merge)
                     if (mToState.isSink() || mToState.isAcceptingState(curlyG)) { // TODO: Are there accepting states that are not sinks? If no --> mToState.isSink()
                         break;
                     }
                     if (mToState.equals(getInitialState().getLabel().get(0))) {
-                        resultBuilder.add(new Transition(slaveState, letter, toState));
+                        resultBuilder.add(new Transition(subState, letter, toState));
                     }
                     else {
-                        List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> otherTokens = slaveState.getLabel().stream()
+                        List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> otherTokens = subState.getLabel().stream()
                                 .filter(ms -> !ms.equals(mFromState)) // tokens that don't come from q ...
                                 .map(ms -> ms.readLetter(letter))
                                 .filter(ms -> ms.equals(mToState)) // ... also move to q'
                                 .collect(Collectors.toList());
                         if (otherTokens.size() > 0) {
-                            resultBuilder.add(new Transition(slaveState, letter, toState));
+                            resultBuilder.add(new Transition(subState, letter, toState));
                         }
                     }
                 }
@@ -198,7 +198,7 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
 
         /**
          *
-         * @return The formula that was used to construct the Slave automaton that this state is part of.
+         * @return The formula that was used to construct the SubAutomaton automaton that this state is part of.
          */
         public Formula getPsi() {
             return psi;
@@ -210,7 +210,7 @@ public class Slave extends RabinAutomaton<List<MojmirAutomaton.State<PropEquival
          * "From LTL to Deterministic Automata."
          * @param r The formulas that are returned will have a rank greater or equal to <code>r</code>.
          * @return The list of formulas ranked <code>r</code> or higher. The elements in this list all are distinct, due
-         *         to the construction of Slave automata.
+         *         to the construction of SubAutomaton automata.
          */
         public List<Formula> succeedingFormulas(int r) {
             if (r >= getLabel().size()) {

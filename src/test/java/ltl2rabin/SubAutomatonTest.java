@@ -12,7 +12,7 @@ import java.util.*;
 
 import static org.junit.Assert.*;
 
-public class SlaveTest {
+public class SubAutomatonTest {
     Variable aVariable;
     Variable bVariable;
     Variable cVariable;
@@ -55,7 +55,7 @@ public class SlaveTest {
     @Test
     public void basicTest() {
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(2));
-        SlaveFromMojmirFactory rabinAutomatonFactory = new SlaveFromMojmirFactory(alphabet);
+        SubAutomatonFromMojmirFactory rabinAutomatonFactory = new SubAutomatonFromMojmirFactory(alphabet);
 
         Formula initLabel = new Variable("b");
         MAMockFactory.MAMock m = maMockFactory.createMAMock(alphabet, initLabel);
@@ -67,15 +67,15 @@ public class SlaveTest {
 
         MojmirAutomaton<PropEquivalenceClass, Set<String>> mockMA = m.toMA();
 
-        Slave ra = rabinAutomatonFactory.createFrom(mockMA);
+        SubAutomaton ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(1, (ra.getStates()).size());
         assertEquals(0, ra.getMaxRank());
 
         // check for correct rabin pair
-        Slave.State q0 = ra.getInitialState();
-        ImmutableSet<Slave.Transition> fm = ra.failMerge(0, Collections.emptySet());
-        assertEquals(ImmutableSet.of(new Slave.Transition(q0, ImmutableSet.of("a"), q0), new Slave.Transition(q0, Collections.emptySet(), q0)), ra.failMerge(0, Collections.emptySet()));
-        assertEquals(ImmutableSet.of(new Slave.Transition(q0, ImmutableSet.of("a", "b"), q0), new Slave.Transition(q0, ImmutableSet.of("b"), q0)), ra.succeed(0, Collections.emptySet()));
+        SubAutomaton.State q0 = ra.getInitialState();
+        ImmutableSet<SubAutomaton.Transition> fm = ra.failMerge(0, Collections.emptySet());
+        assertEquals(ImmutableSet.of(new SubAutomaton.Transition(q0, ImmutableSet.of("a"), q0), new SubAutomaton.Transition(q0, Collections.emptySet(), q0)), ra.failMerge(0, Collections.emptySet()));
+        assertEquals(ImmutableSet.of(new SubAutomaton.Transition(q0, ImmutableSet.of("a", "b"), q0), new SubAutomaton.Transition(q0, ImmutableSet.of("b"), q0)), ra.succeed(0, Collections.emptySet()));
 
         List<Set<String>> word1 = AutomatonMockFactory.createWord("", "a");
         List<Set<String>> word2 = AutomatonMockFactory.createWord("a");
@@ -85,7 +85,7 @@ public class SlaveTest {
     @Test
     public void test1() {
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(1));
-        SlaveFromMojmirFactory rabinAutomatonFactory = new SlaveFromMojmirFactory(alphabet);
+        SubAutomatonFromMojmirFactory rabinAutomatonFactory = new SubAutomatonFromMojmirFactory(alphabet);
 
         Formula initlabel = new Or(ImmutableList.of(aVariable, bVariable, cVariable));
         MAMockFactory.MAMock m = maMockFactory.createMAMock(alphabet, initlabel);
@@ -98,27 +98,27 @@ public class SlaveTest {
 
         MojmirAutomaton<PropEquivalenceClass, Set<String>> mockMA = m.toMA();
 
-        Slave ra = rabinAutomatonFactory.createFrom(mockMA);
+        SubAutomaton ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(1, ra.getStates().size());
         assertEquals(0, ra.getMaxRank());
 
         // check for correct rabin pair
-        ImmutableSet.Builder<Slave.Transition> failBuyBuilder = new ImmutableSet.Builder<>();
-        ImmutableSet.Builder<Slave.Transition> succeedBuilder = new ImmutableSet.Builder<>();
+        ImmutableSet.Builder<SubAutomaton.Transition> failBuyBuilder = new ImmutableSet.Builder<>();
+        ImmutableSet.Builder<SubAutomaton.Transition> succeedBuilder = new ImmutableSet.Builder<>();
         for (int i = 0; i <= ra.getMaxRank() ; i++) {
             failBuyBuilder.addAll(ra.failMerge(i, Collections.emptySet()));
             succeedBuilder.addAll(ra.succeed(i, Collections.emptySet()));
         }
-        ImmutableSet<Slave.Transition> failBuy = failBuyBuilder.build();
-        ImmutableSet<Slave.Transition> succeed = succeedBuilder.build();
+        ImmutableSet<SubAutomaton.Transition> failBuy = failBuyBuilder.build();
+        ImmutableSet<SubAutomaton.Transition> succeed = succeedBuilder.build();
         alphabet.forEach(letter -> {
             if (letter.isEmpty()) {
-                assertTrue(failBuy.contains(new Slave.Transition(ra.getInitialState(), letter, ra.getInitialState())));
-                assertFalse(succeed.contains(new Slave.Transition(ra.getInitialState(), letter, ra.getInitialState())));
+                assertTrue(failBuy.contains(new SubAutomaton.Transition(ra.getInitialState(), letter, ra.getInitialState())));
+                assertFalse(succeed.contains(new SubAutomaton.Transition(ra.getInitialState(), letter, ra.getInitialState())));
             }
             else {
-                assertTrue(succeed.contains(new Slave.Transition(ra.getInitialState(), letter, ra.getInitialState())));
-                assertFalse(failBuy.contains(new Slave.Transition(ra.getInitialState(), letter, ra.getInitialState())));
+                assertTrue(succeed.contains(new SubAutomaton.Transition(ra.getInitialState(), letter, ra.getInitialState())));
+                assertFalse(failBuy.contains(new SubAutomaton.Transition(ra.getInitialState(), letter, ra.getInitialState())));
             }
         });
 
@@ -131,7 +131,7 @@ public class SlaveTest {
     public void test2() {
         // Example 4.12 from the paper: a | (b U c)
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(AutomatonMockFactory.generateAlphabet(3));
-        SlaveFromMojmirFactory rabinAutomatonFactory = new SlaveFromMojmirFactory(alphabet);
+        SubAutomatonFromMojmirFactory rabinAutomatonFactory = new SubAutomatonFromMojmirFactory(alphabet);
 
         U bUc = new U(bVariable, cVariable);
         Formula initialLabel = new And(aVariable, new X(bUc));
@@ -148,7 +148,7 @@ public class SlaveTest {
         m.whenReadingToken(bUc, "c", tt);
         MojmirAutomaton<PropEquivalenceClass, Set<String>> mockMA = m.toMA();
 
-        Slave ra = rabinAutomatonFactory.createFrom(mockMA);
+        SubAutomaton ra = rabinAutomatonFactory.createFrom(mockMA);
         assertEquals(2, ra.getStates().size());
         assertEquals(1, ra.getMaxRank());
 
@@ -168,36 +168,36 @@ public class SlaveTest {
         assertNotEquals(ra.getInitialState(), ra.run(wordACEtc));
 
         // check for correct rabin pair
-        ImmutableSet.Builder<Slave.Transition> failBuyBuilder = new ImmutableSet.Builder<>();
-        ImmutableSet.Builder<Slave.Transition> succeedBuilder = new ImmutableSet.Builder<>();
+        ImmutableSet.Builder<SubAutomaton.Transition> failBuyBuilder = new ImmutableSet.Builder<>();
+        ImmutableSet.Builder<SubAutomaton.Transition> succeedBuilder = new ImmutableSet.Builder<>();
         for (int i = 0; i <= ra.getMaxRank(); i++) {
             failBuyBuilder.addAll(ra.failMerge(i, Collections.emptySet()));
             succeedBuilder.addAll(ra.succeed(i, Collections.emptySet()));
         }
-        ImmutableSet<Slave.Transition> failBuy = failBuyBuilder.build();
-        ImmutableSet<Slave.Transition> succeed = succeedBuilder.build();
-        Slave.State q0 = ra.getInitialState();
-        Slave.State q1 = q0.readLetter(ImmutableSet.of("a"));
+        ImmutableSet<SubAutomaton.Transition> failBuy = failBuyBuilder.build();
+        ImmutableSet<SubAutomaton.Transition> succeed = succeedBuilder.build();
+        SubAutomaton.State q0 = ra.getInitialState();
+        SubAutomaton.State q1 = q0.readLetter(ImmutableSet.of("a"));
         assertNotEquals(q0, q1);
-        Slave.Transition t4ac = new Slave.Transition(q1, ImmutableSet.of("a", "c"), q1);
-        Slave.Transition t4abc = new Slave.Transition(q1, ImmutableSet.of("a", "b", "c"), q1);
-        Slave.Transition t7c = new Slave.Transition(q1, ImmutableSet.of("c"), q0);
-        Slave.Transition t7bc = new Slave.Transition(q1, ImmutableSet.of("b", "c"), q0);
-        ImmutableSet<Slave.Transition> succeed1 = ImmutableSet.of(t4ac, t4abc, t7c, t7bc);
+        SubAutomaton.Transition t4ac = new SubAutomaton.Transition(q1, ImmutableSet.of("a", "c"), q1);
+        SubAutomaton.Transition t4abc = new SubAutomaton.Transition(q1, ImmutableSet.of("a", "b", "c"), q1);
+        SubAutomaton.Transition t7c = new SubAutomaton.Transition(q1, ImmutableSet.of("c"), q0);
+        SubAutomaton.Transition t7bc = new SubAutomaton.Transition(q1, ImmutableSet.of("b", "c"), q0);
+        ImmutableSet<SubAutomaton.Transition> succeed1 = ImmutableSet.of(t4ac, t4abc, t7c, t7bc);
         assertEquals(succeed1, succeed);
-        ImmutableSet.Builder<Slave.Transition> failBuilder = new ImmutableSet.Builder<>();
+        ImmutableSet.Builder<SubAutomaton.Transition> failBuilder = new ImmutableSet.Builder<>();
         alphabet.forEach(letter -> {
             if (!letter.contains("a")) {
-                failBuilder.add(new Slave.Transition(q0, letter, q0)); // t1
+                failBuilder.add(new SubAutomaton.Transition(q0, letter, q0)); // t1
             }
             if (ImmutableSet.copyOf(letter).equals(ImmutableSet.of("a")) || ImmutableSet.copyOf(letter).equals(ImmutableSet.of("b"))) {
-                failBuilder.add(new Slave.Transition(q1, letter, q1)); // t5, t6
+                failBuilder.add(new SubAutomaton.Transition(q1, letter, q1)); // t5, t6
             }
         });
-        failBuilder.add(t7bc).add(t7c).add(new Slave.Transition(q1, Collections.emptySet(), q0)); // t7, t8
-        ImmutableSet.Builder<Slave.Transition> buyBuilder = new ImmutableSet.Builder<>();
-        buyBuilder.add(new Slave.Transition(q1, ImmutableSet.of("a", "b"), q1));
-        ImmutableSet<Slave.Transition> expected = failBuilder.addAll(buyBuilder.build()).build();
+        failBuilder.add(t7bc).add(t7c).add(new SubAutomaton.Transition(q1, Collections.emptySet(), q0)); // t7, t8
+        ImmutableSet.Builder<SubAutomaton.Transition> buyBuilder = new ImmutableSet.Builder<>();
+        buyBuilder.add(new SubAutomaton.Transition(q1, ImmutableSet.of("a", "b"), q1));
+        ImmutableSet<SubAutomaton.Transition> expected = failBuilder.addAll(buyBuilder.build()).build();
         assertEquals(expected, failBuy);
 
         Set<Formula> expectedSucceedingFormulasQ1_1 = ImmutableSet.of(initialLabel);

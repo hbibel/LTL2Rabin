@@ -98,9 +98,9 @@ public class HanoiFormat {
             append(state.getLabel().getFirst().getRepresentative());
             if (!state.getLabel().getSecond().isEmpty()) {
                 resultBuilder.append(" ::");
-                state.getLabel().getSecond().forEach(slaveState -> {
+                state.getLabel().getSecond().forEach(subState -> {
                     int rank = 1;
-                    for (MojmirAutomaton.State<PropEquivalenceClass, Set<String>> mState : slaveState.getLabel()) {
+                    for (MojmirAutomaton.State<PropEquivalenceClass, Set<String>> mState : subState.getLabel()) {
                         resultBuilder.append(' ').append(mState.getLabel().getRepresentative()).append('=').append(rank++);
                     }
                 });

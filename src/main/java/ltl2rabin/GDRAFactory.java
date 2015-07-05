@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 /**
  * This class creates objects that can create a <code>GDRA</code> out of the <code>Result</code> of an <code>LTLFactory</code>.
  */
-public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> {
+public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEquivalenceClass, List<SubAutomaton.State>>, Set<String>> {
     // TODO: Remove this redundant data structure
-    private Map<Pair<PropEquivalenceClass, List<Slave.State>>,
+    private Map<Pair<PropEquivalenceClass, List<SubAutomaton.State>>,
                 GDRA.State> existingStates = new HashMap<>();
     // This map stores the acceptance pairs Acc_r^G (psi) for every combination of r, curlyG and psi.
     private Map<Pair<Pair<Integer, Set<G>>, Formula>, Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accRCurlyGPsis = new HashMap<>();
@@ -34,7 +34,7 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
 
     public GDRA createFrom(LTLFactory.Result parserResult) {
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(parserResult.getAlphabet());
-        SlaveFromFormulaFactory slaveFactory = new SlaveFromFormulaFactory(alphabet);
+        SubAutomatonFromFormulaFactory subAutomatonFactory = new SubAutomatonFromFormulaFactory(alphabet);
 
         ImmutableSet<G> gSet = (new ImmutableSet.Builder<G>())
                 .addAll(parserResult.getgFormulas()).build();
@@ -57,7 +57,7 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
             curlyG.forEach(gPsi -> {
                 Formula psi = gPsi.getOperand();
                 ImmutableSet.Builder<Pair<Formula, Integer>> pairBuilder = new ImmutableSet.Builder<>();
-                for (int i = 0; i <= slaveFactory.createFrom(psi).getMaxRank(); i++) {
+                for (int i = 0; i <= subAutomatonFactory.createFrom(psi).getMaxRank(); i++) {
                     pairBuilder.add(new Pair<>(psi, i));
                 }
                 psiAndRankPairs.add(pairBuilder.build());
@@ -77,13 +77,13 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
         ImmutableList<Map<Formula, Integer>> curlyGRanks = curlyGRanksBuilder.build();
 
         // Create the initial state:
-        ImmutableList.Builder<Slave.State> initialLabelSlaveStatesBuilder = new ImmutableList.Builder<>();
-        // for each subformula from gSet add the initial state of the corresponding Slave
+        ImmutableList.Builder<SubAutomaton.State> initialLabelSubStatesBuilder = new ImmutableList.Builder<>();
+        // for each subformula from gSet add the initial state of the corresponding SubAutomaton
         gSet.forEach(subFormula -> {
-            initialLabelSlaveStatesBuilder.add(slaveFactory.createFrom(subFormula.getOperand()).getInitialState());
+            initialLabelSubStatesBuilder.add(subAutomatonFactory.createFrom(subFormula.getOperand()).getInitialState());
         });
-        Pair<PropEquivalenceClass, List<Slave.State>> initialLabel
-                = new Pair<>(new PropEquivalenceClass(phi), initialLabelSlaveStatesBuilder.build());
+        Pair<PropEquivalenceClass, List<SubAutomaton.State>> initialLabel
+                = new Pair<>(new PropEquivalenceClass(phi), initialLabelSubStatesBuilder.build());
         GDRA.State initialState = new GDRA.State(initialLabel);
         statesBuilder.add(initialState);
 
@@ -103,9 +103,9 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
                     }
                 };
                 PropEquivalenceClass newLabelLTL = new PropEquivalenceClass(afVisitor.afG(temp.getLabel().getFirst().getRepresentative()));
-                ImmutableList.Builder<Slave.State> newLabelSlaveStatesBuilder = new ImmutableList.Builder<>();
-                temp.getLabel().getSecond().forEach(slaveState -> newLabelSlaveStatesBuilder.add(slaveState.readLetter(letter)));
-                GDRA.State newState = addOrGet(new Pair<>(newLabelLTL, newLabelSlaveStatesBuilder.build()));
+                ImmutableList.Builder<SubAutomaton.State> newLabelSubStatesBuilder = new ImmutableList.Builder<>();
+                temp.getLabel().getSecond().forEach(subState -> newLabelSubStatesBuilder.add(subState.readLetter(letter)));
+                GDRA.State newState = addOrGet(new Pair<>(newLabelLTL, newLabelSubStatesBuilder.build()));
 
                 // if the states set already contains the newState then it already has been visited and expanded
                 if (!statesBuilder.build().contains(newState)) {
@@ -123,10 +123,10 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
 
                     formulaToRankMap.forEach((psi, rank) -> {
                         int rankForPsi = formulaToRankMap.get(psi);
-                        Slave ra = slaveFactory.createFrom(psi);
-                        // The acceptance sets of the Slave:
-                        Set<Slave.Transition> succeedAtRank = ra.succeed(rankForPsi, curlyG);
-                        Set<Slave.Transition> failMergeAtRank = ra.failMerge(rankForPsi, curlyG);
+                        SubAutomaton ra = subAutomatonFactory.createFrom(psi);
+                        // The acceptance sets of the SubAutomaton:
+                        Set<SubAutomaton.Transition> succeedAtRank = ra.succeed(rankForPsi, curlyG);
+                        Set<SubAutomaton.Transition> failMergeAtRank = ra.failMerge(rankForPsi, curlyG);
 
                         Pair<Pair<Integer, Set<G>>, Formula> keyForAccRCurlyGPsis = new Pair<>(new Pair<>(rankForPsi, curlyG), psi);
                         Pair<Set<GDRA.Transition>, Set<GDRA.Transition>> accRCurlyGPsi = accRCurlyGPsis.get(keyForAccRCurlyGPsis); // Acc_r^G (psi)
@@ -139,15 +139,15 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
                             accRCurlyG.add(accRCurlyGPsi);
                         }
 
-                        for (Slave.Transition slaveReachTransition : succeedAtRank) {
-                            if (slaveReachTransition.getLetter().equals(letter)
-                                    && tempTransition.getFrom().getLabel().getSecond().contains(slaveReachTransition.getFrom())) {
+                        for (SubAutomaton.Transition subAutomatonSuccTransition : succeedAtRank) {
+                            if (subAutomatonSuccTransition.getLetter().equals(letter)
+                                    && tempTransition.getFrom().getLabel().getSecond().contains(subAutomatonSuccTransition.getFrom())) {
                                 accRCurlyGPsi.getSecond().add(tempTransition);
                             }
                         }
-                        for (Slave.Transition slaveAvoidTransition : failMergeAtRank) {
-                            if (slaveAvoidTransition.getLetter().equals(letter)
-                                    && tempTransition.getFrom().getLabel().getSecond().contains(slaveAvoidTransition.getFrom())) {
+                        for (SubAutomaton.Transition subAutomatonAvoidTransition : failMergeAtRank) {
+                            if (subAutomatonAvoidTransition.getLetter().equals(letter)
+                                    && tempTransition.getFrom().getLabel().getSecond().contains(subAutomatonAvoidTransition.getFrom())) {
                                 accRCurlyGPsi.getFirst().add(tempTransition);
                             }
                         }
@@ -166,12 +166,12 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
 
             states.forEach(state -> {
                 List<Formula> conjunctList = new ArrayList<>();
-                state.getLabel().getSecond().forEach(slaveState -> {
-                    Formula psi = slaveState.getPsi();
+                state.getLabel().getSecond().forEach(subState -> {
+                    Formula psi = subState.getPsi();
                     if (curlyG.contains(new G(psi))) {
                         int rankForPsi = curlyGRanking.get(psi);
                         conjunctList.add(new G(psi));
-                        conjunctList.addAll(slaveState.succeedingFormulas(rankForPsi));
+                        conjunctList.addAll(subState.succeedingFormulas(rankForPsi));
                     }
                 });
 
@@ -189,7 +189,7 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
         return new GDRA(states, initialState, acc, alphabet);
     }
 
-    private GDRA.State addOrGet(Pair<PropEquivalenceClass, List<Slave.State>> label) {
+    private GDRA.State addOrGet(Pair<PropEquivalenceClass, List<SubAutomaton.State>> label) {
         GDRA.State result = existingStates.get(label);
         if (result == null) {
             result = new GDRA.State(label);

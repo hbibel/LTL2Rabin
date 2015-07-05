@@ -1,6 +1,5 @@
 package ltl2rabin;
 
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableSet;
 import ltl2rabin.LTL.PropEquivalenceClass;
 
@@ -10,7 +9,7 @@ import java.util.Set;
 /**
  * A <code>GDRA</code> object represents a generalized deterministic Rabin automaton.
  */
-public class GDRA extends RabinAutomaton<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> {
+public class GDRA extends RabinAutomaton<Pair<PropEquivalenceClass, List<SubAutomaton.State>>, Set<String>> {
     private final Set<Set<Pair<Set<Transition>, Set<Transition>>>> gdraCondition;
 
     /**
@@ -20,8 +19,8 @@ public class GDRA extends RabinAutomaton<Pair<PropEquivalenceClass, List<Slave.S
      * @param rabinCondition The set that represents the generalized rabin condition
      * @param alphabet The alphabet the automaton runs on
      */
-    public GDRA(ImmutableSet<? extends RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>>> states,
-                RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> initialState,
+    public GDRA(ImmutableSet<? extends RabinAutomaton.State<Pair<PropEquivalenceClass, List<SubAutomaton.State>>, Set<String>>> states,
+                RabinAutomaton.State<Pair<PropEquivalenceClass, List<SubAutomaton.State>>, Set<String>> initialState,
                 Set<Set<Pair<Set<Transition>, Set<Transition>>>> rabinCondition,
                 ImmutableSet<Set<String>> alphabet) {
         super(states, initialState, alphabet);
@@ -48,16 +47,16 @@ public class GDRA extends RabinAutomaton<Pair<PropEquivalenceClass, List<Slave.S
         return super.getAlphabet();
     }
 
-    public static class State extends RabinAutomaton.State<Pair<PropEquivalenceClass, List<Slave.State>>, Set<String>> {
+    public static class State extends RabinAutomaton.State<Pair<PropEquivalenceClass, List<SubAutomaton.State>>, Set<String>> {
         /**
          *
          * @param label The label consists of a <code>Pair</code> of<p>
          *              - The PropEquivalenceClass that is reached after reading a word <i>w</i> starting from the
          *                initial state<p>
-         *              - The List of <code>Slave.State</code>s that are reached after the <code>Slave</code>
+         *              - The List of <code>SubAutomaton.State</code>s that are reached after the <code>SubAutomaton</code>
          *                automatons also read the word <i>w</i>.
          */
-        public State(Pair<PropEquivalenceClass, List<Slave.State>> label) {
+        public State(Pair<PropEquivalenceClass, List<SubAutomaton.State>> label) {
             super(label);
         }
 

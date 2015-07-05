@@ -10,34 +10,34 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * A factory of this type will create Slaves (which are state rankings for Mojmir automatons) out of a given
+ * A factory of this type will create SubAutomata (which are state rankings for Mojmir automatons) out of a given
  * <code>MojmirAutomaton</code>.
  */
-public class SlaveFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomaton<PropEquivalenceClass, Set<String>>,
+public class SubAutomatonFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomaton<PropEquivalenceClass, Set<String>>,
         List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>,
         Set<String>> {
-    public SlaveFromMojmirFactory(ImmutableSet<Set<String>> alphabet) {
+    public SubAutomatonFromMojmirFactory(ImmutableSet<Set<String>> alphabet) {
         super(alphabet);
     }
 
     /**
      *
      * @param from    The Mojmir automaton whose states are to be ranked
-     * @return        The Slave, by definition 4.19 in the paper "From LTL to Deterministic Automata."
+     * @return        The SubAutomaton, by definition 4.19 in the paper "From LTL to Deterministic Automata."
      */
-    public Slave createFrom(MojmirAutomaton<PropEquivalenceClass, Set<String>> from) {
-        ListOrderedSet<Slave.State> states = new ListOrderedSet<>();
-        Slave.State initialState;
+    public SubAutomaton createFrom(MojmirAutomaton<PropEquivalenceClass, Set<String>> from) {
+        ListOrderedSet<SubAutomaton.State> states = new ListOrderedSet<>();
+        SubAutomaton.State initialState;
         int maxRank = 0;
 
         List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> initialStateRanking = new ArrayList<>(Collections.singletonList(from.getInitialState()));
-        initialState = new Slave.State(initialStateRanking, from.getInitialState().getLabel().getRepresentative());
+        initialState = new SubAutomaton.State(initialStateRanking, from.getInitialState().getLabel().getRepresentative());
         states.add(initialState);
 
-        ConcurrentLinkedQueue<Slave.State> queue = new ConcurrentLinkedQueue<>();
+        ConcurrentLinkedQueue<SubAutomaton.State> queue = new ConcurrentLinkedQueue<>();
         queue.add(initialState);
         while (!queue.isEmpty()) {
-            Slave.State tempState = queue.poll();
+            SubAutomaton.State tempState = queue.poll();
             if (tempState.getTransitions().size() != getAlphabet().size()) {
                 // tempState does not have transitions for any letter ==> tempState has not been visited before
                 List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>> tempStateRanking = tempState.getLabel();
@@ -50,7 +50,7 @@ public class SlaveFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomato
                             .distinct()
                             .filter(e -> !e.isSink())
                             .collect(Collectors.toList());
-                    Slave.State newState = new Slave.State(newStateRanking, from.getInitialState().getLabel().getRepresentative());
+                    SubAutomaton.State newState = new SubAutomaton.State(newStateRanking, from.getInitialState().getLabel().getRepresentative());
                     int indexOfExistingState = states.indexOf(newState);
                     if (indexOfExistingState != -1) {
                         newState = states.get(indexOfExistingState);
@@ -65,8 +65,8 @@ public class SlaveFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomato
                 maxRank = tempState.getLabel().size() - 1 > maxRank ? tempState.getLabel().size() - 1 : maxRank;
             }
         }
-        ImmutableSet<Slave.State> immutableStates = ImmutableSet.copyOf(states);
+        ImmutableSet<SubAutomaton.State> immutableStates = ImmutableSet.copyOf(states);
 
-        return new Slave(immutableStates, initialState, getAlphabet(), maxRank);
+        return new SubAutomaton(immutableStates, initialState, getAlphabet(), maxRank);
     }
 }
