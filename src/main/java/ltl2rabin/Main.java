@@ -86,7 +86,7 @@ public class Main {
             GDRA gdra = factory.createFrom(parserResult);
             try {
                 PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(outputFilename)));
-                out.print(HanoiFormat.toHOAFv1(gdra));
+                out.print(HanoiFormatStringFactory.toHOAFv1(gdra));
                 out.close();
             } catch (IOException e) {
                 e.printStackTrace();

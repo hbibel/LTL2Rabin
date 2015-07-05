@@ -16,9 +16,6 @@ import java.util.stream.Collectors;
  * This class creates objects that can create a <code>GDRA</code> out of the <code>Result</code> of an <code>LTLFactory</code>.
  */
 public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEquivalenceClass, List<SubAutomaton.State>>, Set<String>> {
-    // TODO: Remove this redundant data structure
-    private Map<Pair<PropEquivalenceClass, List<SubAutomaton.State>>,
-                GDRA.State> existingStates = new HashMap<>();
     // This map stores the acceptance pairs Acc_r^G (psi) for every combination of r, curlyG and psi.
     private Map<Pair<Pair<Integer, Set<G>>, Formula>, Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accRCurlyGPsis = new HashMap<>();
 
@@ -43,7 +40,7 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
         Formula phi = parserResult.getLtlFormula();
 
         Set<GDRA.Transition> univ = new HashSet<>(); // UNIV = Universe, all transitions in the automaton.
-        ImmutableSet.Builder<GDRA.State> statesBuilder = new ImmutableSet.Builder<>();
+        ImmutableMap.Builder<Pair<PropEquivalenceClass, List<SubAutomaton.State>>, GDRA.State> statesMapBuilder = new ImmutableMap.Builder<>();
         // This map stores an acceptance pair Acc_r^G (psi) for every combination of r, curlyG and psi.
         Map<Pair<Pair<Integer, Set<G>>, Formula>, Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accRCurlyGPsis = new HashMap<>();
         // This map stores all the Acc_r^G pairs for combinations of curlyG and r.
@@ -85,7 +82,7 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
         Pair<PropEquivalenceClass, List<SubAutomaton.State>> initialLabel
                 = new Pair<>(new PropEquivalenceClass(phi), initialLabelSubStatesBuilder.build());
         GDRA.State initialState = new GDRA.State(initialLabel);
-        statesBuilder.add(initialState);
+        statesMapBuilder.put(initialLabel, initialState);
 
         // Generate all other states:
         Queue<GDRA.State> statesToBeExpanded = new ConcurrentLinkedQueue<>();
@@ -105,12 +102,14 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
                 PropEquivalenceClass newLabelLTL = new PropEquivalenceClass(afVisitor.afG(temp.getLabel().getFirst().getRepresentative()));
                 ImmutableList.Builder<SubAutomaton.State> newLabelSubStatesBuilder = new ImmutableList.Builder<>();
                 temp.getLabel().getSecond().forEach(subState -> newLabelSubStatesBuilder.add(subState.readLetter(letter)));
-                GDRA.State newState = addOrGet(new Pair<>(newLabelLTL, newLabelSubStatesBuilder.build()));
-
-                // if the states set already contains the newState then it already has been visited and expanded
-                if (!statesBuilder.build().contains(newState)) {
+                final Pair<PropEquivalenceClass, List<SubAutomaton.State>> newLabel = new Pair<>(newLabelLTL, newLabelSubStatesBuilder.build());
+                // Get the state from the existing state map. If it does not exist yet, create it.
+                GDRA.State newState = statesMapBuilder.build().get(newLabel);
+                if (null == newState) {
+                    newState = new GDRA.State(newLabel);
+                    statesMapBuilder.put(newLabel, newState);
+                    // if the states map did not contain the newState then enqueue it to visit and expand it later
                     statesToBeExpanded.offer(newState);
-                    statesBuilder.add(newState);
                 }
                 temp.setTransition(letter, newState);
 
@@ -156,7 +155,7 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
 
             }
         }
-        ImmutableSet<GDRA.State> states = statesBuilder.build();
+        ImmutableSet<GDRA.State> states = ImmutableSet.copyOf(statesMapBuilder.build().values());
 
         // Now that all states and transitions have been generated, we can construct M_r^curlyG:
         curlyGRanks.forEach(curlyGRanking -> {
@@ -187,14 +186,5 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
         // Finally "convert" the map into an immutable set.
         ImmutableSet<Set<Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>>> acc = ImmutableSet.copyOf(curlyGRankToAccMap.values());
         return new GDRA(states, initialState, acc, alphabet);
-    }
-
-    private GDRA.State addOrGet(Pair<PropEquivalenceClass, List<SubAutomaton.State>> label) {
-        GDRA.State result = existingStates.get(label);
-        if (result == null) {
-            result = new GDRA.State(label);
-            existingStates.put(label, result);
-        }
-        return result;
     }
 }

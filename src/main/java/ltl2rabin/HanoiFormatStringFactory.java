@@ -11,7 +11,7 @@ import java.util.*;
  * For details about the hoaf, see https://github.com/adl/hoaf
  * THIS CLASS IS UNTESTED AND NOT ON PRODUCTION LEVEL
  */
-public class HanoiFormat {
+public class HanoiFormatStringFactory {
     @SuppressWarnings("suspicious")
     public static String toHOAFv1(GDRA gdra) {
         StringBuilder resultBuilder = new StringBuilder();
