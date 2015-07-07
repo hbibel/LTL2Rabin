@@ -1,3 +1,15 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.9.+'
+        classpath files('libs/gradle-witness.jar')
+    }
+}
+
+apply plugin: 'witness'
+
 apply plugin: 'java'
 apply plugin: 'antlr'
 
@@ -7,7 +19,6 @@ version = '0.0'
 repositories {
     mavenCentral()
 }
-
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     antlr "org.antlr:antlr4:4.5"
@@ -17,6 +28,24 @@ dependencies {
     compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.0'
     compile group: 'org.mockito', name: 'mockito-core', version: '1.9.5'
     compile group: 'commons-cli', name: 'commons-cli', version: '1.3.1'
+}
+
+dependencyVerification {
+    verify = [
+        'org.antlr:antlr4:768ee2ddeb36a4fe6434c805a13c95238d4b6413e52f771ed2678a18418e30d9',
+        'com.google.guava:guava:d664fbfc03d2e5ce9cab2a44fb01f1d0bf9dfebeccc1a473b1f9ea31f79f6f99',
+        'org.apache.commons:commons-lang3:6b81d10754dadf184d386011486e6509c2cc0c3d33565ced4fb4402b9413d47d',
+        'net.sf.jbddi:jbddi-core:9905e085c216b87aaadc3ea108cdea89fa780beeae8770614d36e7da2edcbd90',
+        'org.apache.commons:commons-collections4:93f8dfcd20831a28d092427723f696bceb70b28e7fb89d7914f14d5ea492ce5a',
+        'org.mockito:mockito-core:f97483ba0944b9fa133aa29638764ddbeadb51ec3dbc02074c58fa2caecd07fa',
+        'commons-cli:commons-cli:3a2f057041aa6a8813f5b59b695f726c5e85014a703d208d7e1689098e92d8c0',
+        'org.antlr:antlr4-runtime:b5c40d55abe6ea4c5614f8f11e8372d98434ed3c1128d58b8eea1db9559737ab',
+        'org.antlr:antlr-runtime:ce3fc8ecb10f39e9a3cddcbb2ce350d272d9cd3d0b1e18e6fe73c3b9389c8734',
+        'org.antlr:ST4:58caabc40c9f74b0b5993fd868e0f64a50c0759094e6a251aaafad98edfc7a3b',
+        'org.hamcrest:hamcrest-core:0361d1493ff0d94f861359efea91200720635072134792efb7217f6e09d5cffb',
+        'org.objenesis:objenesis:c5694b55d92527479382f254199b3c6b1d8780f652ad61e9ca59919887f491a8',
+        'org.abego.treelayout:org.abego.treelayout.core:82b9e3631acc708c115216fa78f97780d8a81dbb7f15f8d82291a1dc3a83b1d0',
+    ]
 }
 
 jar {
