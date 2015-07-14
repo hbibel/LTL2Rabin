@@ -10,8 +10,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * A factory of this type will create SubAutomata (which are state rankings for Mojmir automatons) out of a given
- * <code>MojmirAutomaton</code>.
+ * A factory of this type will create a {@link SubAutomaton} (which is a state ranking for a Mojmir automatons) out of
+ * a given {@link MojmirAutomaton}. Once constructed, every generated automaton will be put into a cache, so
+ * creating a SubAutomaton several times from the same {@link MojmirAutomaton} will be efficient.
  */
 public class SubAutomatonFromMojmirFactory extends RabinAutomatonFactory<MojmirAutomaton<PropEquivalenceClass, Set<String>>,
         List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>,
@@ -21,6 +22,10 @@ public class SubAutomatonFromMojmirFactory extends RabinAutomatonFactory<MojmirA
     }
 
     /**
+     * This method will return a {@link SubAutomaton} whose states are state rankings for the given
+     * {@link MojmirAutomaton}.
+     *
+     * <p><b>Note:</b> The result is <i>not</i> cached. Maybe it will be in later versions.
      *
      * @param from    The Mojmir automaton whose states are to be ranked
      * @return        The SubAutomaton, by definition 4.19 in the paper "From LTL to Deterministic Automata."

@@ -7,9 +7,14 @@ import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * This class is the base class for Factories that create <code>MojmirAutomaton</code> objects. It provides the
- * <code>reach()</code> method that explores the state space from a given initial state
- * @param <F> The type of object that is used to create a <code>MojmirAutomaton</code>.
+ * This class is the base class for Factories that create {@link MojmirAutomaton} objects. It provides the
+ * {@link #reach(MojmirAutomaton.State, Set)} method that explores the state space from a given initial state.
+ *
+ * <p>This class does not necessarily create <b>new</b> instances of {@link MojmirAutomaton}. Any {@link MojmirAutomaton}
+ * created by this class will get cached and retrieved again, if the {@link #createFrom(Object)} method
+ * is called again with the same parameters.
+ *
+ * @param <F> The type of object that is used to create a {@link MojmirAutomaton}.
  */
 public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, PropEquivalenceClass, Set<String>> {
     private static HashMap<Formula, MojmirAutomaton<PropEquivalenceClass, Set<String>>> mojmirAutomata = new HashMap<>();
@@ -32,6 +37,7 @@ public abstract class MojmirAutomatonFactory<F> extends AutomatonFactory<F, Prop
     /**
      * This method creates a complete state set starting from an initial state by reading all possible letters from any
      * possible state.
+     *
      * @param initialState    The initial state, labelled with a <code>PropEquivalenceClass</code> that is the starting
      *                        point for the unfolding of all possible formulas.
      * @param alphabet        The alphabet used for the construction. All states in the result will have transitions

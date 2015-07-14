@@ -1,6 +1,5 @@
 package ltl2rabin;
 
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -13,14 +12,27 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 /**
- * This class creates objects that can create a <code>GDRA</code> out of the <code>Result</code> of an <code>LTLFactory</code>.
+ * A <code>GDRAFactory</code> can create a {@link GDRA} out of the {@link ltl2rabin.LTL.LTLFactory.Result} of an
+ * {@link ltl2rabin.LTL.LTLFactory}. A GDRA represents a Generalized Deterministic Rabin Automaton. The construction
+ * used by the {@link #createFrom(LTLFactory.Result)} method was introduced in the paper "From LTL to
+ * Deterministic Automata -- A Safraless Compositional Approach" by Javier Esparza et al. This implementation of this
+ * algorithm is explained in the Bachelor's Thesis "Deterministic &omega;-Automata for LTL: An efficient and scalable
+ * implementation" by Hannes Bibel.
+ *
+ * <p>The creation of a GDRA can take minutes, hours, or even days, so be patient. If the computation takes long,
+ * it might not be an error, but the result might simply be huge.
+ *
+ * <p>This class is a subclass of the {@link AutomatonFactory} class. It doesn't inherit any actual functionality
+ * though.
  */
 public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEquivalenceClass, List<SubAutomaton.State>>, Set<String>> {
     // This map stores the acceptance pairs Acc_r^G (psi) for every combination of r, curlyG and psi.
     private Map<Pair<Pair<Integer, Set<G>>, Formula>, Pair<Set<GDRA.Transition>, Set<GDRA.Transition>>> accRCurlyGPsis = new HashMap<>();
 
     /**
-     * Create a GDRAFactory with <code>new GDRAFactory(ImmutableSet.of())</code>
+     * Creates a new <code>GDRAFactory</code> while ignoring the <code>alphabet</code> parameter.
+     * The best way to create a <code>GDRAFactory</code> is with <code>new GDRAFactory(ImmutableSet.of())</code>. The
+     * parameter only exists because this method is inherited by the abstract {@link AutomatonFactory} class.
      *
      * @param alphabet This parameter only exists for reasons of conformity with the base class
      *                 <code>AutomatonFactory</code>. It is ignored and never used.
@@ -29,6 +41,14 @@ public class GDRAFactory extends AutomatonFactory<LTLFactory.Result, Pair<PropEq
         super(alphabet);
     }
 
+    /**
+     * This method returns a {@link GDRA} (Generalized Deterministic Rabin Automaton). It computes the set of states,
+     * the transitions and the acceptance sets.
+     * @param parserResult The formula (phi), alphabet (sigma) and the set of G-subformulas that the method needs to
+     *                     create a GDRA. An {@link ltl2rabin.LTL.LTLFactory.Result} is produced by any
+     *                     {@link LTLFactory}, for example an {@link LTLFactoryFromString}.
+     * @return A complete {@link GDRA}, generated from the {@link Formula} given in the input.
+     */
     public GDRA createFrom(LTLFactory.Result parserResult) {
         ImmutableSet<Set<String>> alphabet = ImmutableSet.copyOf(parserResult.getAlphabet());
         SubAutomatonFromFormulaFactory subAutomatonFactory = new SubAutomatonFromFormulaFactory(alphabet);

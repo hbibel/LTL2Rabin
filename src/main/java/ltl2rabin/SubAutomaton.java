@@ -15,14 +15,20 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
- * SubAutomata are Rabin automata that are constructed for a G-subformula. States of GDRAs have a collection of SubAutomaton states.
- * SubAutomata provide the GDRA with valuable information that is used to construct the acceptance condition of the GDRA.
- * A <code>SubAutomaton.State</code> represents a ranking of <code>MojmirAutomaton.State</code>s. The <code>failMerge</code>
- * and <code>succeed</code> methods generate the acceptance sets for a given rank and set of G-subformulas.
+ * SubAutomata are Rabin automata that are constructed for a G-subformula. A {@link ltl2rabin.GDRA.State} has a
+ * collection of {@link ltl2rabin.SubAutomaton.State}s. SubAutomata provide the GDRA with valuable information that is
+ * used to construct the acceptance condition of the GDRA. A {@link ltl2rabin.SubAutomaton.State} represents a ranking
+ * of {@link ltl2rabin.MojmirAutomaton.State}s.
+ *
+ * <p>The {@link #failMerge(int, Set)} and {@link #succeed(int, Set)}
+ * methods generate the acceptance sets for a given rank and set of G-subformulas. Unlike for
+ * {@link MojmirAutomaton}s, acceptance is defined for transitions, not states.
+ *
+ * @see ltl2rabin.Automaton
  */
 public class SubAutomaton extends RabinAutomaton<List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>, Set<String>> {
     private final int maxRank;
-    // computing caches for the (expensive to create) acceptance sets by Guava:
+    // computing caches for the (expensive to create) acceptance sets:
     private final CacheLoader<Pair<Integer, Set<G>>, ImmutableSet<Transition>> failMergeLoader =
             new CacheLoader<Pair<Integer, Set<G>>, ImmutableSet<Transition>>() {
                 @Override
@@ -44,6 +50,17 @@ public class SubAutomaton extends RabinAutomaton<List<MojmirAutomaton.State<Prop
             CacheBuilder.newBuilder()
                     .build(succeedLoader);
 
+    /**
+     * Once initialized, these fields can not be modified.
+     *
+     * @param states          The set of {@link ltl2rabin.SubAutomaton.State}s
+     * @param initialState    The initial {@link ltl2rabin.SubAutomaton.State}, labelled with the initial state
+     *                        of the corresponding {@link MojmirAutomaton}.
+     * @param alphabet        The alphabet that was used to construct this automaton.
+     * @param maxRank         The maximum rank for any {@link ltl2rabin.MojmirAutomaton.State} in any
+     *                        {@link ltl2rabin.SubAutomaton.State}. I.e. the length of the longest list any
+     *                        {@link ltl2rabin.SubAutomaton.State} in this automaton is labelled with.
+     */
     public SubAutomaton(ImmutableSet<State> states,
                         State initialState,
                         ImmutableSet<Set<String>> alphabet,
@@ -53,7 +70,7 @@ public class SubAutomaton extends RabinAutomaton<List<MojmirAutomaton.State<Prop
     }
 
     /**
-     * @return The maximum rank for any Mojmir automaton state in any of the SubAutomaton automaton states.
+     * @return The maximum rank for any {@link ltl2rabin.MojmirAutomaton.State} in any {@link ltl2rabin.SubAutomaton.State}
      */
     public int getMaxRank() {
         return maxRank;
@@ -78,6 +95,7 @@ public class SubAutomaton extends RabinAutomaton<List<MojmirAutomaton.State<Prop
     /**
      * This method returns the combination of fail and merge(i) for a given rank i and a set of G subformulas. It makes
      * use of computing caches, so the first call will be the (by far) most expensive.
+     *
      * @param rank      The requested merging rank
      * @param curlyG    The set of G subformulas that hold
      * @return The union of fail and merge(i)
@@ -146,6 +164,7 @@ public class SubAutomaton extends RabinAutomaton<List<MojmirAutomaton.State<Prop
     /**
      * This method returns the set of succeeding transitions for a given rank i and a set of G subformulas. It makes
      * use of computing caches, so the first call will be the (by far) most expensive.
+     *
      * @param rank      The rank the transitions succeed at
      * @param curlyG    The set of G subformulas that hold
      * @return The set of succeeding transitions
@@ -182,7 +201,15 @@ public class SubAutomaton extends RabinAutomaton<List<MojmirAutomaton.State<Prop
         return resultBuilder.build();
     }
 
+    /**
+     * A {@link ltl2rabin.SubAutomaton.State} is labelled with a <code>List</code> of
+     * {@link ltl2rabin.MojmirAutomaton.State}s. This list represents their ranking.
+     * The ranks go from 0 to list size - 1.
+     *
+     * @see ltl2rabin.Automaton.State
+     */
     public static class State extends RabinAutomaton.State<List<MojmirAutomaton.State<PropEquivalenceClass, Set<String>>>, Set<String>> {
+        // The subformula the automaton was constructed from
         private final Formula psi;
 
         /**
@@ -205,9 +232,10 @@ public class SubAutomaton extends RabinAutomaton<List<MojmirAutomaton.State<Prop
         }
 
         /**
-         * Returns a list of formulas that are labels of <code>MojmirAutomaton.State</code>s that have a rank greater
+         * Returns a list of {@link Formula} that are labels of <code>MojmirAutomaton.State</code>s that have a rank greater
          * or equal <code>r</code>. For an explanation of the name, see Def. 6.10 in the paper
-         * "From LTL to Deterministic Automata."
+         * "From LTL to Deterministic Automata -- A Safraless Compositional Approach" by Javier Esparza, Jan Kretinsky and Salomon Sickert.
+         *
          * @param r The formulas that are returned will have a rank greater or equal to <code>r</code>.
          * @return The list of formulas ranked <code>r</code> or higher. The elements in this list all are distinct, due
          *         to the construction of SubAutomaton automata.
@@ -223,12 +251,18 @@ public class SubAutomaton extends RabinAutomaton<List<MojmirAutomaton.State<Prop
             return conjunctionListBuilder.build();
         }
 
+        /**
+         * {@link ltl2rabin.Automaton.State#readLetter(Object) See here.}
+         */
         @Override
         public State readLetter(Set<String> letter) {
             return (State) super.readLetter(letter);
         }
     }
 
+    /**
+     * @see ltl2rabin.Automaton.Transition
+     */
     public static class Transition extends Automaton.Transition<State, Set<String>> {
 
         protected Transition(State from, Set<String> letter, State to) {

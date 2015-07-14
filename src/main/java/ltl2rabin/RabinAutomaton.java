@@ -4,9 +4,10 @@ import com.google.common.collect.ImmutableSet;
 
 import java.util.*;
 
-/**
+/*
  * Base class for Rabin Automata. Seems unnecessary, since it does not provide anything more of value than
- * the <code>Automaton</code> class. Thus, this class can be removed.
+ * the Automaton class. Thus, this class can be removed in the next refactoring.
+ *
  * @param <T> The type of the object that States are labelled with.
  * @param <U> Letters are of this type.
  */

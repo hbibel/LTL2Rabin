@@ -5,7 +5,8 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 
 /**
- * The abstract base class for all factories that build <code>Automaton</code>s.
+ * The abstract base class for all factories that build <code>Automaton</code> objects.
+ *
  * @param <F> The type of object that is used to create the Automaton from.
  * @param <A> The type of information the automaton is associated with. States of the resulting automaton are labelled
  *            with objects of this type.

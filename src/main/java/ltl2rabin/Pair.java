@@ -3,7 +3,8 @@ package ltl2rabin;
 import java.util.Objects;
 
 /**
- * A 2-tuple
+ * A 2-tuple. All methods should be self-explanatory.
+ *
  * @param <F>    Type of the first object (arbitrary).
  * @param <S>    Type of the second object (arbitrary).
  */
