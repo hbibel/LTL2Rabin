@@ -14,6 +14,7 @@ package ltl2rabin;
 import ltl2rabin.LTL.*;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ public class Main {
          * org.apache.commons.cli package since it follows the POSIX Program Argument Syntax Conventions and also it
          * makes life easier. Unfortunately, it is not compatible with the argument format used by Rabinizer 3.1,
          * so for now we stick to handling arguments as a List. */
-        List<String> argList = Arrays.asList(args);
+        List<String> argList = new ArrayList<>(Arrays.asList(args));
 
         String helpMessage = "usage: java -jar LTL2Rabin.jar [options] [<filename>/<formula>]\n" +
                 " -h,--help     Display this help message.\n" +
