@@ -53,7 +53,7 @@ public class Main {
         }
 
         if (argList.contains("--version") || argList.contains("-v")) {
-            System.out.println("This is LTL2Rabin version \n" + Main.class.getPackage().getImplementationVersion());
+            System.out.println("This is LTL2Rabin version 0.9\n"); // Consider updating the version number automatically
             return;
         }
 

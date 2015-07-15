@@ -14,6 +14,7 @@ apply plugin: 'java'
 apply plugin: 'antlr'
 
 sourceCompatibility = 1.8
+// If you change this version, please also change it also in src/main/java/ltl2rabin/Main.java or automate it.
 version = '0.9'
 
 repositories {
@@ -52,7 +53,9 @@ dependencyVerification {
 // This method builds a 'lean' jar without dependencies
 jar {
     manifest {
-        attributes 'Main-Class': 'ltl2rabin.Main'
+        attributes("Main-Class": "ltl2rabin.Main",
+                   "Implementation-Title": "LTL2Rabin",
+                   "Implementation-Version": version) // This line seems to do nothing.
     }
 }
 
@@ -60,7 +63,9 @@ jar {
 task fatJar(type: Jar) {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     manifest {
-        attributes 'Main-Class': 'ltl2rabin.Main'
+        attributes("Main-Class": "ltl2rabin.Main",
+                   "Implementation-Title": "LTL2Rabin",
+                   "Implementation-Version": version)
     }
     with jar
 }
