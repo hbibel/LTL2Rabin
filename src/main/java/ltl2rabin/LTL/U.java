@@ -3,7 +3,8 @@ package ltl2rabin.LTL;
 import java.util.Objects;
 
 /**
- * This class represents the U (until) operator in an LTL formula.
+ * This class represents the U (until) operator in an LTL formula. It is a binary operator and thus contains
+ * references to exactly two operands.
  */
 public class U extends Formula {
     private final Formula left;
@@ -19,10 +20,16 @@ public class U extends Formula {
         this.right = right;
     }
 
+    /**
+     * @return The left operand of the U operator, i.e. "what happens before". For <i>a U b</i>, this would be <i>a</i>.
+     */
     public Formula getLeft() {
         return left;
     }
 
+    /**
+     * @return The operand right of the U operator. For <i>a U b</i>, this would be <i>b</i>.
+     */
     public Formula getRight() {
         return right;
     }
@@ -46,11 +53,23 @@ public class U extends Formula {
         return builder.toString();
     }
 
+    /**
+     * Accept a visitor. See for example {@link LTLAfGVisitor}.
+     * @param visitor    An object implementing the IVisitor interface.
+     * @return           Whatever the visitor does.
+     */
     @Override
     public Formula accept(IVisitor<Formula> visitor) {
         return visitor.visit(this);
     }
 
+    /**
+     * Tests for structural equivalence. Both operands have to be structurally equivalent for this method to return
+     * true.
+     *
+     * @param obj    The object this is compared to.
+     * @return True, if the objects are structurally equivalent. False otherwise.
+     */
     @Override
     public boolean equals(Object obj) {
         return (obj.getClass() == this.getClass())

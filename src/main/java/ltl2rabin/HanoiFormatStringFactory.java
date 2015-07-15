@@ -9,7 +9,8 @@ import java.util.*;
 /**
  * This class provides static functions that convert Automata to Strings in the Hanoi Omega Automaton Format (hoaf).
  * For details about the hoaf, see https://github.com/adl/hoaf
- * THIS CLASS IS UNTESTED, VERY LIKELY TO CONTAIN BUGS AND IS NOT ON PRODUCTION LEVEL
+ *
+ * <p>THIS CLASS IS UNTESTED, VERY LIKELY TO CONTAIN BUGS AND IS NOT ON PRODUCTION LEVEL
  */
 public class HanoiFormatStringFactory {
     @SuppressWarnings("suspicious")

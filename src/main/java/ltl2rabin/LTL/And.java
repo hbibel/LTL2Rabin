@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * This class represents a logical conjunction (&amp;) in an LTL formula.
+ * This class represents a logical conjunction (&amp;) of an arbitrary list of {@link Formula}s.
  */
 public class And extends Formula {
     private final List<Formula> operands;
@@ -36,7 +36,7 @@ public class And extends Formula {
     }
 
     /**
-     * Use this method to iterate over the operands.
+     * Use this method to get the iterator over the operands.
      *
      * @return The iterator over all operands
      */
@@ -44,6 +44,11 @@ public class And extends Formula {
         return operands.iterator();
     }
 
+    /**
+     * Accept a visitor. See for example {@link LTLAfGVisitor}.
+     * @param visitor    An object implementing the IVisitor interface.
+     * @return           Whatever the visitor does.
+     */
     @Override
     public Formula accept(IVisitor<Formula> visitor) {
         return visitor.visit(this);
@@ -111,8 +116,10 @@ public class And extends Formula {
 
     /**
      * This method tests for structural equivalence. For example, a &amp; b is NOT structurally equivalent to b &amp; a.
-     * @param o If this is not of type And, the result is false
-     * @return Equivalence of this and o.
+     * Two <code>And</code> objects have to contain structurally equivalent operands, in the same order, to be
+     * considered equal.
+     *
+     * @return Structural equivalence of this and o.
      */
     @Override
     public boolean equals(Object o) {

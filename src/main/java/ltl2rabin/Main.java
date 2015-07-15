@@ -53,7 +53,8 @@ public class Main {
         }
 
         if (argList.contains("--version") || argList.contains("-v")) {
-            System.out.println("This is LTL2Rabin version 0.9\n");
+            System.out.println("This is LTL2Rabin version \n" + Main.class.getPackage().getImplementationVersion());
+            return;
         }
 
         boolean fileOutput = true;
@@ -75,6 +76,7 @@ public class Main {
             else {
                 System.out.println("Sorry, I could not find a file named " + fileName + "\n");
                 System.out.println(helpMessage);
+                return;
             }
         }
         else {

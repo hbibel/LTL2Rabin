@@ -1,0 +1,27 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+  <HEAD>
+    <TITLE>LTL2Rabin</TITLE>
+  </HEAD>
+  <BODY>
+  This is LTL2Rabin, a tool that generates a generalized deterministic rabin automaton from an LTL formula. It is
+  released under the <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache 2.0 license</a>.
+
+  <p>The main class is {@link ltl2rabin.Main}. The class that contains the core functionality, the computation of
+      the GDRA, is the {@link ltl2rabin.GDRAFactory} class.
+
+  <p>We distinguish between {@link ltl2rabin.LTL.Formula}, which has limited functionality, and
+      {@link ltl2rabin.LTL.PropEquivalenceClass}, which defines the behaviour for propositionally equivalent sets
+      of formulas.
+
+  <p>This picture gives an overview over the construction:
+
+  <p><img src="resources/overview.png" height="687" width="579"/>
+  <p>The input is handled by {@link ltl2rabin.Main}. The parsing is handled by an {@link ltl2rabin.LTL.LTLFactory}.
+      A {@link ltl2rabin.MojmirAutomaton} is constructed by a {@link ltl2rabin.MojmirAutomatonFactory}.
+      A {@link ltl2rabin.SubAutomaton} is constructed by a {@link ltl2rabin.SubAutomatonFromMojmirFactory} or a
+      {@link ltl2rabin.SubAutomatonFromFormulaFactory}. The Master Transition System, the product and the
+      acceptance conditions are computed by a {@link ltl2rabin.GDRAFactory}.
+  </BODY>
+</HTML>
+

@@ -22,6 +22,7 @@ public class PropEquivalenceClass {
     /**
      * A PropEquivalenceClass wraps a Formula into a propositional equivalence class. Two propositional equivalence
      * classes are considered equal if their representatives are propositionally equivalent.
+     *
      * @param representative The formula that represents the class. For example, "a &amp; b" can serve as a representative
      *                       for "a &amp; b &amp; a", "b &amp; a", "a &amp; b | ff", ... since they all are propositionally equivalent.
      */
@@ -47,6 +48,7 @@ public class PropEquivalenceClass {
         return cachedBDD.imp(other.cachedBDD).isOne();
     }
 
+    // See if a BDD for the formula already exists in the bdd cache.
     private static BDD getOrCreateBDD(final Formula formula) {
         BDD result = formulaBDDMap.get(formula);
         if (result != null) {
@@ -105,6 +107,15 @@ public class PropEquivalenceClass {
         return cachedBDD.isOne();
     }
 
+    /**
+     * Tests for propositional equivalence of two equivalence classes. For LTL-specific operators, only
+     * structural equivalence is considered. Examples:
+     *
+     * <p>- <i>a &amp; b</i> = b &amp; a
+     * <p>- <i>F (a U (X b))</i> = <i>F (a U (X b))</i>
+     * <p>- <i>F (a &amp; b) != F (b &amp; a)</i>
+     *
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -131,6 +142,8 @@ public class PropEquivalenceClass {
      * </pre>
      * This information has little to no value to the user of this tool here, so the output of the bddFactory will be
      * redirected into this black hole where it never can get out from.
+     *
+     * <p>To suppress the output, use {@link PropEquivalenceClass#suppressBDDOutput()}.
      */
     public static class BlackHole {
         public void eatEverything() {}

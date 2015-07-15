@@ -100,6 +100,11 @@ public class Or extends Formula {
         return builder.toString();
     }
 
+    /**
+     * Accept a visitor. See for example {@link LTLAfGVisitor}.
+     * @param visitor    An object implementing the IVisitor interface.
+     * @return           Whatever the visitor does.
+     */
     @Override
     public Formula accept(IVisitor<Formula> visitor) {
         return visitor.visit(this);

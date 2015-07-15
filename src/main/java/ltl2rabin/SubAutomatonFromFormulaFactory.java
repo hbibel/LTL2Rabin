@@ -48,10 +48,22 @@ public class SubAutomatonFromFormulaFactory extends RabinAutomatonFactory<Formul
         return result;
     }
 
+    /**
+     * Puts a constructed automaton into the cache. A {@link SubAutomaton} is identified by the formula <i>psi</i>
+     *
+     * @param psi             The formula the automaton accepts
+     * @param subAutomaton    The {@link SubAutomaton} constructed by a factory.
+     */
     protected static void putIntoCache(Formula psi, SubAutomaton subAutomaton) {
         subAutomata.put(psi, subAutomaton);
     }
 
+    /**
+     * Looks for a previously constructed automaton for psi
+     *
+     * @param psi The formula the automaton has been constructed from.
+     * @return An automaton accepting <i>psi</i>, if it has been constructed before. Null otherwise.
+     */
     protected static SubAutomaton getFromCache(Formula psi) {
         return subAutomata.get(psi);
     }
