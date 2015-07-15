@@ -11,4 +11,4 @@ java -jar LTL2Rabin.jar -h
 ```
 to see a description of the command line arguments.
 
-To view the API documentation generated with *javadocs*, go [here](https://github.com/hbibel/LTL2Rabin)
+To view the API documentation generated with *javadocs*, go [here](http://hbibel.github.io/LTL2Rabin/)
